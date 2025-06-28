@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { UserCircle, Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
 import NavigationHeader from '../components/common/NavigationHeader';
@@ -6,10 +6,12 @@ import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply, { QuickReplyOption } from '../components/ui/QuickReply';
 import { useChat } from '../hooks/useChat';
+import { useTheme } from '../hooks/useTheme';
 
 function MainPage() {
-  const { t } = useLocale();
-  const [showQuickReplies, setShowQuickReplies] = useState(true);
+  const { t, isLoading } = useLocale();
+  const { accentColor, colors } = useTheme();
+  const isInitialized = useRef(false);
 
   const {
     messages,
@@ -23,44 +25,55 @@ function MainPage() {
     completeTyping,
     addWelcomeMessage
   } = useChat({
-    userId: 'guest-' + Date.now(), // 게스트 사용자 ID
+    userId: 'Hyunse0001', // 실제 사용자 ID
     onError: (error) => {
       console.error('Chat error:', error);
     }
   });
 
   useEffect(() => {
-    const welcomeMessage = t('chat.greeting');
-    addWelcomeMessage(welcomeMessage);
-  }, [t, addWelcomeMessage]);
+    // 번역이 로드되고 초기화가 아직 되지 않았을 때만 welcome 메시지 추가
+    if (!isLoading && !isInitialized.current) {
+      const welcomeMessage = t('chat.greeting');
+      addWelcomeMessage(welcomeMessage);
+      isInitialized.current = true;
+    }
+  }, [t, addWelcomeMessage, isLoading]);
 
   const handleQuickReplyClick = async (reply: QuickReplyOption) => {
     const translatedValue = t(reply.valueKey);
     setNewMessage(translatedValue);
-    setShowQuickReplies(false);
     await handleSendMessage(translatedValue);
   };
 
   const handleSendClick = async () => {
-    if (showQuickReplies) {
-      setShowQuickReplies(false);
-    }
     await handleSendMessage();
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <NavigationHeader title={t('common.home')} />
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-white">
+        <div className="flex items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-orange-500" />
+          <span className="text-gray-600">Loading...</span>
+        </div>
+      </div>
+    );
+  }
 
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50">
+  return (
+    <div className="h-screen flex flex-col bg-white overflow-hidden">
+      <NavigationHeader title={t('common.home')} accentColor={accentColor} />
+
+      <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-4">
-            <div className="bg-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border border-blue-100">
-              <UserCircle className="w-5 h-5 text-blue-600" />
+            <div className={`bg-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
+              <UserCircle className={`w-5 h-5 ${colors.text}`} />
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">
-                {t('chat.greeting')}
+                {t('chat.welcomeGreeting')}
               </h1>
               <p className="text-sm text-gray-600">
                 {t('chat.welcomeMessage')}
@@ -70,15 +83,26 @@ function MainPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col bg-gray-50">
+      <div className="flex-1 flex flex-col bg-gray-50 min-h-0">
         <div className="flex-1 overflow-hidden">
           <div 
             ref={chatContainerRef}
-            className="h-full overflow-y-auto"
+            className="h-full overflow-y-auto pb-4"
           >
             <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-              {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
+              {messages.map((message, index) => (
+                <div key={message.id}>
+                  <ChatMessage message={message} accentColor={accentColor} />
+                  {/* 첫 번째 메시지 (봇의 인사) 다음에 QuickReply 표시 */}
+                  {index === 0 && message.type === 'bot' && (
+                    <div className="mt-4">
+                      <QuickReply 
+                        onReplyClick={handleQuickReplyClick}
+                        show={true}
+                      />
+                    </div>
+                  )}
+                </div>
               ))}
               
               {currentlyTyping && (
@@ -91,12 +115,13 @@ function MainPage() {
                   }}
                   isTyping={true}
                   onTypingComplete={completeTyping}
+                  accentColor={accentColor}
                 />
               )}
               
               {isTyping && !currentlyTyping && (
                 <div className="flex items-start gap-3">
-                  <div className="bg-blue-500 text-white p-2 rounded-full flex-shrink-0">
+                  <div className={`bg-${accentColor}-500 text-white p-2 rounded-full flex-shrink-0`}>
                     <Loader2 className="w-4 h-4 animate-spin" />
                   </div>
                   <div className="bg-gray-100 text-gray-800 p-3 rounded-2xl rounded-bl-sm">
@@ -113,17 +138,14 @@ function MainPage() {
           </div>
         </div>
 
-        <QuickReply 
-          onReplyClick={handleQuickReplyClick}
-          show={showQuickReplies}
-        />
-
-        <ChatInput
-          value={newMessage}
-          onChange={setNewMessage}
-          onSend={handleSendClick}
-          disabled={isTyping}
-        />
+        <div className="flex-shrink-0">
+          <ChatInput
+            value={newMessage}
+            onChange={setNewMessage}
+            onSend={handleSendClick}
+            disabled={isTyping}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,21 +1,24 @@
-import React from 'react';
 import { Bot, UserIcon } from 'lucide-react';
 import TypewriterText from './TypewriterText';
 import type { Message } from '../../types';
+import { AccentColor } from '../../utils/theme';
+import { useLocale } from '../../contexts/LocaleContext';
 
 interface ChatMessageProps {
   message: Message;
   isTyping?: boolean;
   onTypingComplete?: () => void;
+  accentColor?: AccentColor;
 }
 
-export default function ChatMessage({ message, isTyping = false, onTypingComplete }: ChatMessageProps) {
+export default function ChatMessage({ message, isTyping = false, onTypingComplete, accentColor = 'orange' }: ChatMessageProps) {
+  const { locale } = useLocale();
   const isBot = message.type === 'bot';
 
   return (
     <div className={`flex items-start gap-3 ${isBot ? '' : 'justify-end'}`}>
       {isBot && (
-        <div className="bg-blue-500 text-white p-2 rounded-full flex-shrink-0">
+        <div className={`bg-${accentColor}-500 text-white p-2 rounded-full flex-shrink-0`}>
           <Bot className="w-4 h-4" />
         </div>
       )}
@@ -25,7 +28,7 @@ export default function ChatMessage({ message, isTyping = false, onTypingComplet
           className={`p-3 rounded-2xl ${
             isBot
               ? 'bg-gray-100 text-gray-800 rounded-bl-sm'
-              : 'bg-blue-500 text-white rounded-br-sm'
+              : `bg-${accentColor}-500 text-white rounded-br-sm`
           }`}
         >
           {isTyping && typeof message.content === 'string' ? (
@@ -42,15 +45,16 @@ export default function ChatMessage({ message, isTyping = false, onTypingComplet
         </div>
         
         <div className={`text-xs text-gray-500 mt-1 px-1 ${isBot ? 'text-left' : 'text-right'}`}>
-          {message.timestamp.toLocaleTimeString([], { 
+          {message.timestamp.toLocaleTimeString(locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', { 
             hour: '2-digit', 
-            minute: '2-digit' 
+            minute: '2-digit',
+            hour12: true
           })}
         </div>
       </div>
 
       {!isBot && (
-        <div className="bg-blue-500 text-white p-2 rounded-full flex-shrink-0">
+        <div className={`bg-${accentColor}-500 text-white p-2 rounded-full flex-shrink-0`}>
           <UserIcon className="w-4 h-4" />
         </div>
       )}

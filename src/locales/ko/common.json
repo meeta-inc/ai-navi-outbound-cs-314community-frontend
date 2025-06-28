@@ -43,16 +43,23 @@
     }
   },
   "chat": {
-    "greeting": "안녕하세요! CS 상담 챗봇입니다.",
+    "welcomeGreeting": "안녕하세요! 3.14community입니다.",
+    "greeting": "어떤 상담을 원하시나요?",
     "welcomeMessage": "학습 관련 궁금한 점이나 문의사항을 자유롭게 말씀해 주세요!",
     "quickReplies": {
       "question": "어떤 도움이 필요하신가요?",
-      "study": "학습 상담",
-      "technical": "기술 문의",
-      "general": "일반 문의",
-      "study.message": "학습과 관련된 질문이나 상담을 원합니다.",
-      "technical.message": "기술적인 문제나 사용법에 대해 문의하고 싶습니다.",
-      "general.message": "일반적인 문의사항이 있습니다."
+      "study": {
+        "title": "학습 상담",
+        "message": "학습과 관련된 질문이나 상담을 원합니다."
+      },
+      "technical": {
+        "title": "기술 문의",
+        "message": "기술적인 문제나 사용법에 대해 문의하고 싶습니다."
+      },
+      "general": {
+        "title": "일반 문의",
+        "message": "일반적인 문의사항이 있습니다."
+      }
     }
   },
   "personality": {

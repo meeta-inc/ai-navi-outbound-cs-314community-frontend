@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { sendChatMessage, type ChatResponse, type ToolInfo } from '../services/api/chat';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { sendChatMessage } from '../services/api/chat';
 import type { Message } from '../types';
 
 interface UseChatOptions {
@@ -93,7 +93,7 @@ export function useChat({ userId, onError }: UseChatOptions) {
     }
   };
 
-  const addWelcomeMessage = (message: string) => {
+  const addWelcomeMessage = useCallback((message: string) => {
     const welcomeMessage: Message = {
       id: 'welcome',
       type: 'bot',
@@ -101,7 +101,7 @@ export function useChat({ userId, onError }: UseChatOptions) {
       timestamp: new Date()
     };
     setMessages([welcomeMessage]);
-  };
+  }, []);
 
   return {
     messages,

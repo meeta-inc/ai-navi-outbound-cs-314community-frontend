@@ -1,17 +1,17 @@
-import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Home,
-  ArrowLeft,
-  Headphones
+  ArrowLeft
 } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
+import { AccentColor, getColorClasses } from '../../utils/theme';
 
 interface NavigationHeaderProps {
   title: string;
+  accentColor?: AccentColor;
 }
 
-export default function NavigationHeader({ title }: NavigationHeaderProps) {
+export default function NavigationHeader({ accentColor: propAccentColor }: NavigationHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLocale();
@@ -24,7 +24,7 @@ export default function NavigationHeader({ title }: NavigationHeaderProps) {
     {
       id: 'home',
       icon: <Home className="w-6 h-6" />,
-      activeIcon: <Home className="w-6 h-6 text-blue-600" />,
+      activeIcon: <Home className="w-6 h-6 text-orange-600" />,
       label: t('common.home'),
       description: t('student.menu.home.desc'),
       onClick: handleHomeClick
@@ -40,23 +40,33 @@ export default function NavigationHeader({ title }: NavigationHeaderProps) {
   };
 
   const navItems = getNavItems();
-  const accentColor = 'blue';
+  const accentColor = propAccentColor || 'orange';
+  const colors = getColorClasses(accentColor);
 
   return (
-    <div className="bg-white border-b">
+    <div className={`bg-white border-b ${colors.border}`}>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             {shouldShowBackButton() && (
               <button
                 onClick={() => navigate(-1)}
-                className={`p-2 text-${accentColor}-600 hover:text-${accentColor}-800 transition-colors`}
+                className={`p-2 ${colors.text} ${colors.textHover} transition-colors`}
                 aria-label={t('common.back')}
               >
                 <ArrowLeft className="w-6 h-6" />
               </button>
             )}
-            <h1 className="text-xl font-bold">{title}</h1>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                <span className={`text-2xl font-bold ${colors.accent}`}>∞</span>
+                <span className="text-xl font-bold text-gray-800 ml-1">3.14</span>
+                <span className={`text-lg font-medium ${colors.accentSecondary} ml-1`}>community</span>
+              </div>
+              <div className={`text-xs ${colors.accent} font-medium ml-2`}>
+                〜学びたい気持ちを育てる〜
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {navItems.map((item: any) => (
@@ -67,7 +77,7 @@ export default function NavigationHeader({ title }: NavigationHeaderProps) {
                   className={`p-3 rounded-lg transition-all duration-200 ${
                     item.disabled 
                       ? 'opacity-50 cursor-not-allowed' 
-                      : 'hover:bg-gray-50'
+                      : colors.bgHover
                   }`}
                   aria-label={item.label}
                 >

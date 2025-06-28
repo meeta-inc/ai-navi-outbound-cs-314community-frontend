@@ -18,15 +18,15 @@ interface QuickReplyProps {
 
 const quickReplies: QuickReplyOption[] = [
   {
-    textKey: 'chat.quickReplies.study',
+    textKey: 'chat.quickReplies.study.title',
     valueKey: 'chat.quickReplies.study.message',
     icon: <BookOpen className="w-4 h-4" />,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    hoverBgColor: "hover:bg-blue-100"
+    color: "text-orange-600",
+    bgColor: "bg-orange-50",
+    hoverBgColor: "hover:bg-orange-100"
   },
   {
-    textKey: 'chat.quickReplies.technical',
+    textKey: 'chat.quickReplies.technical.title',
     valueKey: 'chat.quickReplies.technical.message',
     icon: <Settings className="w-4 h-4" />,
     color: "text-green-600",
@@ -34,7 +34,7 @@ const quickReplies: QuickReplyOption[] = [
     hoverBgColor: "hover:bg-green-100"
   },
   {
-    textKey: 'chat.quickReplies.general',
+    textKey: 'chat.quickReplies.general.title',
     valueKey: 'chat.quickReplies.general.message',
     icon: <HelpCircle className="w-4 h-4" />,
     color: "text-purple-600",
@@ -49,16 +49,13 @@ export default function QuickReply({ onReplyClick, show }: QuickReplyProps) {
   if (!show) return null;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 pb-4">
-      <div className="text-sm font-medium text-gray-700 mb-3">
-        {t('chat.quickReplies.question')}
-      </div>
+    <div className="pl-12">
       <div className="flex flex-wrap gap-2">
         {quickReplies.map((reply, index) => (
           <button
             key={index}
             onClick={() => onReplyClick(reply)}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${reply.color} ${reply.bgColor} ${reply.hoverBgColor} border border-transparent hover:border-gray-200`}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${reply.color} ${reply.bgColor} ${reply.hoverBgColor} border border-transparent hover:border-orange-200`}
           >
             {reply.icon}
             {t(reply.textKey)}

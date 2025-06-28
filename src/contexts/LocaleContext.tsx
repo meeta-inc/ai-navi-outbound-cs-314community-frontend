@@ -6,6 +6,7 @@ interface LocaleContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string, params?: Record<string, string>) => string;
+  isLoading: boolean;
 }
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
@@ -36,6 +37,7 @@ const loadTranslations = async () => {
 
 export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [locale, setLocale] = useState<Locale>('ja');
+  const [isLoading, setIsLoading] = useState(true);
   const [translations, setTranslations] = useState<Record<Locale, Record<string, any>>>({
     ko: {},
     ja: {},
@@ -47,19 +49,21 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const loadData = async () => {
       const loadedTranslations = await loadTranslations();
       setTranslations(loadedTranslations);
+      
+      // 저장된 locale 불러오기 (기본값: 일본어)
+      const savedLocale = localStorage.getItem('locale') as Locale;
+      if (savedLocale && (savedLocale === 'ko' || savedLocale === 'ja' || savedLocale === 'en')) {
+        setLocale(savedLocale);
+      } else {
+        // 기본값을 일본어로 설정
+        setLocale('ja');
+        localStorage.setItem('locale', 'ja');
+      }
+      
+      setIsLoading(false);
     };
     
     loadData();
-
-    // 저장된 locale 불러오기 (기본값: 일본어)
-    const savedLocale = localStorage.getItem('locale') as Locale;
-    if (savedLocale && (savedLocale === 'ko' || savedLocale === 'ja' || savedLocale === 'en')) {
-      setLocale(savedLocale);
-    } else {
-      // 기본값을 일본어로 설정
-      setLocale('ja');
-      localStorage.setItem('locale', 'ja');
-    }
   }, []);
 
   const handleSetLocale = (newLocale: Locale) => {
@@ -108,7 +112,7 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale: handleSetLocale, t }}>
+    <LocaleContext.Provider value={{ locale, setLocale: handleSetLocale, t, isLoading }}>
       {children}
     </LocaleContext.Provider>
   );

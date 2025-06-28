@@ -43,16 +43,23 @@
     }
   },
   "chat": {
-    "greeting": "Hello! I'm a CS support chatbot.",
+    "welcomeGreeting": "Hello! This is 3.14community.",
+    "greeting": "What kind of consultation would you like?",
     "welcomeMessage": "Feel free to ask any questions about your studies or if you have any concerns!",
     "quickReplies": {
       "question": "What kind of help do you need?",
-      "study": "Study Support",
-      "technical": "Technical Inquiry",
-      "general": "General Inquiry",
-      "study.message": "I would like to ask questions or get advice about studying.",
-      "technical.message": "I want to inquire about technical issues or usage.",
-      "general.message": "I have general inquiries."
+      "study": {
+        "title": "Study Support",
+        "message": "I would like to ask questions or get advice about studying."
+      },
+      "technical": {
+        "title": "Technical Inquiry",
+        "message": "I want to inquire about technical issues or usage."
+      },
+      "general": {
+        "title": "General Inquiry",
+        "message": "I have general inquiries."
+      }
     },
     "menu": {
       "schedule": "Academic Schedule",

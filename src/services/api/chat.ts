@@ -21,16 +21,16 @@ export interface ChatResponse {
   timestamp?: string;
 }
 
-export const sendChatMessage = async (message: string, studentId: string): Promise<ChatResponse> => {
+export const sendChatMessage = async (message: string, userId: string): Promise<ChatResponse> => {
   return fetchApi('/students/chat', {
     method: 'POST',
     body: JSON.stringify({
+      userId,
       message,
-      studentId,
     }),
   });
 };
 
-export const getChatHistory = async (studentId: string): Promise<ChatMessage[]> => {
-  return fetchApi(`/students/chat/history/${studentId}`);
+export const getChatHistory = async (userId: string): Promise<ChatMessage[]> => {
+  return fetchApi(`/students/chat/history/${userId}`);
 };

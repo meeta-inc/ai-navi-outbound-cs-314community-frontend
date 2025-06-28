@@ -43,16 +43,23 @@
     }
   },
   "chat": {
-    "greeting": "こんにちは！CS相談チャットボットです。",
+    "welcomeGreeting": "こんにちは！3.14communityです。",
+    "greeting": "どのようなご相談でしょうか？",
     "welcomeMessage": "学習に関するご質問やお困りのことがありましたら、お気軽にお聞かせください！",
     "quickReplies": {
       "question": "どのようなご相談でしょうか？",
-      "study": "学習相談",
-      "technical": "技術的なお問い合わせ",
-      "general": "一般的なお問い合わせ",
-      "study.message": "学習に関するご質問や相談をお願いします。",
-      "technical.message": "技術的な問題や使い方についてお問い合わせしたいです。",
-      "general.message": "一般的なお問い合わせがあります。"
+      "study": {
+        "title": "学習相談",
+        "message": "学習に関するご質問や相談をお願いします。"
+      },
+      "technical": {
+        "title": "技術的なお問い合わせ",
+        "message": "技術的な問題や使い方についてお問い合わせしたいです。"
+      },
+      "general": {
+        "title": "一般的なお問い合わせ",
+        "message": "一般的なお問い合わせがあります。"
+      }
     },
     "menu": {
       "schedule": "学事日程",
