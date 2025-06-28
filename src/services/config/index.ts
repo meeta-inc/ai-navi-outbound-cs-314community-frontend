@@ -20,10 +20,22 @@ export const getChatApiUrl = () => {
   return chatApiUrl;
 };
 
+export const getAccentColor = () => {
+  const accentColor = import.meta.env.VITE_ACCENT_COLOR;
+  
+  if (!accentColor || !['orange', 'blue', 'green', 'purple'].includes(accentColor)) {
+    console.warn('Invalid or undefined accent color, falling back to orange');
+    return 'orange';
+  }
+  
+  return accentColor as 'orange' | 'blue' | 'green' | 'purple';
+};
+
 export const getAppConfig = () => {
   return {
     apiUrl: getApiUrl(),
     chatApiUrl: getChatApiUrl(),
+    accentColor: getAccentColor(),
     environment: import.meta.env.MODE,
     isDevelopment: import.meta.env.DEV,
     isProduction: import.meta.env.PROD,

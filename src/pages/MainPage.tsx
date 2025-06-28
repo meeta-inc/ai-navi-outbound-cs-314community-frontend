@@ -7,10 +7,12 @@ import ChatInput from '../components/ui/ChatInput';
 import QuickReply, { QuickReplyOption } from '../components/ui/QuickReply';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
+import { getAccentColor } from '../services/config';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
-  const { accentColor, colors } = useTheme();
+  const accentColor = getAccentColor();
+  const { colors } = useTheme();
   const isInitialized = useRef(false);
 
   const {
@@ -92,7 +94,7 @@ function MainPage() {
             <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
               {messages.map((message, index) => (
                 <div key={message.id}>
-                  <ChatMessage message={message} accentColor={accentColor} />
+                  <ChatMessage message={message} />
                   {/* 첫 번째 메시지 (봇의 인사) 다음에 QuickReply 표시 */}
                   {index === 0 && message.type === 'bot' && (
                     <div className="mt-4">
@@ -115,13 +117,12 @@ function MainPage() {
                   }}
                   isTyping={true}
                   onTypingComplete={completeTyping}
-                  accentColor={accentColor}
                 />
               )}
               
               {isTyping && !currentlyTyping && (
                 <div className="flex items-start gap-3">
-                  <div className={`bg-${accentColor}-500 text-white p-2 rounded-full flex-shrink-0`}>
+                  <div className={`${colors.background} text-white p-2 rounded-full flex-shrink-0`}>
                     <Loader2 className="w-4 h-4 animate-spin" />
                   </div>
                   <div className="bg-gray-100 text-gray-800 p-3 rounded-2xl rounded-bl-sm">
