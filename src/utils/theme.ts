@@ -6,6 +6,8 @@ export interface ColorClasses {
   textHover: string;
   bgHover: string;
   background: string;
+  backgroundHover: string;
+  ring: string;
   accent: string;
   accentSecondary: string;
   gradient: {
@@ -21,6 +23,8 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textHover: 'hover:text-orange-800',
     bgHover: 'hover:bg-orange-50',
     background: 'bg-orange-500',
+    backgroundHover: 'hover:bg-orange-600',
+    ring: 'ring-orange-500',
     accent: 'text-orange-500',
     accentSecondary: 'text-orange-600',
     gradient: {
@@ -34,6 +38,8 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textHover: 'hover:text-blue-800',
     bgHover: 'hover:bg-blue-50',
     background: 'bg-blue-500',
+    backgroundHover: 'hover:bg-blue-600',
+    ring: 'ring-blue-500',
     accent: 'text-blue-500',
     accentSecondary: 'text-blue-600',
     gradient: {
@@ -47,6 +53,8 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textHover: 'hover:text-green-800',
     bgHover: 'hover:bg-green-50',
     background: 'bg-green-500',
+    backgroundHover: 'hover:bg-green-600',
+    ring: 'ring-green-500',
     accent: 'text-green-500',
     accentSecondary: 'text-green-600',
     gradient: {
@@ -60,6 +68,8 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textHover: 'hover:text-purple-800',
     bgHover: 'hover:bg-purple-50',
     background: 'bg-purple-500',
+    backgroundHover: 'hover:bg-purple-600',
+    ring: 'ring-purple-500',
     accent: 'text-purple-500',
     accentSecondary: 'text-purple-600',
     gradient: {
