@@ -1,0 +1,75 @@
+{
+  "common": {
+    "home": "Home",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success"
+  },
+  "student": {
+    "menu": {
+      "home": {
+        "desc": "Go to main home"
+      },
+      "typeCheck": "Personality Diagnosis Test",
+      "typeCheck.desc": "Learn about your tendencies and learning style",
+      "chatbot": "Chatbot Counseling",
+      "chatbot.desc": "Feel free to ask any questions you have",
+      "matchingQa": "Matching Q&A",
+      "matchingQa.desc": "Please answer questions from parents",
+      "report": {
+        "desc": "Check your personality diagnosis results"
+      },
+      "community": "Chatbot Friends",
+      "community.desc": "Please answer questions from chatbot"
+    },
+    "activity": {
+      "typeCheck": "Personality Diagnosis Complete",
+      "chatbot": "Chatbot Counseling"
+    },
+    "chatbot": {
+      "placeholder": "Enter a message...",
+      "send": "Send Message",
+      "error": "Failed to send message. Please try again.",
+      "response1": "Yes, please tell me. I'll help you.",
+      "response2": "That's an interesting story. Could you tell me more details?",
+      "response3": "I see. Let me make a suggestion that might help.",
+      "response4": "That's a good question. Shall we think about it together?"
+    }
+  },
+  "chat": {
+    "greeting": "Hello! I'm a CS support chatbot.",
+    "welcomeMessage": "Feel free to ask any questions about your studies or if you have any concerns!",
+    "quickReplies": {
+      "question": "What kind of help do you need?",
+      "study": "Study Support",
+      "technical": "Technical Inquiry",
+      "general": "General Inquiry",
+      "study.message": "I would like to ask questions or get advice about studying.",
+      "technical.message": "I want to inquire about technical issues or usage.",
+      "general.message": "I have general inquiries."
+    },
+    "menu": {
+      "schedule": "Academic Schedule",
+      "grades": "Grade Analysis",
+      "guidance": "Personal Learning",
+      "academy": "Usage Guide",
+      "counseling": "Counseling Request",
+      "ai": "AI\nCounseling",
+      "admissionInfo": "Admission Info"
+    }
+  },
+  "personality": {
+    "test": {
+      "title": "Personality Type Test"
+    }
+  },
+  "report": {
+    "title": "Career Report"
+  }
+}
