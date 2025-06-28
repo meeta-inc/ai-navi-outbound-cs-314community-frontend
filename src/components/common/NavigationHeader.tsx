@@ -28,14 +28,6 @@ export default function NavigationHeader({ title }: NavigationHeaderProps) {
       label: t('common.home'),
       description: t('student.menu.home.desc'),
       onClick: handleHomeClick
-    },
-    {
-      id: 'chat',
-      icon: <Headphones className="w-6 h-6" />,
-      activeIcon: <Headphones className="w-6 h-6 text-blue-600" />,
-      label: t('student.menu.chatbot'),
-      description: t('student.menu.chatbot.desc'),
-      onClick: () => navigate('/student-main')
     }
   ];
 

@@ -1,6 +1,6 @@
 {
   "common": {
-    "home": "ホーム",
+    "home": "錬成会CS AI Navi",
     "back": "戻る",
     "save": "保存",
     "cancel": "キャンセル",
@@ -14,7 +14,7 @@
   "student": {
     "menu": {
       "home": {
-        "desc": "メインホームに移動します。"
+        "desc": "錬成会メインホームに移動します。"
       },
       "typeCheck": "AI性格タイプ診断",
       "typeCheck.desc": "自分の傾向と学習スタイルを知りましょう",
