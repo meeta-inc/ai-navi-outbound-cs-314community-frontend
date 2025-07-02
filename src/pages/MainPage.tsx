@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { UserCircle, Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
-import NavigationHeader from '../components/common/NavigationHeader';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply, { QuickReplyOption } from '../components/ui/QuickReply';
@@ -65,21 +64,16 @@ function MainPage() {
 
   return (
     <div className="h-screen flex flex-col bg-white overflow-hidden">
-      <NavigationHeader title={t('common.home')} accentColor={accentColor} />
-
       <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-4">
             <div className={`bg-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
-              <UserCircle className={`w-5 h-5 ${colors.text}`} />
+              <UserCircle className={`w-4 h-4 ${colors.text}`} />
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900">
                 {t('chat.welcomeGreeting')}
               </h1>
-              <p className="text-sm text-gray-600">
-                {t('chat.welcomeMessage')}
-              </p>
             </div>
           </div>
         </div>
