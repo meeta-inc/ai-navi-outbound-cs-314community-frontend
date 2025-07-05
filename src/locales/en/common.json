@@ -48,6 +48,8 @@
     "welcomeMessage": "Feel free to ask any questions about your studies or if you have any concerns!",
     "quickReplies": {
       "question": "What kind of help do you need?",
+      "description": "Here are the top 3 questions we received this week!",
+      "other": "Other",
       "study": {
         "title": "Study Support",
         "message": "I would like to ask questions or get advice about studying."
@@ -59,6 +61,26 @@
       "general": {
         "title": "General Inquiry",
         "message": "I have general inquiries."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "description": "Please select from the frequently asked question categories",
+      "schedule": {
+        "title": "Classes & Schedule",
+        "message": "I have questions about class times or schedules."
+      },
+      "grades": {
+        "title": "Grades & Assessment",
+        "message": "I have questions about grades or assessments."
+      },
+      "homework": {
+        "title": "Homework & Assignments",
+        "message": "I have questions about homework or assignments."
+      },
+      "support": {
+        "title": "Learning Support",
+        "message": "I have questions about learning support or counseling."
       }
     },
     "menu": {

@@ -5,6 +5,7 @@ export interface ColorClasses {
   text: string;
   textHover: string;
   bgHover: string;
+  bgLight: string;
   background: string;
   backgroundHover: string;
   ring: string;
@@ -22,6 +23,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     text: 'text-orange-600',
     textHover: 'hover:text-orange-800',
     bgHover: 'hover:bg-orange-50',
+    bgLight: 'bg-orange-50',
     background: 'bg-orange-500',
     backgroundHover: 'hover:bg-orange-600',
     ring: 'ring-orange-500',
@@ -37,6 +39,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     text: 'text-blue-600',
     textHover: 'hover:text-blue-800',
     bgHover: 'hover:bg-blue-50',
+    bgLight: 'bg-blue-50',
     background: 'bg-blue-500',
     backgroundHover: 'hover:bg-blue-600',
     ring: 'ring-blue-500',
@@ -52,6 +55,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     text: 'text-green-600',
     textHover: 'hover:text-green-800',
     bgHover: 'hover:bg-green-50',
+    bgLight: 'bg-green-50',
     background: 'bg-green-500',
     backgroundHover: 'hover:bg-green-600',
     ring: 'ring-green-500',
@@ -67,6 +71,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     text: 'text-purple-600',
     textHover: 'hover:text-purple-800',
     bgHover: 'hover:bg-purple-50',
+    bgLight: 'bg-purple-50',
     background: 'bg-purple-500',
     backgroundHover: 'hover:bg-purple-600',
     ring: 'ring-purple-500',
