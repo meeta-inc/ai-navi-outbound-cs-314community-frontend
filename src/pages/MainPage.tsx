@@ -1,16 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { UserCircle, Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
+import NavigationHeader from '../components/common/NavigationHeader';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply, { QuickReplyOption } from '../components/ui/QuickReply';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
-import { getAccentColor } from '../services/config';
+import { getAccentColor, getShowNavigationHeader } from '../services/config';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
   const accentColor = getAccentColor();
+  const showNavigationHeader = getShowNavigationHeader();
   const { colors } = useTheme();
   const isInitialized = useRef(false);
 
@@ -64,6 +66,10 @@ function MainPage() {
 
   return (
     <div className="h-screen flex flex-col bg-white overflow-hidden">
+      {showNavigationHeader && (
+        <NavigationHeader title={t('common.home')} accentColor={accentColor} />
+      )}
+      
       <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-4">

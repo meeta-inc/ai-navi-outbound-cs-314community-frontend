@@ -31,11 +31,23 @@ export const getAccentColor = () => {
   return accentColor as 'orange' | 'blue' | 'green' | 'purple';
 };
 
+export const getShowNavigationHeader = () => {
+  const showHeader = import.meta.env.VITE_SHOW_NAVIGATION_HEADER;
+  
+  // 문자열 'true'를 boolean으로 변환, 기본값은 true
+  if (showHeader === 'false') {
+    return false;
+  }
+  
+  return true;
+};
+
 export const getAppConfig = () => {
   return {
     apiUrl: getApiUrl(),
     chatApiUrl: getChatApiUrl(),
     accentColor: getAccentColor(),
+    showNavigationHeader: getShowNavigationHeader(),
     environment: import.meta.env.MODE,
     isDevelopment: import.meta.env.DEV,
     isProduction: import.meta.env.PROD,
