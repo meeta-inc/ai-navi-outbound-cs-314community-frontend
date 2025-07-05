@@ -48,6 +48,8 @@
     "welcomeMessage": "학습 관련 궁금한 점이나 문의사항을 자유롭게 말씀해 주세요!",
     "quickReplies": {
       "question": "어떤 도움이 필요하신가요?",
+      "description": "이번주에 많이 받았던 질문은 Top3입니다!",
+      "other": "그 외",
       "study": {
         "title": "학습 상담",
         "message": "학습과 관련된 질문이나 상담을 원합니다."
@@ -59,6 +61,26 @@
       "general": {
         "title": "일반 문의",
         "message": "일반적인 문의사항이 있습니다."
+      }
+    },
+    "faq": {
+      "title": "자주 묻는 질문",
+      "description": "자주 묻는 질문 카테고리에서 선택해주세요",
+      "schedule": {
+        "title": "수업 및 일정",
+        "message": "수업 시간이나 일정에 대해 질문이 있습니다."
+      },
+      "grades": {
+        "title": "성적 및 평가",
+        "message": "성적이나 평가에 대해 질문이 있습니다."
+      },
+      "homework": {
+        "title": "숙제 및 과제",
+        "message": "숙제나 과제에 대해 질문이 있습니다."
+      },
+      "support": {
+        "title": "학습 지원",
+        "message": "학습 지원이나 상담에 대해 질문이 있습니다."
       }
     }
   },
