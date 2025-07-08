@@ -8,6 +8,7 @@ import type { Message } from '../types';
 interface UseChatOptions {
   userId: string;
   onError?: (error: Error) => void;
+  onTypingComplete?: () => void;
 }
 
 interface ProcessedChatResponse {
@@ -16,7 +17,7 @@ interface ProcessedChatResponse {
   toolInput?: any;
 }
 
-export function useChat({ userId, onError }: UseChatOptions) {
+export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -134,17 +135,21 @@ export function useChat({ userId, onError }: UseChatOptions) {
       }
 
       setCurrentlyTyping(null);
+      
+      // 타이핑 완료 콜백 호출
+      if (onTypingComplete) {
+        onTypingComplete();
+      }
     }
   };
 
   const addWelcomeMessage = useCallback((message: string) => {
-    const welcomeMessage: Message = {
-      id: 'welcome',
-      type: 'bot',
-      content: message,
-      timestamp: new Date()
-    };
-    setMessages([welcomeMessage]);
+    // 타이핑 효과로 welcome 메시지 표시
+    setCurrentlyTyping({
+      message: message,
+      toolName: undefined,
+      toolInput: undefined
+    });
   }, []);
 
   return {
