@@ -44,11 +44,16 @@
   },
   "chat": {
     "welcomeGreeting": "Hello! This is 3.14community.",
-    "greeting": "What kind of consultation would you like?",
+    "greeting": "Hello! Please feel free to ask anything about {school_name}!",
     "welcomeMessage": "Feel free to ask any questions about your studies or if you have any concerns!",
+    "schoolName": "3.14 community",
     "quickReplies": {
       "question": "What kind of help do you need?",
       "description": "Here are the top 3 questions we received this week!",
+      "header": "✨Frequently Asked Questions Top3 (14-day statistics)",
+      "summerCourse": "When does the summer course start?",
+      "tuition": "How much is the annual tuition?",
+      "elementary": "Is it for elementary students too?",
       "other": "Other",
       "study": {
         "title": "Study Support",

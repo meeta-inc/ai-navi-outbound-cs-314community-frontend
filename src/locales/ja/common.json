@@ -44,11 +44,16 @@
   },
   "chat": {
     "welcomeGreeting": "こんにちは！3.14communityです。",
-    "greeting": "どのようなご相談でしょうか？",
+    "greeting": "こんにちは！{school_name}について何でも質問してください！",
     "welcomeMessage": "学習に関するご質問やお困りのことがありましたら、お気軽にお聞かせください！",
+    "schoolName": "3.14 community",
     "quickReplies": {
       "question": "どのようなご相談でしょうか？",
       "description": "今週よく受けた質問のTop3です！",
+      "header": "✨よくある質問Top3（直近14日間の統計）",
+      "summerCourse": "夏期講習はいつから始まりますか？",
+      "tuition": "年間の授業料はいくらですか？",
+      "elementary": "小学生も対象ですか？",
       "other": "その他",
       "study": {
         "title": "学習相談",

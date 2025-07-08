@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { UserCircle, Loader2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
 import NavigationHeader from '../components/common/NavigationHeader';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
-import QuickReply, { QuickReplyOption } from '../components/ui/QuickReply';
+import QuickReply from '../components/ui/QuickReply';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
 import { getAccentColor, getShowNavigationHeader } from '../services/config';
@@ -15,6 +15,7 @@ function MainPage() {
   const showNavigationHeader = getShowNavigationHeader();
   const { colors } = useTheme();
   const isInitialized = useRef(false);
+  const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
 
   const {
     messages,
@@ -31,22 +32,31 @@ function MainPage() {
     userId: 'Hyunse0001', // 실제 사용자 ID
     onError: (error) => {
       console.error('Chat error:', error);
+    },
+    onTypingComplete: () => {
+      // 첫 번째 메시지 타이핑 완료 후 Figma QuickReply 표시
+      setTimeout(() => {
+        if (messages.length <= 1) {
+          setShowFigmaQuickReply(true);
+        }
+      }, 500);
     }
   });
 
   useEffect(() => {
     // 번역이 로드되고 초기화가 아직 되지 않았을 때만 welcome 메시지 추가
     if (!isLoading && !isInitialized.current) {
-      const welcomeMessage = t('chat.greeting');
+      const schoolName = t('chat.schoolName');
+      const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
       addWelcomeMessage(welcomeMessage);
       isInitialized.current = true;
     }
   }, [t, addWelcomeMessage, isLoading]);
 
-  const handleQuickReplyClick = async (reply: QuickReplyOption) => {
-    const translatedValue = t(reply.valueKey);
-    setNewMessage(translatedValue);
-    await handleSendMessage(translatedValue);
+  const handleQuickReplyClick = async (text: string) => {
+    setNewMessage(text);
+    setShowFigmaQuickReply(false);
+    await handleSendMessage(text);
   };
 
   const handleSendClick = async () => {
@@ -65,15 +75,26 @@ function MainPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-navi-white overflow-hidden">
       {showNavigationHeader && (
-        <NavigationHeader title={t('common.home')} accentColor={accentColor} />
+        <NavigationHeader 
+          title={t('common.home')} 
+          accentColor={accentColor}
+          showDynamicHeader={true}
+          clientId="default"
+          onHeaderAction={(action) => {
+            if (action.type === 'close') {
+              console.log('Header close action triggered');
+            }
+          }}
+        />
       )}
       
-      <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
+      // 상단 그리팅 영역 제거
+      {/* <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-4">
-            <div className={`bg-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
+            <div className={`bg-navi-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
               <UserCircle className={`w-4 h-4 ${colors.text}`} />
             </div>
             <div>
@@ -83,7 +104,7 @@ function MainPage() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex-1 flex flex-col bg-gray-50 min-h-0">
         <div className="flex-1 overflow-hidden">
@@ -96,7 +117,7 @@ function MainPage() {
                 <div key={message.id}>
                   <ChatMessage message={message} />
                   {/* 첫 번째 메시지 (봇의 인사) 다음에 QuickReply 표시 */}
-                  {index === 0 && message.type === 'bot' && (
+                  {index === 0 && message.type === 'bot' && showFigmaQuickReply && (
                     <div className="mt-4">
                       <QuickReply 
                         onReplyClick={handleQuickReplyClick}
