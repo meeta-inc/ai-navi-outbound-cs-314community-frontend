@@ -1,4 +1,4 @@
-export type AccentColor = 'orange' | 'blue' | 'green' | 'purple';
+export type AccentColor = 'orange' | 'blue' | 'green' | 'red' | 'purple';
 
 export interface ColorClasses {
   border: string;
@@ -19,74 +19,90 @@ export interface ColorClasses {
 
 const colorMap: Record<AccentColor, ColorClasses> = {
   orange: {
-    border: 'border-orange-100',
-    text: 'text-orange-600',
-    textHover: 'hover:text-orange-800',
-    bgHover: 'hover:bg-orange-50',
-    bgLight: 'bg-orange-50',
-    background: 'bg-orange-500',
-    backgroundHover: 'hover:bg-orange-600',
-    ring: 'ring-orange-500',
-    accent: 'text-orange-500',
-    accentSecondary: 'text-orange-600',
+    border: 'border-navi-orange-sub2',
+    text: 'text-navi-orange-main',
+    textHover: 'hover:text-navi-orange-main',
+    bgHover: 'hover:bg-navi-orange-sub2',
+    bgLight: 'bg-navi-orange-sub2',
+    background: 'bg-navi-orange-main',
+    backgroundHover: 'hover:bg-navi-orange-main',
+    ring: 'ring-navi-orange-main',
+    accent: 'text-navi-orange-main',
+    accentSecondary: 'text-navi-orange-sub1',
     gradient: {
-      from: 'from-orange-50',
-      to: 'to-red-50'
+      from: 'from-navi-orange-sub2',
+      to: 'to-navi-orange-sub1'
     }
   },
   blue: {
-    border: 'border-blue-100',
-    text: 'text-blue-600',
-    textHover: 'hover:text-blue-800',
-    bgHover: 'hover:bg-blue-50',
-    bgLight: 'bg-blue-50',
-    background: 'bg-blue-500',
-    backgroundHover: 'hover:bg-blue-600',
-    ring: 'ring-blue-500',
-    accent: 'text-blue-500',
-    accentSecondary: 'text-blue-600',
+    border: 'border-navi-blue-sub2',
+    text: 'text-navi-blue-main',
+    textHover: 'hover:text-navi-blue-main',
+    bgHover: 'hover:bg-navi-blue-sub2',
+    bgLight: 'bg-navi-blue-sub2',
+    background: 'bg-navi-blue-main',
+    backgroundHover: 'hover:bg-navi-blue-main',
+    ring: 'ring-navi-blue-main',
+    accent: 'text-navi-blue-main',
+    accentSecondary: 'text-navi-blue-sub1',
     gradient: {
-      from: 'from-blue-50',
-      to: 'to-indigo-50'
+      from: 'from-navi-blue-sub2',
+      to: 'to-navi-blue-sub1'
     }
   },
   green: {
-    border: 'border-green-100',
-    text: 'text-green-600',
-    textHover: 'hover:text-green-800',
-    bgHover: 'hover:bg-green-50',
-    bgLight: 'bg-green-50',
-    background: 'bg-green-500',
-    backgroundHover: 'hover:bg-green-600',
-    ring: 'ring-green-500',
-    accent: 'text-green-500',
-    accentSecondary: 'text-green-600',
+    border: 'border-navi-green-sub2',
+    text: 'text-navi-green-main',
+    textHover: 'hover:text-navi-green-main',
+    bgHover: 'hover:bg-navi-green-sub2',
+    bgLight: 'bg-navi-green-sub2',
+    background: 'bg-navi-green-main',
+    backgroundHover: 'hover:bg-navi-green-main',
+    ring: 'ring-navi-green-main',
+    accent: 'text-navi-green-main',
+    accentSecondary: 'text-navi-green-sub1',
     gradient: {
-      from: 'from-green-50',
-      to: 'to-emerald-50'
+      from: 'from-navi-green-sub2',
+      to: 'to-navi-green-sub1'
+    }
+  },
+  red: {
+    border: 'border-navi-red-sub2',
+    text: 'text-navi-red-main',
+    textHover: 'hover:text-navi-red-main',
+    bgHover: 'hover:bg-navi-red-sub2',
+    bgLight: 'bg-navi-red-sub2',
+    background: 'bg-navi-red-main',
+    backgroundHover: 'hover:bg-navi-red-main',
+    ring: 'ring-navi-red-main',
+    accent: 'text-navi-red-main',
+    accentSecondary: 'text-navi-red-sub1',
+    gradient: {
+      from: 'from-navi-red-sub2',
+      to: 'to-navi-red-sub1'
     }
   },
   purple: {
-    border: 'border-purple-100',
-    text: 'text-purple-600',
-    textHover: 'hover:text-purple-800',
-    bgHover: 'hover:bg-purple-50',
-    bgLight: 'bg-purple-50',
-    background: 'bg-purple-500',
-    backgroundHover: 'hover:bg-purple-600',
-    ring: 'ring-purple-500',
-    accent: 'text-purple-500',
-    accentSecondary: 'text-purple-600',
+    border: 'border-navi-purple-sub2',
+    text: 'text-navi-purple-main',
+    textHover: 'hover:text-navi-purple-main',
+    bgHover: 'hover:bg-navi-purple-sub2',
+    bgLight: 'bg-navi-purple-sub2',
+    background: 'bg-navi-purple-main',
+    backgroundHover: 'hover:bg-navi-purple-main',
+    ring: 'ring-navi-purple-main',
+    accent: 'text-navi-purple-main',
+    accentSecondary: 'text-navi-purple-sub1',
     gradient: {
-      from: 'from-purple-50',
-      to: 'to-pink-50'
+      from: 'from-navi-purple-sub2',
+      to: 'to-navi-purple-sub1'
     }
   }
 };
 
 /**
  * 액센트 컬러에 따른 CSS 클래스들을 반환합니다.
- * @param color - 액센트 컬러 ('orange' | 'blue' | 'green' | 'purple')
+ * @param color - 액센트 컬러 ('orange' | 'blue' | 'green' | 'red' | 'purple')
  * @returns 해당 컬러의 CSS 클래스 객체
  */
 export function getColorClasses(color: AccentColor): ColorClasses {

@@ -1,0 +1,45 @@
+{
+  // Claude Code가 설치된 개발 컨테이너
+  "name": "Claude Code가 포함된 React TypeScript 개발환경",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-dev",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-json",
+        "ms-vscode.sublime-keybindings",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-npm-script"
+      ],
+      "settings": {
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "emmet.includeLanguages": {
+          "javascript": "javascriptreact",
+          "typescript": "typescriptreact"
+        },
+        "tailwindCSS.experimental.classRegex": [
+          "className\\s*[:=]\\s*[\"']([^\"']*)[\"']"
+        ],
+        "claude.anthropicKey": "${env:ANTHROPIC_API_KEY}"
+      }
+    }
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "npm install && echo 'Claude CLI는 별도로 설치가 필요합니다. VS Code에서 Claude Code 확장을 사용하세요.'",
+  "remoteUser": "node"
+}
