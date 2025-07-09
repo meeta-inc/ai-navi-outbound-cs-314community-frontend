@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
-import NavigationHeader from '../components/layout/header/NavigationHeader';
-import ChatMessage from '../components/ui/ChatMessage';
-import ChatInput from '../components/ui/ChatInput';
-import QuickReply from '../components/ui/QuickReply';
-import FAQCategory from '../components/ui/FAQCategory';
-import TopQuestions from '../components/ui/TopQuestions';
+import { NavigationHeader } from '../components/organisms/NavigationHeader';
+import { ChatMessage } from '../components/organisms/ChatMessage';
+import { ChatInput } from '../components/organisms/ChatInput';
+import { QuickReply } from '../components/organisms/QuickReply';
+import { FAQCategory } from '../components/organisms/FAQCategory';
+import { TopQuestions } from '../components/organisms/TopQuestions';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
 import { getAccentColor, getShowNavigationHeader } from '../shared/config/app.config';
@@ -175,7 +175,7 @@ function MainPage() {
           accentColor={accentColor}
           showDynamicHeader={true}
           clientId="default"
-          onHeaderAction={(action) => {
+          onHeaderAction={(action: any) => {
             if (action.type === 'close') {
               console.log('Header close action triggered');
             }
@@ -227,7 +227,6 @@ function MainPage() {
                 <div className="mt-4">
                   <FAQCategory 
                     onCategorySelect={handleFAQCategorySelect}
-                    showBackButton={false}
                   />
                 </div>
               )}

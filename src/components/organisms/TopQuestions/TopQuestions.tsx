@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useLocale } from '../../contexts/LocaleContext';
-import { getColorClasses } from '../../shared/config/theme.config';
-import { getAccentColor } from "../../shared/config/app.config";
-import { getTopQuestionsByCategory, updateQuestionStats } from '../../services/api/questions';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
+import { getAccentColor } from "../../../shared/config/app.config";
+import { getTopQuestionsByCategory, updateQuestionStats } from '../../../services/api/questions';
+import { Button } from '../../atoms/Button';
 
 interface TopQuestionsProps {
   categoryId: string;
@@ -15,7 +16,7 @@ interface TopQuestionsProps {
   className?: string;
 }
 
-export default function TopQuestions({ 
+export function TopQuestions({ 
   categoryId,
   categoryTitle,
   onQuestionSelect,
@@ -107,7 +108,7 @@ export default function TopQuestions({
         <div className="flex flex-col gap-[7px] items-start">
           {Array.isArray(questions) && questions.length > 0 ? questions.map((question, index) => (
             <div key={index} className="pl-5 w-full">
-              <button
+              <Button
                 onClick={() => handleQuestionClick(question)}
                 className={`${colors.background} ${colors.textWhite} inline-flex items-center justify-start max-w-[257px] p-[10px] rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left`}
                 style={{ 
@@ -115,7 +116,7 @@ export default function TopQuestions({
                 }}
               >
                 {question}
-              </button>
+              </Button>
             </div>
           )) : (
             <div className="pl-5 w-full">
@@ -125,7 +126,7 @@ export default function TopQuestions({
           
           {/* Back to Categories Button */}
           <div className="pl-5 w-full">
-            <button
+            <Button
               onClick={handleBackClick}
               className={`${colors.bgLight} ${colors.textSecondary} inline-flex items-center justify-start max-w-[257px] p-[10px] rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left`}
               style={{ 
@@ -133,7 +134,7 @@ export default function TopQuestions({
               }}
             >
               {backToCategories}
-            </button>
+            </Button>
           </div>
         </div>
       )}
