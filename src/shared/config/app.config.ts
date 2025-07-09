@@ -42,12 +42,24 @@ export const getShowNavigationHeader = () => {
   return true;
 };
 
+export const getShowTimestamp = () => {
+  const showTimestamp = import.meta.env.VITE_SHOW_TIMESTAMP;
+  
+  // 문자열 'false'를 boolean으로 변환, 기본값은 true
+  if (showTimestamp === 'false') {
+    return false;
+  }
+  
+  return true;
+};
+
 export const getAppConfig = () => {
   return {
     apiUrl: getApiUrl(),
     chatApiUrl: getChatApiUrl(),
     accentColor: getAccentColor(),
     showNavigationHeader: getShowNavigationHeader(),
+    showTimestamp: getShowTimestamp(),
     environment: import.meta.env.MODE,
     isDevelopment: import.meta.env.DEV,
     isProduction: import.meta.env.PROD,
