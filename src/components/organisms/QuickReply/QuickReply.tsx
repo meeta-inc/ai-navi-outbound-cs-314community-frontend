@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useLocale } from '../../contexts/LocaleContext';
-import { getColorClasses } from '../../shared/config/theme.config';
-import { getAccentColor } from "../../shared/config/app.config";
-import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from '../../services/api/questions';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
+import { getAccentColor } from "../../../shared/config/app.config";
+import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from '../../../services/api/questions';
+import { Button } from '../../atoms/Button';
 
 export interface QuickReplyOption {
   id: string;
@@ -19,7 +20,7 @@ interface QuickReplyProps {
   options?: QuickReplyOption[];
 }
 
-export default function QuickReply({ 
+export function QuickReply({ 
   onReplyClick, 
   onShowFAQCategories,
   show, 
@@ -125,7 +126,7 @@ export default function QuickReply({
         <div className="flex flex-col gap-[7px] items-start">
           {finalOptions.map((option) => (
           <div key={option.id} className="pl-5 w-full">
-            <button
+            <Button
               onClick={() => handleOptionClick(option)}
               className={`
                 inline-flex items-center justify-start
@@ -143,7 +144,7 @@ export default function QuickReply({
               }}
             >
               {option.text}
-            </button>
+            </Button>
           </div>
           ))}
         </div>

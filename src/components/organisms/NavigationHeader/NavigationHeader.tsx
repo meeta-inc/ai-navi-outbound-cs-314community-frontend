@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { AccentColor, getColorClasses } from '../../../shared/config/theme.config';
-import { DynamicNaviHeader } from './DynamicNaviHeader';
+import DynamicNaviHeader from './DynamicNaviHeader';
 import { HeaderAction } from '../../../shared/config/headerConfig';
 
 interface NavigationHeaderProps {
