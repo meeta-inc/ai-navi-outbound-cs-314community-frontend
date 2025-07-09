@@ -138,3 +138,5 @@ export const headerIcons = {
 } as const;
 
 export type HeaderIconType = keyof typeof headerIcons;
+
+export default headerIcons;

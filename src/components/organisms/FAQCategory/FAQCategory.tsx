@@ -1,10 +1,10 @@
 import React from 'react';
-import { ArrowLeft, MessageCircleMore } from 'lucide-react';
-import { useLocale } from '../../contexts/LocaleContext';
-import { getColorClasses } from '../../shared/config/theme.config';
-import { getAccentColor } from "../../shared/config/app.config";
-import { DynamicIcon } from './DynamicIcon';
-import { getIconConfig, IconConfig } from '../../shared/config/iconConfig';
+import { MessageCircleMore } from 'lucide-react';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { getColorClasses } from '../../../shared/config/theme.config';
+import { getAccentColor } from "../../../shared/config/app.config";
+import { Icon } from '../../atoms/Icon';
+import { getIconConfig, IconConfig } from '../../../shared/config/iconConfig';
 
 export interface FAQCategoryItem {
   id: string;
@@ -17,10 +17,7 @@ export interface FAQCategoryItem {
 interface FAQCategoryProps {
   categories?: FAQCategoryItem[];
   onCategorySelect: (category: FAQCategoryItem) => void;
-  onBack?: () => void;
-  title?: string;
   description?: string;
-  showBackButton?: boolean;
   className?: string;
 }
 
@@ -61,13 +58,10 @@ const createDefaultCategories = (): FAQCategoryItem[] => {
   ];
 };
 
-export default function FAQCategory({ 
+export function FAQCategory({ 
   categories,
   onCategorySelect,
-  onBack,
-  title,
   description,
-  showBackButton = true,
   className = ""
 }: FAQCategoryProps) {
   const defaultCategories = createDefaultCategories();
@@ -76,7 +70,6 @@ export default function FAQCategory({
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
 
-  const displayTitle = title || t('chat.faq.title');
   const displayDescription = description || t('chat.faq.description');
 
   return (
@@ -104,7 +97,7 @@ export default function FAQCategory({
             >
               <div className="w-5 h-5 flex items-center justify-center">
                 {category.iconConfig ? (
-                  <DynamicIcon 
+                  <Icon 
                     config={category.iconConfig} 
                     className="w-4 h-4"
                   />
