@@ -54,7 +54,7 @@ export default function QuickReply({
           });
         } catch (err) {
           console.error('Failed to fetch quick reply questions:', err);
-          setError('질문을 불러오는데 실패했습니다.');
+          setError(t('chat.quickReplies.error'));
           // 에러 발생 시 기본값 사용
           setApiData({
             header: t('chat.quickReplies.header'),
@@ -109,7 +109,7 @@ export default function QuickReply({
       {isLoading && (
         <div className="flex items-center justify-center py-4">
           <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="ml-2 text-sm text-gray-500">질문을 불러오는 중...</span>
+          <span className="ml-2 text-sm text-gray-500">{t('chat.quickReplies.loading')}</span>
         </div>
       )}
 
