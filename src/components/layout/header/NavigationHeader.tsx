@@ -3,10 +3,10 @@ import {
   Home,
   ArrowLeft
 } from 'lucide-react';
-import { useLocale } from '../../contexts/LocaleContext';
-import { AccentColor, getColorClasses } from '../../utils/theme';
-import { DynamicNaviHeader } from '../navigation/DynamicNaviHeader';
-import { HeaderAction } from '../../config/headerConfig';
+import { useLocale } from '../../../contexts/LocaleContext';
+import { AccentColor, getColorClasses } from '../../../shared/config/theme.config';
+import { DynamicNaviHeader } from './DynamicNaviHeader';
+import { HeaderAction } from '../../../shared/config/headerConfig';
 
 interface NavigationHeaderProps {
   title: string;
