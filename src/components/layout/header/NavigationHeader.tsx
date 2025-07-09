@@ -63,9 +63,9 @@ export default function NavigationHeader({
   };
 
   return (
-    <div className={`bg-navi-white border-b ${colors.border}`}>
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+    <div className={`bg-navi-white border-b ${colors.border} h-[60px]`}>
+      <div className="max-w-7xl mx-auto px-4 h-full flex items-center">
+        <div className="flex justify-between items-center w-full">
           <div className="flex items-center gap-4">
             {shouldShowBackButton() && (
               <button
@@ -82,9 +82,6 @@ export default function NavigationHeader({
                   <span className={`text-2xl font-bold ${colors.accent}`}>∞</span>
                   <span className={`text-xl font-bold ${colors.textSecondary} ml-1`}>3.14</span>
                   <span className={`text-lg font-medium ${colors.accentSecondary} ml-1`}>community</span>
-                </div>
-                <div className={`text-xs ${colors.accent} font-medium ml-2`}>
-                  〜学びたい気持ちを育てる〜
                 </div>
               </div>
             )}

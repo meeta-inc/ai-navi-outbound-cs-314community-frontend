@@ -14,6 +14,7 @@ export interface ColorClasses {
   textWhite: string;
   textSecondary: string;
   textMuted: string;
+  textBlack: string;
   bgWhite: string;
   bgSecondary: string;
   gradient: {
@@ -37,6 +38,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textWhite: 'text-white',
     textSecondary: 'text-gray-700',
     textMuted: 'text-gray-500',
+    textBlack: 'text-navi-black',
     bgWhite: 'bg-white',
     bgSecondary: 'bg-gray-50',
     gradient: {
@@ -58,6 +60,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textWhite: 'text-white',
     textSecondary: 'text-gray-700',
     textMuted: 'text-gray-500',
+    textBlack: 'text-navi-black',
     bgWhite: 'bg-white',
     bgSecondary: 'bg-gray-50',
     gradient: {
@@ -79,6 +82,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textWhite: 'text-white',
     textSecondary: 'text-gray-700',
     textMuted: 'text-gray-500',
+    textBlack: 'text-navi-black',
     bgWhite: 'bg-white',
     bgSecondary: 'bg-gray-50',
     gradient: {
@@ -100,6 +104,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textWhite: 'text-white',
     textSecondary: 'text-gray-700',
     textMuted: 'text-gray-500',
+    textBlack: 'text-navi-black',
     bgWhite: 'bg-white',
     bgSecondary: 'bg-gray-50',
     gradient: {
@@ -121,6 +126,7 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     textWhite: 'text-white',
     textSecondary: 'text-gray-700',
     textMuted: 'text-gray-500',
+    textBlack: 'text-navi-black',
     bgWhite: 'bg-white',
     bgSecondary: 'bg-gray-50',
     gradient: {
