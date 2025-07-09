@@ -1,2 +1,3 @@
 export { ChatInput } from './ChatInput';
-export { ChatInput as default } from './ChatInput';
+import { ChatInput } from './ChatInput';
+export default ChatInput;

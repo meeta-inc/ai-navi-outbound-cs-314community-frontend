@@ -1,3 +1,4 @@
 export { FAQCategory } from './FAQCategory';
-export { FAQCategory as default } from './FAQCategory';
+import { FAQCategory } from './FAQCategory';
+export default FAQCategory;
 export type { FAQCategoryItem } from './FAQCategory';
