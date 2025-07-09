@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AccentColor, getColorClasses, isValidAccentColor } from '../utils/theme';
+import { AccentColor, getColorClasses, isValidAccentColor } from '../shared/config/theme.config';
 
 interface UseThemeOptions {
   defaultColor?: AccentColor;

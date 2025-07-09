@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Download } from 'lucide-react';
 import { sendChatMessage } from '../services/api/chat';
-import { getColorClasses } from '../utils/theme';
-import { getAccentColor } from '../services/config';
+import { getColorClasses } from '../shared/config/theme.config';
+import { getAccentColor } from "../shared/config/app.config";
 import type { Message } from '../types';
 
 interface UseChatOptions {

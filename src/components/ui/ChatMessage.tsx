@@ -1,11 +1,10 @@
-import { UserIcon } from 'lucide-react';
 import TypewriterText from './TypewriterText';
 import type { Message } from '../../types';
-import { getColorClasses } from '../../utils/theme';
+import { getColorClasses } from '../../shared/config/theme.config';
+import { getAccentColor, getShowTimestamp } from '../../shared/config/app.config';
 import { useLocale } from '../../contexts/LocaleContext';
-import { getAccentColor } from '../../services/config';
-import { getSupporterName } from '../../config/chatConfig';
-import AiChatbotIcon from '../../assets/icons/chat/Ai_Chatbot_1.svg';
+import { getSupporterName } from '../../shared/config/chatConfig';
+import AiChatbotIcon from '../../assets/icons/Ai_Chatbot_1.svg';
 
 interface ChatMessageProps {
   message: Message;
@@ -17,6 +16,7 @@ interface ChatMessageProps {
 export default function ChatMessage({ message, isTyping = false, onTypingComplete }: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
+  const showTimestamp = getShowTimestamp();
   const colors = getColorClasses(accentColor);
   const isBot = message.type === 'bot';
   const supporterName = getSupporterName();
@@ -70,28 +70,33 @@ export default function ChatMessage({ message, isTyping = false, onTypingComplet
     );
   }
 
-  // 사용자 메시지 (기존 스타일 유지)
+  // 사용자 메시지 (Figma 디자인에 맞춤)
   return (
-    <div className="flex items-start gap-3 justify-end">
-      <div className="max-w-[85%] order-first">
-        <div className={`p-3 rounded-2xl ${colors.background} ${colors.textWhite} rounded-br-sm`}>
-          <div className="whitespace-pre-wrap">
-            {typeof message.content === 'string' ? message.content : message.content}
+    <div className="box-border content-stretch flex flex-col gap-[3px] items-end justify-start p-0 relative size-full">
+      <div className="flex items-center justify-center max-w-[257px] relative shrink-0">
+        <div className="bg-[#ebebeb] box-border content-stretch flex flex-row gap-2 items-start justify-start px-[15px] py-2.5 relative rounded-tl-[10px] rounded-bl-[10px] rounded-br-[10px]">
+          <div className="flex items-center justify-center max-w-[227px] relative shrink-0">
+            <div
+              className="font-['Work_Sans:Regular',_'Noto_Sans_JP:Regular',_sans-serif] font-normal leading-[20px] relative text-[#303030] text-[14px] text-left"
+              style={{ fontFamily: "'Work Sans', 'Noto Sans JP', sans-serif" }}
+            >
+              <div className="whitespace-pre-wrap">
+                {typeof message.content === 'string' ? message.content : message.content}
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div className={`text-xs ${colors.textMuted} mt-1 px-1 text-right`}>
+      </div>
+      
+      {showTimestamp && (
+        <div className="text-xs text-[#666666] mt-1 px-1 text-right">
           {message.timestamp.toLocaleTimeString(locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', { 
             hour: '2-digit', 
             minute: '2-digit',
             hour12: true
           })}
         </div>
-      </div>
-
-      <div className={`${colors.background} ${colors.textWhite} p-2 rounded-full flex-shrink-0`}>
-        <UserIcon className="w-4 h-4" />
-      </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import React from 'react';
-import { HeaderAction, getHeaderConfig, filterActionsByMaxItems, isActionVisible } from '../../config/headerConfig';
-import { headerIcons } from '../icons/HeaderIcons';
-import { getColorClasses } from '../../utils/theme';
-import { getAccentColor } from '../../services/config';
+import { HeaderAction, getHeaderConfig, filterActionsByMaxItems, isActionVisible } from '../../../shared/config/headerConfig';
+import { headerIcons } from './HeaderIcons';
+import { getColorClasses } from '../../../shared/config/theme.config';
+import { getAccentColor } from "../../../shared/config/app.config";
 
 interface DynamicNaviHeaderProps {
   clientId?: string;
