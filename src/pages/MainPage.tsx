@@ -219,31 +219,29 @@ function MainPage() {
                       />
                     </div>
                   )}
+                  {/* FAQ 카테고리를 해당 메시지 바로 다음에 표시 */}
+                  {message.content === t('chat.faq.whatWouldYouLikeToKnow') && message.type === 'bot' && showFAQCategories && (
+                    <div className="mt-4">
+                      <FAQCategory 
+                        onCategorySelect={handleFAQCategorySelect}
+                      />
+                    </div>
+                  )}
+                  {/* Top 질문을 해당 메시지 바로 다음에 표시 */}
+                  {selectedCategory && message.content === t('chat.faq.categorySelected', { category: t(selectedCategory.textKey) }) && message.type === 'bot' && showTopQuestions && (
+                    <div className="mt-4">
+                      <TopQuestions
+                        categoryId={selectedCategory.id}
+                        categoryTitle={t(selectedCategory.textKey)}
+                        onQuestionSelect={handleTopQuestionSelect}
+                        onBackToCategories={handleBackToCategories}
+                        userId="Hyunse0001"
+                        onDataLoaded={handleTopQuestionsDataLoaded}
+                      />
+                    </div>
+                  )}
                 </div>
               ))}
-              
-              {/* FAQ 카테고리 표시 */}
-              {showFAQCategories && (
-                <div className="mt-4">
-                  <FAQCategory 
-                    onCategorySelect={handleFAQCategorySelect}
-                  />
-                </div>
-              )}
-              
-              {/* Top 질문 표시 */}
-              {showTopQuestions && selectedCategory && (
-                <div className="mt-4">
-                  <TopQuestions
-                    categoryId={selectedCategory.id}
-                    categoryTitle={t(selectedCategory.textKey)}
-                    onQuestionSelect={handleTopQuestionSelect}
-                    onBackToCategories={handleBackToCategories}
-                    userId="Hyunse0001"
-                    onDataLoaded={handleTopQuestionsDataLoaded}
-                  />
-                </div>
-              )}
               
               {currentlyTyping && (
                 <ChatMessage
