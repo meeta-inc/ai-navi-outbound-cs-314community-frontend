@@ -10,6 +10,7 @@ export interface QuickReplyOption {
 
 interface QuickReplyProps {
   onReplyClick: (text: string) => void;
+  onShowFAQCategories?: () => void;
   show: boolean;
   options?: QuickReplyOption[];
 }
@@ -39,6 +40,7 @@ const defaultOptions: QuickReplyOption[] = [
 
 export default function QuickReply({ 
   onReplyClick, 
+  onShowFAQCategories,
   show, 
   options = defaultOptions 
 }: QuickReplyProps) {
@@ -49,6 +51,12 @@ export default function QuickReply({
   if (!show) return null;
 
   const handleOptionClick = (option: QuickReplyOption) => {
+    // "그외" 버튼의 경우 FAQ 카테고리 표시
+    if (option.id === 'other' && onShowFAQCategories) {
+      onShowFAQCategories();
+      return;
+    }
+    
     const translatedText = t(option.textKey);
     onReplyClick(translatedText);
   };

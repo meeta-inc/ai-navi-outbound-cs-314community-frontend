@@ -24,13 +24,18 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
   const [currentlyTyping, setCurrentlyTyping] = useState<ProcessedChatResponse | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const shouldScrollRef = useRef<boolean>(true);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (shouldScrollRef.current) {
+      scrollToBottom();
+    }
+    // 스크롤 후 플래그 리셋
+    shouldScrollRef.current = true;
   }, [messages, currentlyTyping]);
 
   const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
@@ -152,6 +157,43 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
     });
   }, []);
 
+  const addTypingBotMessage = useCallback((message: string) => {
+    // 타이핑 효과로 봇 메시지 표시
+    setCurrentlyTyping({
+      message: message,
+      toolName: undefined,
+      toolInput: undefined
+    });
+  }, []);
+
+  const addUserMessage = useCallback((content: string, shouldScroll: boolean = true) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: content,
+      timestamp: new Date()
+    };
+    
+    // 스크롤 방지 플래그 설정
+    shouldScrollRef.current = shouldScroll;
+    
+    setMessages(prev => [...prev, userMessage]);
+  }, []);
+
+  const addBotMessage = useCallback((content: string | React.ReactNode, shouldScroll: boolean = true) => {
+    const botMessage: Message = {
+      id: Date.now().toString(),
+      type: 'bot',
+      content: content,
+      timestamp: new Date()
+    };
+    
+    // 스크롤 방지 플래그 설정
+    shouldScrollRef.current = shouldScroll;
+    
+    setMessages(prev => [...prev, botMessage]);
+  }, []);
+
   return {
     messages,
     newMessage,
@@ -163,6 +205,9 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
     handleSendMessage,
     completeTyping,
     addWelcomeMessage,
+    addTypingBotMessage,
+    addUserMessage,
+    addBotMessage,
     scrollToBottom
   };
 }
