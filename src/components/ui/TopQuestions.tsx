@@ -42,7 +42,7 @@ export default function TopQuestions({
         setQuestions(data.questions);
       } catch (err) {
         console.error('Failed to fetch top questions:', err);
-        setError('질문을 불러오는데 실패했습니다.');
+        setError(t('chat.faq.error'));
         // 에러 발생 시 로컬 데이터 사용
         const questionsResult = t(`chat.faq.${categoryId}.topQuestions`);
         setQuestions(Array.isArray(questionsResult) ? questionsResult : []);
@@ -91,7 +91,7 @@ export default function TopQuestions({
       {isLoading && (
         <div className="flex items-center justify-center py-4">
           <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="ml-2 text-sm text-gray-500">질문을 불러오는 중...</span>
+          <span className="ml-2 text-sm text-gray-500">{t('chat.faq.loading')}</span>
         </div>
       )}
 
@@ -119,7 +119,7 @@ export default function TopQuestions({
             </div>
           )) : (
             <div className="pl-5 w-full">
-              <p className="text-gray-500 text-sm">질문을 불러올 수 없습니다.</p>
+              <p className="text-gray-500 text-sm">{t('chat.faq.noQuestions')}</p>
             </div>
           )}
           

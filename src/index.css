@@ -52,6 +52,20 @@
   }
 }
 
+@layer utilities {
+  .text-meeta-black {
+    color: #000000;
+  }
+  
+  .bg-meeta-black {
+    background-color: #000000;
+  }
+  
+  .border-meeta-black {
+    border-color: #000000;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
