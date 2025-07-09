@@ -98,7 +98,9 @@ export default function FAQCategory({
             <button
               onClick={() => onCategorySelect(category)}
               className={`${colors.background} ${colors.textWhite} inline-flex items-center gap-2.5 max-w-[257px] pl-2.5 pr-5 py-2.5 rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left`}
-              style={{ fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif" }}
+              style={{ 
+                fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
+              }}
             >
               <div className="w-5 h-5 flex items-center justify-center">
                 {category.iconConfig ? (
@@ -110,7 +112,7 @@ export default function FAQCategory({
                   category.icon || <MessageCircleMore className="w-4 h-4" />
                 )}
               </div>
-              <span className="flex-1 min-w-0">
+              <span className="font-semibold flex-1 min-w-0">
                 {t(category.textKey)}
               </span>
             </button>
