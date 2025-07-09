@@ -1,2 +1,3 @@
 export { TopQuestions } from './TopQuestions';
-export { TopQuestions as default } from './TopQuestions';
+import { TopQuestions } from './TopQuestions';
+export default TopQuestions;
