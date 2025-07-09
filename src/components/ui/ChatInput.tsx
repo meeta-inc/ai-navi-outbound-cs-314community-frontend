@@ -57,7 +57,7 @@ export default function ChatInput({
         className={`w-8 h-8 sm:w-[35px] sm:h-[35px] flex justify-center items-center flex-shrink-0 transition-colors ${colors.backgroundHover} hover:text-white group`}
         aria-label="카테고리"
       >
-        <CategoryIcon className={`w-5 h-5 ${colors.textBlack} group-hover:text-white`} />
+        <CategoryIcon className={`w-7 h-7 ${colors.textBlack} group-hover:text-white`} />
       </button>
       
       {/* Input Field */}
@@ -110,7 +110,7 @@ export default function ChatInput({
         }`}
         aria-label={t('student.chatbot.send')}
       >
-        <SendIcon className={`w-5 h-5 transition-colors ${
+        <SendIcon className={`w-7 h-7 transition-colors ${
           value.trim() && !disabled
             ? `${colors.text} group-hover:text-white`
             : 'text-gray-400'
