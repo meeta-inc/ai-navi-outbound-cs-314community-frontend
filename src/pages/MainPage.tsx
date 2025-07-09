@@ -67,7 +67,7 @@ function MainPage() {
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <div className="flex items-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin text-orange-500" />
+          <Loader2 className={`w-6 h-6 animate-spin ${colors.text}`} />
           <span className="text-gray-600">Loading...</span>
         </div>
       </div>
@@ -75,7 +75,7 @@ function MainPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-navi-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-white overflow-hidden">
       {showNavigationHeader && (
         <NavigationHeader 
           title={t('common.home')} 
@@ -90,11 +90,10 @@ function MainPage() {
         />
       )}
       
-      // 상단 그리팅 영역 제거
       {/* <div className={`bg-gradient-to-r ${colors.gradient.from} ${colors.gradient.to} flex-shrink-0`}>
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex items-center gap-4">
-            <div className={`bg-navi-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
+            <div className={`bg-white/80 backdrop-blur-sm p-2.5 rounded-full shadow-sm border ${colors.border}`}>
               <UserCircle className={`w-4 h-4 ${colors.text}`} />
             </div>
             <div>
@@ -146,11 +145,11 @@ function MainPage() {
                   <div className={`${colors.background} text-white p-2 rounded-full flex-shrink-0`}>
                     <Loader2 className="w-4 h-4 animate-spin" />
                   </div>
-                  <div className="bg-gray-100 text-gray-800 p-3 rounded-2xl rounded-bl-sm">
+                  <div className={`${colors.bgLight} p-3 rounded-2xl rounded-bl-sm`}>
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                      <div className={`w-2 h-2 ${colors.background} rounded-full animate-bounce`} style={{ animationDelay: '0ms' }}></div>
+                      <div className={`w-2 h-2 ${colors.background} rounded-full animate-bounce`} style={{ animationDelay: '150ms' }}></div>
+                      <div className={`w-2 h-2 ${colors.background} rounded-full animate-bounce`} style={{ animationDelay: '300ms' }}></div>
                     </div>
                   </div>
                 </div>
