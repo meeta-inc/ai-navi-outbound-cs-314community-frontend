@@ -17,18 +17,18 @@ interface QuickReplyProps {
 
 const defaultOptions: QuickReplyOption[] = [
   {
-    id: 'summer-course',
-    textKey: 'chat.quickReplies.summerCourse',
+    id: 'top1',
+    textKey: 'chat.quickReplies.top1',
     type: 'primary'
   },
   {
-    id: 'tuition',
-    textKey: 'chat.quickReplies.tuition',
+    id: 'top2',
+    textKey: 'chat.quickReplies.top2',
     type: 'primary'
   },
   {
-    id: 'elementary',
-    textKey: 'chat.quickReplies.elementary',
+    id: 'top3',
+    textKey: 'chat.quickReplies.top3',
     type: 'primary'
   },
   {
