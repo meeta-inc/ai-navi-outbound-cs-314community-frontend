@@ -5,6 +5,7 @@ import NavigationHeader from '../components/layout/header/NavigationHeader';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply from '../components/ui/QuickReply';
+import FAQCategory from '../components/ui/FAQCategory';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
 import { getAccentColor, getShowNavigationHeader } from '../shared/config/app.config';
@@ -16,6 +17,8 @@ function MainPage() {
   const { colors } = useTheme();
   const isInitialized = useRef(false);
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
+  const [showFAQCategories, setShowFAQCategories] = useState(false);
+  const [waitingForFAQCategories, setWaitingForFAQCategories] = useState(false);
 
   const {
     messages,
@@ -27,7 +30,9 @@ function MainPage() {
     chatContainerRef,
     handleSendMessage,
     completeTyping,
-    addWelcomeMessage
+    addWelcomeMessage,
+    addTypingBotMessage,
+    addUserMessage
   } = useChat({
     userId: 'Hyunse0001', // 실제 사용자 ID
     onError: (error) => {
@@ -40,6 +45,14 @@ function MainPage() {
           setShowFigmaQuickReply(true);
         }
       }, 500);
+      
+      // FAQ 카테고리 대기 중이면 표시
+      if (waitingForFAQCategories) {
+        setTimeout(() => {
+          setShowFAQCategories(true);
+          setWaitingForFAQCategories(false);
+        }, 500);
+      }
     }
   });
 
@@ -57,6 +70,27 @@ function MainPage() {
     setNewMessage(text);
     setShowFigmaQuickReply(false);
     await handleSendMessage(text);
+  };
+
+  const handleShowFAQCategories = () => {
+    const otherText = t('chat.quickReplies.other');
+    const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
+    
+    // 유저 메시지 추가
+    addUserMessage(otherText, false);
+    setShowFigmaQuickReply(false);
+    
+    // 타이핑 봇 메시지 추가
+    setTimeout(() => {
+      setWaitingForFAQCategories(true);
+      addTypingBotMessage(whatWouldYouLikeToKnow);
+    }, 100);
+  };
+
+  const handleFAQCategorySelect = async (category: any) => {
+    const questionText = t(category.valueKey);
+    setShowFAQCategories(false);
+    await handleSendMessage(questionText);
   };
 
   const handleSendClick = async () => {
@@ -120,12 +154,23 @@ function MainPage() {
                     <div className="mt-4">
                       <QuickReply 
                         onReplyClick={handleQuickReplyClick}
+                        onShowFAQCategories={handleShowFAQCategories}
                         show={true}
                       />
                     </div>
                   )}
                 </div>
               ))}
+              
+              {/* FAQ 카테고리 표시 */}
+              {showFAQCategories && (
+                <div className="mt-4">
+                  <FAQCategory 
+                    onCategorySelect={handleFAQCategorySelect}
+                    showBackButton={false}
+                  />
+                </div>
+              )}
               
               {currentlyTyping && (
                 <ChatMessage
