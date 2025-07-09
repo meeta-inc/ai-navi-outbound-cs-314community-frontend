@@ -1,3 +1,5 @@
+import { AccentColor } from './theme.config';
+
 export const getApiUrl = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -20,15 +22,15 @@ export const getChatApiUrl = () => {
   return chatApiUrl;
 };
 
-export const getAccentColor = () => {
+export const getAccentColor = (): AccentColor => {
   const accentColor = import.meta.env.VITE_ACCENT_COLOR;
   
-  if (!accentColor || !['orange', 'blue', 'green', 'purple'].includes(accentColor)) {
+  if (!accentColor || !['orange', 'blue', 'green', 'red', 'purple'].includes(accentColor)) {
     console.warn('Invalid or undefined accent color, falling back to orange');
     return 'orange';
   }
   
-  return accentColor as 'orange' | 'blue' | 'green' | 'purple';
+  return accentColor as AccentColor;
 };
 
 export const getShowNavigationHeader = () => {

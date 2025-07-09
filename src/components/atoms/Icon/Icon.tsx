@@ -1,7 +1,7 @@
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
-import { IconConfig } from '../../shared/config/iconConfig';
-import { CustomIcon, SchoolIcon, TeacherIcon, ImageIcon } from '../icons/CustomIcon';
+import { IconConfig } from '../../../shared/config/iconConfig';
+import { CustomIcon, SchoolIcon, TeacherIcon, ImageIcon } from '../../icons/CustomIcon';
 
 // 커스텀 아이콘 컴포넌트 매핑
 // 새로운 커스텀 아이콘을 추가하려면 여기에 import하고 componentMap에 추가하세요
@@ -13,12 +13,12 @@ const componentMap = {
   // 추가 컴포넌트들...
 };
 
-interface DynamicIconProps {
+interface IconProps {
   config: IconConfig;
   className?: string;
 }
 
-export const DynamicIcon: React.FC<DynamicIconProps> = ({ config, className = "w-4 h-4" }) => {
+export const Icon: React.FC<IconProps> = ({ config, className = "w-4 h-4" }) => {
   switch (config.type) {
     case 'lucide':
       try {

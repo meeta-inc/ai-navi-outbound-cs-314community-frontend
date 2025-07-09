@@ -10,7 +10,7 @@ interface DynamicNaviHeaderProps {
   className?: string;
 }
 
-export const DynamicNaviHeader: React.FC<DynamicNaviHeaderProps> = ({
+const DynamicNaviHeader: React.FC<DynamicNaviHeaderProps> = ({
   clientId = 'default',
   onActionClick,
   className = '',
