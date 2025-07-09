@@ -70,7 +70,29 @@
     },
     "faq": {
       "title": "よくある質問",
-      "description": "よくある質問カテゴリから選択してください",
+      "description": "最も当てはまるカテゴリを教えてください",
+      "selectCategory": "最も当てはまるカテゴリを教えてください",
+      "whatWouldYouLikeToKnow": "どのようなことを知りたいですか？",
+      "classes": {
+        "title": "授業について",
+        "message": "授業について質問があります。"
+      },
+      "teachers": {
+        "title": "講師について",
+        "message": "講師について質問があります。"
+      },
+      "results": {
+        "title": "塾の実績について",
+        "message": "塾の実績について質問があります。"
+      },
+      "homework": {
+        "title": "宿題について",
+        "message": "宿題について質問があります。"
+      },
+      "other": {
+        "title": "その他",
+        "message": "その他の質問があります。"
+      },
       "schedule": {
         "title": "授業・スケジュール",
         "message": "授業時間やスケジュールについて質問があります。"
@@ -78,10 +100,6 @@
       "grades": {
         "title": "成績・評価",
         "message": "成績や評価について質問があります。"
-      },
-      "homework": {
-        "title": "宿題・課題",
-        "message": "宿題や課題について質問があります。"
       },
       "support": {
         "title": "サポート・相談",
