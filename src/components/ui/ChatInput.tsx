@@ -38,6 +38,10 @@ export default function ChatInput({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
+      // IME 변환 중일 때는 메시지 전송하지 않음
+      if (e.nativeEvent.isComposing) {
+        return;
+      }
       e.preventDefault();
       if (value.trim() && !disabled) {
         onSend();
