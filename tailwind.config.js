@@ -31,6 +31,7 @@ export default {
             sub2: '#EDE9FE',
           },
           white: '#FFFFFF',
+          black: '#000000',
         },
       },
     },
