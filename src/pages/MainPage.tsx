@@ -6,6 +6,7 @@ import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply from '../components/ui/QuickReply';
 import FAQCategory from '../components/ui/FAQCategory';
+import TopQuestions from '../components/ui/TopQuestions';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
 import { getAccentColor, getShowNavigationHeader } from '../shared/config/app.config';
@@ -19,6 +20,9 @@ function MainPage() {
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
   const [showFAQCategories, setShowFAQCategories] = useState(false);
   const [waitingForFAQCategories, setWaitingForFAQCategories] = useState(false);
+  const [showTopQuestions, setShowTopQuestions] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [waitingForTopQuestions, setWaitingForTopQuestions] = useState(false);
 
   const {
     messages,
@@ -43,6 +47,10 @@ function MainPage() {
       setTimeout(() => {
         if (messages.length <= 1) {
           setShowFigmaQuickReply(true);
+          // QuickReply가 표시된 후 스크롤
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
         }
       }, 500);
       
@@ -51,6 +59,18 @@ function MainPage() {
         setTimeout(() => {
           setShowFAQCategories(true);
           setWaitingForFAQCategories(false);
+          // FAQ 카테고리가 표시된 후 스크롤
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }, 500);
+      }
+      
+      // Top 질문 대기 중이면 표시
+      if (waitingForTopQuestions) {
+        setTimeout(() => {
+          setShowTopQuestions(true);
+          setWaitingForTopQuestions(false);
         }, 500);
       }
     }
@@ -87,10 +107,49 @@ function MainPage() {
     }, 100);
   };
 
-  const handleFAQCategorySelect = async (category: any) => {
-    const questionText = t(category.valueKey);
+  const handleFAQCategorySelect = (category: any) => {
+    const categoryTitle = t(category.textKey);
+    const categorySelectedMessage = t('chat.faq.categorySelected', { category: categoryTitle });
+    
+    // 1. 유저 메시지로 선택한 카테고리 표시
+    addUserMessage(categoryTitle, false);
     setShowFAQCategories(false);
-    await handleSendMessage(questionText);
+    setSelectedCategory(category);
+    
+    // 2. 봇 메시지 타이핑 애니메이션으로 표시
+    setTimeout(() => {
+      setWaitingForTopQuestions(true);
+      addTypingBotMessage(categorySelectedMessage);
+    }, 100);
+  };
+
+  const handleTopQuestionSelect = async (question: string) => {
+    // 4. 각 top 질문을 클릭하면 유저 메시지로 표시 후 LLM 송신
+    setShowTopQuestions(false);
+    setSelectedCategory(null);
+    await handleSendMessage(question);
+  };
+
+  const handleBackToCategories = () => {
+    // 5. 카테고리 선택으로 돌아가기 클릭하면 유저 메시지로 표시 후 카테고리 재표시
+    const backText = t('chat.faq.backToCategories');
+    const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
+    
+    addUserMessage(backText, false);
+    setShowTopQuestions(false);
+    setSelectedCategory(null);
+    
+    setTimeout(() => {
+      setWaitingForFAQCategories(true);
+      addTypingBotMessage(whatWouldYouLikeToKnow);
+    }, 100);
+  };
+
+  const handleTopQuestionsDataLoaded = () => {
+    // TopQuestions 데이터가 로드되고 렌더링이 완료된 후 스크롤
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 200);
   };
 
   const handleSendClick = async () => {
@@ -156,6 +215,7 @@ function MainPage() {
                         onReplyClick={handleQuickReplyClick}
                         onShowFAQCategories={handleShowFAQCategories}
                         show={true}
+                        userId="Hyunse0001"
                       />
                     </div>
                   )}
@@ -168,6 +228,20 @@ function MainPage() {
                   <FAQCategory 
                     onCategorySelect={handleFAQCategorySelect}
                     showBackButton={false}
+                  />
+                </div>
+              )}
+              
+              {/* Top 질문 표시 */}
+              {showTopQuestions && selectedCategory && (
+                <div className="mt-4">
+                  <TopQuestions
+                    categoryId={selectedCategory.id}
+                    categoryTitle={t(selectedCategory.textKey)}
+                    onQuestionSelect={handleTopQuestionSelect}
+                    onBackToCategories={handleBackToCategories}
+                    userId="Hyunse0001"
+                    onDataLoaded={handleTopQuestionsDataLoaded}
                   />
                 </div>
               )}
