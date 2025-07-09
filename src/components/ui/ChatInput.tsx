@@ -81,11 +81,10 @@ export default function ChatInput({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t('student.chatbot.placeholder')}
-          className="resize-none bg-transparent border-none outline-none"
+          className={`resize-none bg-transparent border-none outline-none ${colors.textBlack}`}
           style={{
             maxHeight: '270px',
             alignSelf: 'stretch',
-            color: '#B7B7B7',
             fontFamily: 'Work Sans',
             fontSize: '16px',
             fontStyle: 'normal',
