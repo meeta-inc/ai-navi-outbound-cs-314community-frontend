@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useLocale } from '../../contexts/LocaleContext';
-import { getColorClasses } from '../../utils/theme';
-import { getAccentColor } from '../../services/config';
+import { getColorClasses } from '../../shared/config/theme.config';
+import { getAccentColor } from "../../shared/config/app.config";
 
 interface ChatInputProps {
   value: string;

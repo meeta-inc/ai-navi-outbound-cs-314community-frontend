@@ -1,4 +1,4 @@
-import { getApiUrl, getChatApiUrl } from '../config';
+import { getApiUrl, getChatApiUrl } from '../../shared/config/app.config';
 import { getAuthToken } from '../auth';
 
 export const fetchApi = async (endpoint: string, options: RequestInit = {}) => {

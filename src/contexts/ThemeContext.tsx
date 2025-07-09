@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode } from 'react';
-import { AccentColor } from '../utils/theme';
+import { AccentColor } from '../shared/config/theme.config';
 import { useTheme } from '../hooks/useTheme';
 
 interface ThemeContextType {

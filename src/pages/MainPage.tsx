@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
-import NavigationHeader from '../components/common/NavigationHeader';
+import NavigationHeader from '../components/layout/header/NavigationHeader';
 import ChatMessage from '../components/ui/ChatMessage';
 import ChatInput from '../components/ui/ChatInput';
 import QuickReply from '../components/ui/QuickReply';
 import { useChat } from '../hooks/useChat';
 import { useTheme } from '../hooks/useTheme';
-import { getAccentColor, getShowNavigationHeader } from '../services/config';
+import { getAccentColor, getShowNavigationHeader } from '../shared/config/app.config';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
