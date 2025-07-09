@@ -51,7 +51,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="bg-white border-t" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+    <div className={`${colors.bgWhite} border-t`} style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       <div className="max-w-3xl mx-auto px-4">
         <div className="pt-4 px-4 pb-4 flex items-center gap-3">
           <div className="flex-1">
@@ -61,13 +61,7 @@ export default function ChatInput({
               onChange={handleChange}
               onKeyPress={handleKeyPress}
               placeholder={placeholder || t('student.chatbot.placeholder')}
-              className="w-full resize-none rounded-lg border-gray-200 px-4 py-3 max-h-32 min-h-[48px] focus:ring-2 focus:border-transparent"
-              style={{
-                '--tw-ring-color': accentColor === 'orange' ? 'rgb(249 115 22)' : 
-                                  accentColor === 'blue' ? 'rgb(59 130 246)' :
-                                  accentColor === 'green' ? 'rgb(34 197 94)' :
-                                  'rgb(168 85 247)'
-              } as React.CSSProperties}
+              className={`w-full resize-none rounded-lg ${colors.border} px-4 py-3 max-h-32 min-h-[48px] focus:ring-2 focus:border-transparent ${colors.ring}`}
               rows={1}
               disabled={disabled}
             />
@@ -78,7 +72,7 @@ export default function ChatInput({
             className={`w-12 h-12 rounded-lg transition-colors flex-shrink-0 flex items-center justify-center ${
               value.trim() && !disabled
                 ? `${colors.background} text-white ${colors.backgroundHover}`
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : `${colors.bgHover} ${colors.textMuted} cursor-not-allowed`
             }`}
             aria-label={t('student.chatbot.send')}
           >

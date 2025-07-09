@@ -1,6 +1,8 @@
 import React from 'react';
 import { HeaderAction, getHeaderConfig, filterActionsByMaxItems, isActionVisible } from '../../config/headerConfig';
 import { headerIcons } from '../icons/HeaderIcons';
+import { getColorClasses } from '../../utils/theme';
+import { getAccentColor } from '../../services/config';
 
 interface DynamicNaviHeaderProps {
   clientId?: string;
@@ -15,6 +17,8 @@ export const DynamicNaviHeader: React.FC<DynamicNaviHeaderProps> = ({
 }) => {
   const headerConfig = getHeaderConfig(clientId);
   const visibleActions = filterActionsByMaxItems(headerConfig.actions, headerConfig.maxItems);
+  const accentColor = getAccentColor();
+  const colors = getColorClasses(accentColor);
 
   const handleActionClick = (action: HeaderAction) => {
     if (onActionClick) {
@@ -56,12 +60,12 @@ export const DynamicNaviHeader: React.FC<DynamicNaviHeaderProps> = ({
                 className={`relative shrink-0 size-6 flex items-center justify-center transition-colors duration-200 ${
                   action.disabled 
                     ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-gray-100 rounded-full p-1 cursor-pointer'
+                    : `${colors.bgHover} rounded-full p-1 cursor-pointer`
                 }`}
                 aria-label={action.label}
                 title={action.label}
               >
-                <IconComponent size={20} className="text-gray-700" />
+                <IconComponent size={20} className={colors.textSecondary} />
               </button>
             );
           })}

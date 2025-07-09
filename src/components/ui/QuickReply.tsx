@@ -1,4 +1,6 @@
 import { useLocale } from '../../contexts/LocaleContext';
+import { getColorClasses } from '../../utils/theme';
+import { getAccentColor } from '../../services/config';
 
 export interface QuickReplyOption {
   id: string;
@@ -41,6 +43,8 @@ export default function QuickReply({
   options = defaultOptions 
 }: QuickReplyProps) {
   const { t } = useLocale();
+  const accentColor = getAccentColor();
+  const colors = getColorClasses(accentColor);
 
   if (!show) return null;
 
@@ -54,7 +58,7 @@ export default function QuickReply({
       {/* Header Section */}
       <div className="mb-[7px] pl-5">
         <p 
-          className="text-[#b7b7b7] text-[12px] font-medium leading-[16px] tracking-[0.6px]"
+          className={`${colors.textMuted} text-[12px] font-medium leading-[16px] tracking-[0.6px]`}
           style={{ fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif" }}
         >
           {t('chat.quickReplies.header')}
@@ -74,8 +78,8 @@ export default function QuickReply({
                 transition-all duration-200 hover:opacity-90
                 text-left
                 ${option.type === 'primary' 
-                  ? 'bg-navi-orange-main text-navi-white' 
-                  : 'bg-navi-orange-sub2 text-[#303030]'
+                  ? `${colors.background} ${colors.textWhite}` 
+                  : `${colors.bgLight} ${colors.textSecondary}`
                 }
               `}
               style={{ 
