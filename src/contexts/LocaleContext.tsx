@@ -5,7 +5,7 @@ type Locale = 'ko' | 'ja' | 'en';
 interface LocaleContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: (key: string, params?: Record<string, string>) => string;
+  t: (key: string, params?: Record<string, string>) => any;
   isLoading: boolean;
 }
 
@@ -71,7 +71,7 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem('locale', newLocale);
   };
 
-  const t = (key: string, params?: Record<string, string>): string => {
+  const t = (key: string, params?: Record<string, string>): any => {
     const keys = key.split('.');
     let value: any = translations[locale];
     
@@ -96,15 +96,15 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     }
 
-    // 문자열이 아닌 경우 키 반환
+    // 문자열이 아닌 경우 (배열 등) 원본 값 반환, null/undefined면 키 반환
     if (typeof value !== 'string') {
-      return key;
+      return value !== null && value !== undefined ? value : key;
     }
 
-    // 파라미터 치환 ({{param}} 형식)
-    if (params) {
+    // 파라미터 치환 (문자열인 경우에만)
+    if (params && typeof value === 'string') {
       return Object.entries(params).reduce((text, [param, replacement]) => {
-        return text.replace(new RegExp(`{{${param}}}`, 'g'), replacement);
+        return text.replace(new RegExp(`{${param}}`, 'g'), replacement);
       }, value);
     }
 
