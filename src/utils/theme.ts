@@ -11,6 +11,11 @@ export interface ColorClasses {
   ring: string;
   accent: string;
   accentSecondary: string;
+  textWhite: string;
+  textSecondary: string;
+  textMuted: string;
+  bgWhite: string;
+  bgSecondary: string;
   gradient: {
     from: string;
     to: string;
@@ -29,6 +34,11 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     ring: 'ring-navi-orange-main',
     accent: 'text-navi-orange-main',
     accentSecondary: 'text-navi-orange-sub1',
+    textWhite: 'text-white',
+    textSecondary: 'text-gray-700',
+    textMuted: 'text-gray-500',
+    bgWhite: 'bg-white',
+    bgSecondary: 'bg-gray-50',
     gradient: {
       from: 'from-navi-orange-sub2',
       to: 'to-navi-orange-sub1'
@@ -45,6 +55,11 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     ring: 'ring-navi-blue-main',
     accent: 'text-navi-blue-main',
     accentSecondary: 'text-navi-blue-sub1',
+    textWhite: 'text-white',
+    textSecondary: 'text-gray-700',
+    textMuted: 'text-gray-500',
+    bgWhite: 'bg-white',
+    bgSecondary: 'bg-gray-50',
     gradient: {
       from: 'from-navi-blue-sub2',
       to: 'to-navi-blue-sub1'
@@ -61,6 +76,11 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     ring: 'ring-navi-green-main',
     accent: 'text-navi-green-main',
     accentSecondary: 'text-navi-green-sub1',
+    textWhite: 'text-white',
+    textSecondary: 'text-gray-700',
+    textMuted: 'text-gray-500',
+    bgWhite: 'bg-white',
+    bgSecondary: 'bg-gray-50',
     gradient: {
       from: 'from-navi-green-sub2',
       to: 'to-navi-green-sub1'
@@ -77,6 +97,11 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     ring: 'ring-navi-red-main',
     accent: 'text-navi-red-main',
     accentSecondary: 'text-navi-red-sub1',
+    textWhite: 'text-white',
+    textSecondary: 'text-gray-700',
+    textMuted: 'text-gray-500',
+    bgWhite: 'bg-white',
+    bgSecondary: 'bg-gray-50',
     gradient: {
       from: 'from-navi-red-sub2',
       to: 'to-navi-red-sub1'
@@ -93,6 +118,11 @@ const colorMap: Record<AccentColor, ColorClasses> = {
     ring: 'ring-navi-purple-main',
     accent: 'text-navi-purple-main',
     accentSecondary: 'text-navi-purple-sub1',
+    textWhite: 'text-white',
+    textSecondary: 'text-gray-700',
+    textMuted: 'text-gray-500',
+    bgWhite: 'bg-white',
+    bgSecondary: 'bg-gray-50',
     gradient: {
       from: 'from-navi-purple-sub2',
       to: 'to-navi-purple-sub1'
