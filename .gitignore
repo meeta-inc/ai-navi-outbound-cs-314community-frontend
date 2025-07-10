@@ -26,3 +26,5 @@ dist-ssr
 # 빌드 디렉토리
 build
 public
+*storybook.log
+storybook-static
