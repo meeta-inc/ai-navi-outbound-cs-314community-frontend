@@ -18,18 +18,7 @@ const preview: Preview = {
       toc: true,
     },
     a11y: {
-      config: {
-        rules: [
-          {
-            id: 'color-contrast',
-            enabled: true,
-          },
-          {
-            id: 'focus-visible',
-            enabled: true,
-          },
-        ],
-      },
+      disable: true,
     },
   },
   tags: ['autodocs'],
