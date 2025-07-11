@@ -1,40 +1,36 @@
 import React from 'react';
 
 interface ChatLayoutProps {
-  header: React.ReactNode;
-  messages: React.ReactNode;
+  header?: React.ReactNode;
+  children: React.ReactNode;
   input: React.ReactNode;
-  quickReplies?: React.ReactNode;
-  faqCategory?: React.ReactNode;
   className?: string;
+  showNavigationHeader?: boolean;
 }
 
 export function ChatLayout({
   header,
-  messages,
+  children,
   input,
-  quickReplies,
-  faqCategory,
-  className = ""
+  className = "",
+  showNavigationHeader = false
 }: ChatLayoutProps) {
   return (
-    <div className={`flex flex-col h-full ${className}`}>
-      {/* Header */}
-      {header}
+    <div className={`h-screen flex flex-col bg-white overflow-hidden ${className}`}>
+      {/* Navigation Header */}
+      {showNavigationHeader && header}
       
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages}
-        
-        {/* Quick Replies */}
-        {quickReplies}
-        
-        {/* FAQ Category */}
-        {faqCategory}
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col bg-gray-50 min-h-0">
+        <div className="flex-1 overflow-hidden">
+          {children}
+        </div>
+
+        {/* Input Area */}
+        <div className="flex-shrink-0">
+          {input}
+        </div>
       </div>
-      
-      {/* Input Area */}
-      {input}
     </div>
   );
 }
