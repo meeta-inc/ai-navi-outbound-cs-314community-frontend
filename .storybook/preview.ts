@@ -29,6 +29,18 @@ const preview: Preview = {
     a11y: {
       disable: true,
     },
+    options: {
+      storySort: {
+        order: [
+          'Atoms',
+          'Molecules', 
+          'Organisms',
+          'Templates',
+          'Pages',
+          '*'
+        ],
+      },
+    },
   },
   tags: ['autodocs'],
 };
