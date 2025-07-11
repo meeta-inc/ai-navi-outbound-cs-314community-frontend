@@ -44,18 +44,18 @@ type Story = StoryObj<typeof meta>;
 
 export const BotMessage: Story = {
   args: {
-    content: '안녕하세요! 무엇을 도와드릴까요?',
+    content: '안녕하세요! 무엇을 도와드릴까요? 😊',
     isBot: true,
-    accentColor: 'blue',
+    accentColor: 'purple',
     isTyping: false,
   },
 };
 
 export const UserMessage: Story = {
   args: {
-    content: '안녕하세요! 도움이 필요합니다.',
+    content: '안녕하세요! 도움이 필요합니다. 🙋‍♂️',
     isBot: false,
-    accentColor: 'blue',
+    accentColor: 'purple',
   },
 };
 

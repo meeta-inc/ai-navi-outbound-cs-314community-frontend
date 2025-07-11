@@ -45,7 +45,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: '기본 버튼',
-    className: 'px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600',
+    className: 'px-6 py-3 bg-purple-500 text-white rounded-xl hover:bg-purple-600 font-semibold shadow-lg',
   },
 };
 
@@ -53,14 +53,14 @@ export const Disabled: Story = {
   args: {
     children: '비활성화된 버튼',
     disabled: true,
-    className: 'px-4 py-2 bg-gray-300 text-gray-500 rounded cursor-not-allowed',
+    className: 'px-6 py-3 bg-gray-400 text-gray-600 rounded-xl cursor-not-allowed font-semibold shadow-md',
   },
 };
 
 export const Primary: Story = {
   args: {
     children: '주요 버튼',
-    className: 'px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium',
+    className: 'px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl hover:from-indigo-700 hover:to-purple-700 font-bold shadow-xl transform hover:scale-105 transition-all duration-200',
   },
 };
 
