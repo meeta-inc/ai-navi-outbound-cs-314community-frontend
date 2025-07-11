@@ -34,15 +34,15 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    text: '안녕하세요! 이것은 타이핑 효과가 적용된 텍스트입니다.',
-    speed: 50,
+    text: '✨ 안녕하세요! 이것은 타이핑 효과가 적용된 텍스트입니다. 🚀',
+    speed: 40,
   },
 };
 
 export const FastTyping: Story = {
   args: {
-    text: '빠른 타이핑 효과입니다. 글자가 빠르게 나타납니다.',
-    speed: 20,
+    text: '⚡ 빠른 타이핑 효과입니다. 글자가 번개처럼 빠르게 나타납니다! 💨',
+    speed: 15,
   },
 };
 

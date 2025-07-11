@@ -150,9 +150,11 @@ Amplify 콘솔에서 **환경 변수** 탭으로 이동하여 설정:
 
 | 변수명 | 값 | 설명 |
 |--------|-----|------|
-| `NODE_VERSION` | `18` | Node.js 버전 |
+| `NODE_VERSION` | `20` | Node.js 버전 (Storybook 9.x 필수) |
 | `CHROMATIC_PROJECT_TOKEN` | `your_token` | Chromatic 연동 (선택사항) |
 | `STORYBOOK_ENVIRONMENT` | `production` | 스토리북 환경 |
+
+> **중요**: Storybook 9.x는 Node.js 20 이상이 필요합니다.
 
 ### 5. 도메인 설정
 1. **도메인 관리** 탭에서 사용자 정의 도메인 추가 (선택사항)
