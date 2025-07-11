@@ -1,5 +1,35 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { TopQuestions } from './TopQuestions';
+import { fn } from '@storybook/test';
+
+// API 모킹을 위한 mock 데이터
+const mockQuestions = {
+  general: [
+    '서비스 이용 방법이 궁금해요',
+    '회원가입은 어떻게 하나요?',
+    '비밀번호를 잊어버렸어요'
+  ],
+  academic: [
+    '수강신청은 언제 시작하나요?',
+    '성적 확인은 어디서 하나요?',
+    '휴학 신청 절차가 궁금합니다'
+  ],
+  technical: [
+    '앱이 실행되지 않아요',
+    '로그인이 안 돼요',
+    '화면이 깨져서 보여요'
+  ],
+  payment: [
+    '결제 수단을 변경하고 싶어요',
+    '환불은 어떻게 받나요?',
+    '결제 내역을 확인하고 싶어요'
+  ],
+  default: [
+    '자주 묻는 질문 1',
+    '자주 묻는 질문 2',
+    '자주 묻는 질문 3'
+  ]
+};
 
 const meta: Meta<typeof TopQuestions> = {
   title: 'Organisms/TopQuestions',
@@ -10,6 +40,11 @@ const meta: Meta<typeof TopQuestions> = {
       description: {
         component: '특정 FAQ 카테고리의 상위 질문들을 표시하는 컴포넌트입니다. 뒤로가기 버튼과 질문 목록을 제공합니다.',
       },
+    },
+    msw: {
+      handlers: [
+        // API 모킹 핸들러
+      ],
     },
   },
   argTypes: {
@@ -50,39 +85,55 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    categoryId: 'general',
-    categoryTitle: '일반 문의',
+    categoryId: 'category1',
+    categoryTitle: '授業について',
     userId: 'user123',
   },
 };
 
-export const AcademicCategory: Story = {
+export const TeacherCategory: Story = {
   args: {
-    categoryId: 'academic',
-    categoryTitle: '학사 관련',
+    categoryId: 'category2',
+    categoryTitle: '講師について',
     userId: 'user123',
   },
 };
 
-export const TechnicalCategory: Story = {
+export const AchievementCategory: Story = {
   args: {
-    categoryId: 'technical',
-    categoryTitle: '기술 지원',
+    categoryId: 'category3',
+    categoryTitle: '塾の実績について',
+    userId: 'user123',
+  },
+};
+
+export const HomeworkCategory: Story = {
+  args: {
+    categoryId: 'category4',
+    categoryTitle: '宿題について',
+    userId: 'user123',
+  },
+};
+
+export const OtherCategory: Story = {
+  args: {
+    categoryId: 'other',
+    categoryTitle: 'その他',
     userId: 'user123',
   },
 };
 
 export const LongCategoryTitle: Story = {
   args: {
-    categoryId: 'long-title',
-    categoryTitle: '매우 긴 카테고리 제목을 가진 FAQ 섹션',
+    categoryId: 'category1',
+    categoryTitle: '非常に長いカテゴリタイトルを持つFAQセクション',
     userId: 'user123',
   },
 };
 
-export const ShortCategoryTitle: Story = {
+export const ShortTitle: Story = {
   args: {
-    categoryId: 'short',
+    categoryId: 'category2',
     categoryTitle: 'FAQ',
     userId: 'user123',
   },
@@ -90,72 +141,16 @@ export const ShortCategoryTitle: Story = {
 
 export const WithEmojiTitle: Story = {
   args: {
-    categoryId: 'emoji',
-    categoryTitle: '📚 학습 가이드',
-    userId: 'user123',
-  },
-};
-
-export const PaymentCategory: Story = {
-  args: {
-    categoryId: 'payment',
-    categoryTitle: '💳 결제 문의',
-    userId: 'user123',
-  },
-};
-
-export const AccountCategory: Story = {
-  args: {
-    categoryId: 'account',
-    categoryTitle: '👤 계정 관리',
-    userId: 'user123',
-  },
-};
-
-export const SystemCategory: Story = {
-  args: {
-    categoryId: 'system',
-    categoryTitle: '⚙️ 시스템 설정',
-    userId: 'user123',
-  },
-};
-
-export const CommunityCategory: Story = {
-  args: {
-    categoryId: 'community',
-    categoryTitle: '👥 커뮤니티',
-    userId: 'user123',
-  },
-};
-
-export const SecurityCategory: Story = {
-  args: {
-    categoryId: 'security',
-    categoryTitle: '🔒 보안 관련',
-    userId: 'user123',
-  },
-};
-
-export const MobileCategory: Story = {
-  args: {
-    categoryId: 'mobile',
-    categoryTitle: '📱 모바일 앱',
-    userId: 'user123',
-  },
-};
-
-export const FeedbackCategory: Story = {
-  args: {
-    categoryId: 'feedback',
-    categoryTitle: '💬 피드백 및 제안',
+    categoryId: 'category3',
+    categoryTitle: '📚 学習ガイド',
     userId: 'user123',
   },
 };
 
 export const WithCustomClass: Story = {
   args: {
-    categoryId: 'custom',
-    categoryTitle: '맞춤 스타일',
+    categoryId: 'category1',
+    categoryTitle: 'カスタムスタイル',
     userId: 'user123',
     className: 'bg-blue-50 border border-blue-200 rounded-lg',
   },
