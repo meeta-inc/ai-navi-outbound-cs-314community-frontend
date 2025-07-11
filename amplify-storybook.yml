@@ -1,0 +1,32 @@
+version: 1
+applications:
+  - appRoot: .
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - node --version
+            - npm ci
+        build:
+          commands:
+            - npm run build-storybook --quiet
+      artifacts:
+        baseDirectory: storybook-static
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+    test:
+      phases:
+        preTest:
+          commands:
+            - npm ci
+        test:
+          commands:
+            - npm run lint
+            - echo "Storybook interaction tests require running server - skipping in build"
+      artifacts:
+        baseDirectory: test-results
+        files:
+          - '**/*'
