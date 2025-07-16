@@ -1,4 +1,5 @@
 // import { getApiUrl } from '../../shared/config/app.config'; // 향후 API 호출 시 사용
+import type { GradeType } from '../../shared/constants/grade.constants';
 
 export interface QuickReplyData {
   id: string;
@@ -26,7 +27,7 @@ export interface ApiTopQuestionsResponse {
  * 퀵 리플라이 톱3 질문을 가져오는 API 함수
  * 현재는 로컬 데이터를 반환하지만, 향후 백엔드 API 호출로 변경 예정
  */
-export const getQuickReplyQuestions = async (_userId: string): Promise<ApiQuickRepliesResponse> => {
+export const getQuickReplyQuestions = async (_userId: string, grade?: GradeType): Promise<ApiQuickRepliesResponse> => {
   try {
     // TODO: 실제 API 호출로 교체
     // const apiUrl = getApiUrl();
@@ -47,28 +48,38 @@ export const getQuickReplyQuestions = async (_userId: string): Promise<ApiQuickR
     // 현재는 로컬 데이터 반환 (향후 API 호출로 교체)
     return new Promise((resolve) => {
       setTimeout(() => {
+        // 학년별 질문 키 매핑
+        const gradeQuestionKeys = {
+          preschool: ['chat.quickReplies.preschool.top1', 'chat.quickReplies.preschool.top2', 'chat.quickReplies.preschool.top3'],
+          elementary: ['chat.quickReplies.elementary.top1', 'chat.quickReplies.elementary.top2', 'chat.quickReplies.elementary.top3'],
+          middle: ['chat.quickReplies.middle.top1', 'chat.quickReplies.middle.top2', 'chat.quickReplies.middle.top3'],
+          high: ['chat.quickReplies.high.top1', 'chat.quickReplies.high.top2', 'chat.quickReplies.high.top3']
+        };
+        
+        // 기본 질문 (학년이 없는 경우)
+        const defaultQuestions = [
+          { id: 'top1', text: 'chat.quickReplies.top1', type: 'primary' as const },
+          { id: 'top2', text: 'chat.quickReplies.top2', type: 'primary' as const },
+          { id: 'top3', text: 'chat.quickReplies.top3', type: 'primary' as const }
+        ];
+        
+        // 학년별 질문 생성
+        const gradeQuestions = grade && gradeQuestionKeys[grade] 
+          ? gradeQuestionKeys[grade].map((key, index) => ({
+              id: `top${index + 1}`,
+              text: key,
+              type: 'primary' as const
+            }))
+          : defaultQuestions;
+        
         resolve({
           header: "✨よくある質問Top3（直近14日間の統計）",
           questions: [
-            {
-              id: 'top1',
-              text: '夏期講習はいつから始まりますか？',
-              type: 'primary'
-            },
-            {
-              id: 'top2', 
-              text: '年間の授業料はいくらですか？',
-              type: 'primary'
-            },
-            {
-              id: 'top3',
-              text: '小学生も対象ですか？',
-              type: 'primary'
-            },
+            ...gradeQuestions,
             {
               id: 'other',
-              text: 'その他',
-              type: 'secondary'
+              text: 'chat.quickReplies.other',
+              type: 'secondary' as const
             }
           ]
         });
