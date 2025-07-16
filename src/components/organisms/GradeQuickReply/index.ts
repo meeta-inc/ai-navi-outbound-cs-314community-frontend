@@ -1,0 +1,1 @@
+export { GradeQuickReply } from './GradeQuickReply';

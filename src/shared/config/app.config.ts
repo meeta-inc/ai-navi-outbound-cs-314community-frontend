@@ -55,6 +55,17 @@ export const getShowTimestamp = () => {
   return true;
 };
 
+export const getShowGradeSelection = () => {
+  const showGradeSelection = import.meta.env.VITE_SHOW_GRADE_SELECTION;
+  
+  // 문자열 'false'를 boolean으로 변환, 기본값은 true
+  if (showGradeSelection === 'false') {
+    return false;
+  }
+  
+  return true;
+};
+
 export const getAppConfig = () => {
   return {
     apiUrl: getApiUrl(),
@@ -62,6 +73,7 @@ export const getAppConfig = () => {
     accentColor: getAccentColor(),
     showNavigationHeader: getShowNavigationHeader(),
     showTimestamp: getShowTimestamp(),
+    showGradeSelection: getShowGradeSelection(),
     environment: import.meta.env.MODE,
     isDevelopment: import.meta.env.DEV,
     isProduction: import.meta.env.PROD,
