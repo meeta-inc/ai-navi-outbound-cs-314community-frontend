@@ -295,12 +295,18 @@ function MainPage() {
         className="h-full overflow-y-auto pb-4"
       >
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-          {messages.map((message, index) => (
-            <div key={message.id}>
-              <ChatMessage 
-                message={message} 
-                hideAvatar={index === 1 && message.type === 'bot' && showGradeSelection && message.content === t('onboarding.gradeSelectionMessage')}
-              />
+          {messages.map((message, index) => {
+            // 첫 번째 봇 메시지인지 확인
+            const botMessages = messages.filter(m => m.type === 'bot');
+            const firstBotMessageIndex = messages.findIndex(m => m.type === 'bot');
+            const isFirstBotMessage = message.type === 'bot' && index === firstBotMessageIndex;
+            
+            return (
+              <div key={message.id}>
+                <ChatMessage 
+                  message={message} 
+                  hideAvatar={message.type === 'bot' && !isFirstBotMessage}
+                />
               
               {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) */}
               {index === 1 && message.type === 'bot' && showGradeSelectionComponent && showGradeSelection && 
@@ -372,8 +378,9 @@ function MainPage() {
                   />
                 </div>
               )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
           
           {currentlyTyping && (
             <ChatMessage
@@ -385,6 +392,7 @@ function MainPage() {
               }}
               isTyping={true}
               onTypingComplete={completeTyping}
+              hideAvatar={messages.some(m => m.type === 'bot')}
             />
           )}
           
