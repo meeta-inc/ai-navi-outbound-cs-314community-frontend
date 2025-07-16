@@ -10,9 +10,10 @@ interface ChatMessageProps {
   message: Message;
   isTyping?: boolean;
   onTypingComplete?: () => void;
+  hideAvatar?: boolean;
 }
 
-export function ChatMessage({ message, isTyping = false, onTypingComplete }: ChatMessageProps) {
+export function ChatMessage({ message, isTyping = false, onTypingComplete, hideAvatar = false }: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
   const showTimestamp = getShowTimestamp();
@@ -22,7 +23,7 @@ export function ChatMessage({ message, isTyping = false, onTypingComplete }: Cha
   if (isBot) {
     return (
       <div className="box-border content-stretch flex flex-col items-start justify-start max-w-[287px] p-0 relative shrink-0 w-[287px]">
-        <UserAvatar accentColor={accentColor} />
+        {!hideAvatar && <UserAvatar accentColor={accentColor} />}
         <ChatBubble
           content={message.content}
           isBot={true}

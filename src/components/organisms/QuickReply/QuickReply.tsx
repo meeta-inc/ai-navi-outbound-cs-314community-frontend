@@ -5,6 +5,7 @@ import { getColorClasses, AccentColor } from '../../../shared/config/theme.confi
 import { getAccentColor } from "../../../shared/config/app.config";
 import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from '../../../services/api/questions';
 import { Button } from '../../atoms/Button';
+import type { GradeType } from '../../../shared/constants/grade.constants';
 
 export interface QuickReplyOption {
   id: string;
@@ -15,17 +16,23 @@ export interface QuickReplyOption {
 interface QuickReplyProps {
   onReplyClick: (text: string) => void;
   onShowFAQCategories?: () => void;
+  onBackClick?: () => void;
   show: boolean;
   userId: string;
   options?: QuickReplyOption[];
+  showBackButton?: boolean;
+  grade?: GradeType;
 }
 
 export function QuickReply({ 
   onReplyClick, 
   onShowFAQCategories,
+  onBackClick,
   show, 
   userId,
-  options 
+  options,
+  showBackButton = false,
+  grade
 }: QuickReplyProps) {
   const { t } = useLocale();
   const accentColor = getAccentColor();
@@ -44,12 +51,12 @@ export function QuickReply({
         setIsLoading(true);
         setError(null);
         try {
-          const data = await getQuickReplyQuestions(userId);
+          const data = await getQuickReplyQuestions(userId, grade);
           setApiData({
             header: data.header,
             questions: data.questions.map(q => ({
               id: q.id,
-              text: q.text,
+              text: t(q.text), // 로컬라이즈 키를 실제 텍스트로 변환
               type: q.type
             }))
           });
@@ -73,7 +80,7 @@ export function QuickReply({
 
       fetchQuickReplyData();
     }
-  }, [show, userId, options, t]);
+  }, [show, userId, options, t, grade]);
 
   if (!show) return null;
 
@@ -147,6 +154,28 @@ export function QuickReply({
             </Button>
           </div>
           ))}
+          
+          {/* もどる 버튼 */}
+          {showBackButton && onBackClick && (
+            <div className="pl-5 w-full">
+              <Button
+                onClick={onBackClick}
+                className="
+                  inline-flex items-center justify-start
+                  max-w-[257px] p-[10px] rounded-[20px]
+                  text-[12px] font-semibold leading-[16px] tracking-[0.6px]
+                  transition-all duration-200 hover:opacity-90
+                  text-left
+                  bg-[#EBEBEB] text-gray-700
+                "
+                style={{ 
+                  fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
+                }}
+              >
+                もどる
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ interface ButtonProps {
   children: React.ReactNode;
   'aria-label'?: string;
   type?: 'button' | 'submit' | 'reset';
+  style?: React.CSSProperties;
 }
 
 export function Button({ 
@@ -15,7 +16,8 @@ export function Button({
   className = '', 
   children, 
   'aria-label': ariaLabel,
-  type = 'button'
+  type = 'button',
+  style
 }: ButtonProps) {
   return (
     <button
@@ -24,6 +26,7 @@ export function Button({
       disabled={disabled}
       className={className}
       aria-label={ariaLabel}
+      style={style}
     >
       {children}
     </button>

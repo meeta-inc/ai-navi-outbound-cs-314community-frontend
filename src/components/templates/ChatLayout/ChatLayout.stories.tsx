@@ -5,6 +5,8 @@ import { ChatMessage } from '../../organisms/ChatMessage/ChatMessage';
 import { ChatInput } from '../../organisms/ChatInput/ChatInput';
 import { QuickReply } from '../../organisms/QuickReply/QuickReply';
 import { FAQCategory } from '../../organisms/FAQCategory/FAQCategory';
+import { GradeSelection } from '../../organisms/GradeSelection/GradeSelection';
+import { GradeQuickReply } from '../../organisms/GradeQuickReply/GradeQuickReply';
 
 const meta: Meta<typeof ChatLayout> = {
   title: 'Templates/ChatLayout',
@@ -17,15 +19,35 @@ const meta: Meta<typeof ChatLayout> = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <div style={{ height: '100vh', width: '100vw', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+        <div style={{ 
+          width: '375px', 
+          height: '812px', 
+          backgroundColor: 'white', 
+          borderRadius: '12px', 
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)', 
+          overflow: 'hidden',
+          border: '1px solid #e5e7eb'
+        }}>
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
   argTypes: {
     header: {
       description: '헤더 영역에 표시될 컴포넌트',
     },
-    messages: {
-      description: '메시지 목록을 표시할 컴포넌트',
+    children: {
+      description: '메인 컨텐츠 영역에 표시될 컴포넌트',
     },
     input: {
       description: '입력 영역 컴포넌트',
+    },
+    messages: {
+      description: '메시지 목록을 표시할 컴포넌트 (스토리북 테스트용)',
     },
     quickReplies: {
       description: '빠른 응답 컴포넌트 (선택사항)',
@@ -37,6 +59,10 @@ const meta: Meta<typeof ChatLayout> = {
       control: 'text',
       description: '추가 CSS 클래스',
     },
+    showNavigationHeader: {
+      control: 'boolean',
+      description: '네비게이션 헤더 표시 여부',
+    },
   },
   tags: ['autodocs'],
 };
@@ -45,7 +71,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const sampleMessages = (
-  <div className="space-y-4">
+  <div className="space-y-4 p-4">
     <ChatMessage
       message={{
         id: '1',
@@ -309,6 +335,292 @@ export const DarkMode: Story = {
     docs: {
       description: {
         story: '다크 모드 스타일링이 적용된 채팅 레이아웃입니다.',
+      },
+    },
+  },
+};
+
+// 온보딩 플로우 스토리들
+export const OnboardingStep1_GradeSelection: Story = {
+  args: {
+    header: sampleHeader,
+    messages: (
+      <div className="space-y-4">
+        <ChatMessage
+          message={{
+            id: '1',
+            type: 'bot',
+            content: 'こんにちは！3.14 communityについて何でも質問してください！',
+            timestamp: new Date(Date.now() - 120000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '2',
+            type: 'bot',
+            content: 'まずは、お子様の学年を教えてください🙋',
+            timestamp: new Date(Date.now() - 60000),
+          }}
+          hideAvatar={true}
+        />
+        <div className="mt-4">
+          <GradeSelection onGradeSelect={() => {}} />
+        </div>
+      </div>
+    ),
+    input: sampleInput,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '온보딩 플로우 1단계: 학년 선택 화면입니다.',
+      },
+    },
+  },
+};
+
+export const OnboardingStep2_GradeConfirmation: Story = {
+  args: {
+    header: sampleHeader,
+    messages: (
+      <div className="space-y-4">
+        <ChatMessage
+          message={{
+            id: '1',
+            type: 'bot',
+            content: 'こんにちは！3.14 communityについて何でも質問してください！',
+            timestamp: new Date(Date.now() - 180000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '2',
+            type: 'bot',
+            content: 'まずは、お子様の学年を教えてください🙋',
+            timestamp: new Date(Date.now() - 120000),
+          }}
+          hideAvatar={true}
+        />
+        <ChatMessage
+          message={{
+            id: '3',
+            type: 'user',
+            content: '🧑‍🎓中学生',
+            timestamp: new Date(Date.now() - 60000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '4',
+            type: 'bot',
+            content: '中学生ですね！どのようなことを知りたいですか？',
+            timestamp: new Date(),
+          }}
+        />
+      </div>
+    ),
+    input: sampleInput,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '온보딩 플로우 2단계: 학년 확인 메시지 표시 화면입니다.',
+      },
+    },
+  },
+};
+
+export const OnboardingStep3_GradeQuickReply: Story = {
+  args: {
+    header: sampleHeader,
+    messages: (
+      <div className="space-y-4">
+        <ChatMessage
+          message={{
+            id: '1',
+            type: 'bot',
+            content: 'こんにちは！3.14 communityについて何でも質問してください！',
+            timestamp: new Date(Date.now() - 240000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '2',
+            type: 'bot',
+            content: 'まずは、お子様の学年を教えてください🙋',
+            timestamp: new Date(Date.now() - 180000),
+          }}
+          hideAvatar={true}
+        />
+        <ChatMessage
+          message={{
+            id: '3',
+            type: 'user',
+            content: '🧑‍🎓中学生',
+            timestamp: new Date(Date.now() - 120000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '4',
+            type: 'bot',
+            content: '中学生ですね！どのようなことを知りたいですか？',
+            timestamp: new Date(Date.now() - 60000),
+          }}
+        />
+      </div>
+    ),
+    quickReplies: (
+      <GradeQuickReply
+        grade="middle"
+        onReplyClick={() => {}}
+        onShowFAQCategories={() => {}}
+        onBackClick={() => {}}
+      />
+    ),
+    input: sampleInput,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '온보딩 플로우 3단계: 학년별 QuickReply 표시 화면입니다.',
+      },
+    },
+  },
+};
+
+export const OnboardingStep4_BackToGradeSelection: Story = {
+  args: {
+    header: sampleHeader,
+    messages: (
+      <div className="space-y-4">
+        <ChatMessage
+          message={{
+            id: '1',
+            type: 'bot',
+            content: 'こんにちは！3.14 communityについて何でも質問してください！',
+            timestamp: new Date(Date.now() - 300000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '2',
+            type: 'bot',
+            content: 'まずは、お子様の学年を教えてください🙋',
+            timestamp: new Date(Date.now() - 240000),
+          }}
+          hideAvatar={true}
+        />
+        <ChatMessage
+          message={{
+            id: '3',
+            type: 'user',
+            content: '🧑‍🎓中学生',
+            timestamp: new Date(Date.now() - 180000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '4',
+            type: 'bot',
+            content: '中学生ですね！どのようなことを知りたいですか？',
+            timestamp: new Date(Date.now() - 120000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '5',
+            type: 'user',
+            content: 'もどる',
+            timestamp: new Date(Date.now() - 60000),
+          }}
+        />
+      </div>
+    ),
+    quickReplies: (
+      <GradeSelection onGradeSelect={() => {}} />
+    ),
+    input: sampleInput,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '온보딩 플로우 4단계: "もどる" 버튼 클릭 후 학년 선택으로 돌아가는 화면입니다.',
+      },
+    },
+  },
+};
+
+export const OnboardingAllGrades: Story = {
+  args: {
+    header: sampleHeader,
+    messages: (
+      <div className="space-y-4">
+        <ChatMessage
+          message={{
+            id: '1',
+            type: 'bot',
+            content: 'こんにちは！3.14 communityについて何でも질問してください！',
+            timestamp: new Date(Date.now() - 60000),
+          }}
+        />
+        <ChatMessage
+          message={{
+            id: '2',
+            type: 'bot',
+            content: 'まずは、お子様の学年を教えてください🙋',
+            timestamp: new Date(),
+          }}
+          hideAvatar={true}
+        />
+      </div>
+    ),
+    quickReplies: (
+      <div className="space-y-6 p-4 max-h-96 overflow-y-auto">
+        <div>
+          <h3 className="text-sm font-medium mb-3">🐣 幼児 QuickReply</h3>
+          <GradeQuickReply
+            grade="preschool"
+            onReplyClick={() => {}}
+            onShowFAQCategories={() => {}}
+            onBackClick={() => {}}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-3">👦 小学生 QuickReply</h3>
+          <GradeQuickReply
+            grade="elementary"
+            onReplyClick={() => {}}
+            onShowFAQCategories={() => {}}
+            onBackClick={() => {}}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-3">🧑‍🎓 中学生 QuickReply</h3>
+          <GradeQuickReply
+            grade="middle"
+            onReplyClick={() => {}}
+            onShowFAQCategories={() => {}}
+            onBackClick={() => {}}
+          />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-3">👩‍🎓 高校生 QuickReply</h3>
+          <GradeQuickReply
+            grade="high"
+            onReplyClick={() => {}}
+            onShowFAQCategories={() => {}}
+            onBackClick={() => {}}
+          />
+        </div>
+      </div>
+    ),
+    input: sampleInput,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '모든 학년별 QuickReply를 한 번에 비교해볼 수 있는 화면입니다.',
       },
     },
   },

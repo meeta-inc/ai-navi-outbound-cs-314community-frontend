@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { QuickReply } from './QuickReply';
+import { GRADE_QUESTION_KEYS } from '../../../shared/constants/grade.constants';
 
 const meta: Meta<typeof QuickReply> = {
   title: 'Organisms/QuickReply',
@@ -243,5 +244,196 @@ export const MixedTypes: Story = {
         type: 'secondary',
       },
     ],
+  },
+};
+
+// 학년별 QuickReply 스토리
+export const PreschoolGrade: Story = {
+  args: {
+    show: true,
+    userId: 'user123',
+    grade: 'preschool',
+    showBackButton: true,
+    options: [
+      {
+        id: 'top1',
+        text: '入園準備について教えてください',
+        type: 'primary',
+      },
+      {
+        id: 'top2',
+        text: '保育時間はどのくらいですか？',
+        type: 'primary',
+      },
+      {
+        id: 'top3',
+        text: '給食はありますか？',
+        type: 'primary',
+      },
+      {
+        id: 'other',
+        text: 'その他',
+        type: 'secondary',
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '🐣 幼児 학년을 위한 QuickReply 컴포넌트입니다.',
+      },
+    },
+  },
+};
+
+export const ElementaryGrade: Story = {
+  args: {
+    show: true,
+    userId: 'user123',
+    grade: 'elementary',
+    showBackButton: true,
+    options: [
+      {
+        id: 'top1',
+        text: '授業カリキュラムについて教えてください',
+        type: 'primary',
+      },
+      {
+        id: 'top2',
+        text: '放課後のクラブ活動はありますか？',
+        type: 'primary',
+      },
+      {
+        id: 'top3',
+        text: '宿題はどのくらい出ますか？',
+        type: 'primary',
+      },
+      {
+        id: 'other',
+        text: 'その他',
+        type: 'secondary',
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '👦 小学生 학년을 위한 QuickReply 컴포넌트입니다.',
+      },
+    },
+  },
+};
+
+export const MiddleGrade: Story = {
+  args: {
+    show: true,
+    userId: 'user123',
+    grade: 'middle',
+    showBackButton: true,
+    options: [
+      {
+        id: 'top1',
+        text: '夏期講習はいつから始まりますか？',
+        type: 'primary',
+      },
+      {
+        id: 'top2',
+        text: '年間の授業料はいくらですか？',
+        type: 'primary',
+      },
+      {
+        id: 'top3',
+        text: '小学生も対象ですか？',
+        type: 'primary',
+      },
+      {
+        id: 'other',
+        text: 'その他',
+        type: 'secondary',
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '🧑‍🎓 中学生 학년을 위한 QuickReply 컴포넌트입니다.',
+      },
+    },
+  },
+};
+
+export const HighGrade: Story = {
+  args: {
+    show: true,
+    userId: 'user123',
+    grade: 'high',
+    showBackButton: true,
+    options: [
+      {
+        id: 'top1',
+        text: '大学進学実績を教えてください',
+        type: 'primary',
+      },
+      {
+        id: 'top2',
+        text: '部活動は何がありますか？',
+        type: 'primary',
+      },
+      {
+        id: 'top3',
+        text: '推薦入試の対策はありますか？',
+        type: 'primary',
+      },
+      {
+        id: 'other',
+        text: 'その他',
+        type: 'secondary',
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '👩‍🎓 高校生 학년을 위한 QuickReply 컴포넌트입니다.',
+      },
+    },
+  },
+};
+
+export const GradeWithBackButton: Story = {
+  args: {
+    show: true,
+    userId: 'user123',
+    grade: 'middle',
+    showBackButton: true,
+    options: [
+      {
+        id: 'top1',
+        text: '夏期講習はいつから始まりますか？',
+        type: 'primary',
+      },
+      {
+        id: 'top2',
+        text: '年間の授業料はいくらですか？',
+        type: 'primary',
+      },
+      {
+        id: 'top3',
+        text: '小学生も対象ですか？',
+        type: 'primary',
+      },
+      {
+        id: 'other',
+        text: 'その他',
+        type: 'secondary',
+      },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '学年별 QuickReply에 "もどる" 버튼이 포함된 버전입니다.',
+      },
+    },
   },
 };

@@ -10,12 +10,18 @@ import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
 import { useChat } from '../hooks/useChat';
-import { getAccentColor, getShowNavigationHeader } from '../shared/config/app.config';
+import { getAccentColor, getShowNavigationHeader, getShowGradeSelection } from '../shared/config/app.config';
+import { getColorClasses } from '../shared/config/theme.config';
+import { GradeSelection } from '../components/organisms/GradeSelection';
+import { GradeQuickReply } from '../components/organisms/GradeQuickReply';
+import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/grade.constants';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
   const accentColor = getAccentColor();
+  const colors = getColorClasses(accentColor);
   const showNavigationHeader = getShowNavigationHeader();
+  const showGradeSelection = getShowGradeSelection();
   const isInitialized = useRef(false);
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
   const [showFAQCategories, setShowFAQCategories] = useState(false);
@@ -23,6 +29,11 @@ function MainPage() {
   const [showTopQuestions, setShowTopQuestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [waitingForTopQuestions, setWaitingForTopQuestions] = useState(false);
+  
+  // 온보딩 관련 상태
+  const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState<GradeType | null>(null);
+  const [showOnboardingMessage, setShowOnboardingMessage] = useState(false);
 
   const {
     messages,
@@ -43,11 +54,17 @@ function MainPage() {
       console.error('Chat error:', error);
     },
     onTypingComplete: () => {
-      // 첫 번째 메시지 타이핑 완료 후 Figma QuickReply 표시
+      // 첫 번째 메시지 타이핑 완료 후 처리
       setTimeout(() => {
         if (messages.length <= 1) {
-          setShowFigmaQuickReply(true);
-          // QuickReply가 표시된 후 스크롤
+          if (showGradeSelection) {
+            // 학년 선택이 활성화된 경우: 온보딩 메시지 표시
+            setShowOnboardingMessage(true);
+          } else {
+            // 학년 선택이 비활성화된 경우: 기본 QuickReply 표시
+            setShowFigmaQuickReply(true);
+          }
+          // 스크롤
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
@@ -89,7 +106,65 @@ function MainPage() {
   const handleQuickReplyClick = async (text: string) => {
     setNewMessage(text);
     setShowFigmaQuickReply(false);
+    
     await handleSendMessage(text);
+  };
+
+
+  // 온보딩 메시지가 표시된 후 GradeSelection 표시
+  useEffect(() => {
+    if (showOnboardingMessage) {
+      // 온보딩 메시지를 ChatMessage로 추가
+      const onboardingMessage = t('onboarding.gradeSelectionMessage');
+      addTypingBotMessage(onboardingMessage);
+      
+      setTimeout(() => {
+        setShowGradeSelectionComponent(true);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 1000);
+    }
+  }, [showOnboardingMessage, addTypingBotMessage, t]);
+
+  // 학년 선택 핸들러
+  const handleGradeSelect = (grade: GradeType) => {
+    setSelectedGrade(grade);
+    setShowGradeSelectionComponent(false);
+    
+    // 선택한 학년을 사용자 메시지로 표시
+    addUserMessage(GRADE_LABELS[grade], false);
+    
+    // 학년 확인 봇 메시지 추가
+    setTimeout(() => {
+      const confirmationMessage = `${GRADE_NAMES[grade]}ですね！どのようなことを知りたいですか？`;
+      addTypingBotMessage(confirmationMessage);
+      
+      // 학년별 퀵 리플라이 표시
+      setTimeout(() => {
+        setShowFigmaQuickReply(true);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 1000);
+    }, 500);
+  };
+
+  // もどる 버튼 핸들러
+  const handleBackToGradeSelection = () => {
+    setShowFigmaQuickReply(false);
+    setSelectedGrade(null);
+    
+    // "もどる" 사용자 메시지 표시
+    addUserMessage('もどる', false);
+    
+    // GradeSelection 다시 표시
+    setTimeout(() => {
+      setShowGradeSelectionComponent(true);
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }, 500);
   };
 
   const handleShowFAQCategories = () => {
@@ -222,15 +297,57 @@ function MainPage() {
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           {messages.map((message, index) => (
             <div key={message.id}>
-              <ChatMessage message={message} />
-              {/* 첫 번째 메시지 (봇의 인사) 다음에 QuickReply 표시 */}
-              {index === 0 && message.type === 'bot' && showFigmaQuickReply && (
+              <ChatMessage 
+                message={message} 
+                hideAvatar={index === 1 && message.type === 'bot' && showGradeSelection && message.content === t('onboarding.gradeSelectionMessage')}
+              />
+              
+              {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) */}
+              {index === 1 && message.type === 'bot' && showGradeSelectionComponent && showGradeSelection && 
+               !messages.some(msg => msg.content === 'もどる') && (
+                <div className="mt-4">
+                  <GradeSelection onGradeSelect={handleGradeSelect} />
+                </div>
+              )}
+              
+              {/* もどる 버튼 클릭 후 GradeSelection 표시 (가장 마지막 もどる 메시지에만) */}
+              {message.type === 'user' && message.content === 'もどる' && showGradeSelectionComponent && 
+               index === messages.length - 1 && (
+                <div className="mt-4">
+                  <GradeSelection onGradeSelect={handleGradeSelect} />
+                </div>
+              )}
+              
+              {/* 온보딩이 비활성화된 경우 기본 QuickReply 표시 */}
+              {index === 0 && message.type === 'bot' && showFigmaQuickReply && !showGradeSelection && (
                 <div className="mt-4">
                   <QuickReply 
                     onReplyClick={handleQuickReplyClick}
                     onShowFAQCategories={handleShowFAQCategories}
                     show={true}
                     userId="Hyunse0001"
+                  />
+                </div>
+              )}
+              
+              {/* 학년 확인 메시지 후 학년별 QuickReply 표시 (가장 마지막 확인 메시지에서만) */}
+              {message.type === 'bot' && showFigmaQuickReply && selectedGrade && 
+               message.content && typeof message.content === 'string' && (message.content.includes('ですね！どのようなことを知りたいですか？')) && 
+               (() => {
+                 // 학년 확인 메시지들을 찾아서 현재 메시지가 가장 마지막인지 확인
+                 const confirmationMessages = messages.filter(msg => 
+                   msg.type === 'bot' && msg.content && typeof msg.content === 'string' && 
+                   msg.content.includes('ですね！どのようなことを知りたいですか？')
+                 );
+                 const lastConfirmationIndex = messages.lastIndexOf(confirmationMessages[confirmationMessages.length - 1]);
+                 return index === lastConfirmationIndex;
+               })() && (
+                <div className="mt-4">
+                  <GradeQuickReply
+                    grade={selectedGrade}
+                    onReplyClick={handleQuickReplyClick}
+                    onShowFAQCategories={handleShowFAQCategories}
+                    onBackClick={handleBackToGradeSelection}
                   />
                 </div>
               )}
