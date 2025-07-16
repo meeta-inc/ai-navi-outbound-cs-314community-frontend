@@ -11,6 +11,10 @@
     "error": "An error occurred",
     "success": "Success"
   },
+  "onboarding": {
+    "gradeSelectionHeader": "Please tell us your child's grade level",
+    "gradeSelectionMessage": "First, please tell us your child's grade level🙋"
+  },
   "student": {
     "menu": {
       "home": {

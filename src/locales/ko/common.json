@@ -11,6 +11,10 @@
     "error": "오류가 발생했습니다",
     "success": "성공했습니다"
   },
+  "onboarding": {
+    "gradeSelectionHeader": "자녀의 학년을 알려주세요",
+    "gradeSelectionMessage": "먼저, 자녀의 학년을 알려주세요🙋"
+  },
   "student": {
     "menu": {
       "home": {
