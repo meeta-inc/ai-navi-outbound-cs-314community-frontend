@@ -2,6 +2,7 @@ import React from 'react';
 import * as LucideIcons from 'lucide-react';
 import { IconConfig } from '../../../shared/config/iconConfig';
 import { CustomIcon, SchoolIcon, TeacherIcon, ImageIcon } from '../../icons/CustomIcon';
+import { AiChatbotIcon } from '../../../assets/icons';
 
 // 커스텀 아이콘 컴포넌트 매핑
 // 새로운 커스텀 아이콘을 추가하려면 여기에 import하고 componentMap에 추가하세요
@@ -10,6 +11,7 @@ const componentMap = {
   SchoolIcon: SchoolIcon,
   TeacherIcon: TeacherIcon,
   ImageIcon: ImageIcon,
+  AiChatbotIcon: AiChatbotIcon,
   // 추가 컴포넌트들...
 };
 
