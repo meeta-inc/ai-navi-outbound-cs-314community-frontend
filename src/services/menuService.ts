@@ -6,7 +6,10 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
     items: [
       {
         id: 'ai-faq',
-        icon: 'MessageCircle',
+        icon: {
+          type: 'component',
+          value: 'AiChatbotIcon'
+        },
         label: 'AI FAQ',
         action: 'navigate',
         url: '/faq',
@@ -14,7 +17,10 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
       },
       {
         id: 'request-materials',
-        icon: 'FileText',
+        icon: {
+          type: 'lucide',
+          value: 'FileText'
+        },
         label: '資料請求',
         action: 'navigate',
         url: '/request-materials',
@@ -22,7 +28,10 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
       },
       {
         id: 'ai-consultation',
-        icon: 'Phone',
+        icon: {
+          type: 'lucide',
+          value: 'Phone'
+        },
         label: 'AI電話相談',
         action: 'navigate',
         url: '/consultation',
@@ -39,21 +48,30 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
     items: [
       {
         id: 'course-info',
-        icon: 'Book',
+        icon: {
+          type: 'lucide',
+          value: 'Book'
+        },
         label: '講座情報',
         action: 'navigate',
         url: '/courses'
       },
       {
         id: 'enrollment',
-        icon: 'UserPlus',
+        icon: {
+          type: 'lucide',
+          value: 'UserPlus'
+        },
         label: '入学案内',
         action: 'navigate',
         url: '/enrollment'
       },
       {
         id: 'support',
-        icon: 'HelpCircle',
+        icon: {
+          type: 'lucide',
+          value: 'HelpCircle'
+        },
         label: 'サポート',
         action: 'navigate',
         url: '/support'
@@ -69,21 +87,30 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
     items: [
       {
         id: 'products',
-        icon: 'Package',
+        icon: {
+          type: 'lucide',
+          value: 'Package'
+        },
         label: '製品情報',
         action: 'navigate',
         url: '/products'
       },
       {
         id: 'pricing',
-        icon: 'CreditCard',
+        icon: {
+          type: 'lucide',
+          value: 'CreditCard'
+        },
         label: '料金プラン',
         action: 'navigate',
         url: '/pricing'
       },
       {
         id: 'contact',
-        icon: 'Mail',
+        icon: {
+          type: 'lucide',
+          value: 'Mail'
+        },
         label: 'お問い合わせ',
         action: 'navigate',
         url: '/contact'

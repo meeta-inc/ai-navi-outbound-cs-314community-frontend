@@ -28,21 +28,30 @@ const threeItemsConfig: MenuConfig = {
   items: [
     {
       id: 'ai-faq',
-      icon: 'MessageCircle',
+      icon: {
+        type: 'component',
+        value: 'AiChatbotIcon'
+      },
       label: 'AI FAQ',
       action: 'navigate',
       url: '/faq'
     },
     {
       id: 'request-materials',
-      icon: 'FileText',
+      icon: {
+        type: 'lucide',
+        value: 'FileText'
+      },
       label: '資料請求',
       action: 'navigate',
       url: '/request-materials'
     },
     {
       id: 'ai-consultation',
-      icon: 'Phone',
+      icon: {
+        type: 'lucide',
+        value: 'Phone'
+      },
       label: 'AI電話相談',
       action: 'navigate',
       url: '/consultation'
@@ -66,7 +75,10 @@ const fourItemsConfig: MenuConfig = {
     ...threeItemsConfig.items,
     {
       id: 'support',
-      icon: 'HelpCircle',
+      icon: {
+        type: 'lucide',
+        value: 'HelpCircle'
+      },
       label: 'サポート',
       action: 'navigate',
       url: '/support'
@@ -80,14 +92,20 @@ const sixItemsConfig: MenuConfig = {
     ...fourItemsConfig.items,
     {
       id: 'news',
-      icon: 'Newspaper',
+      icon: {
+        type: 'lucide',
+        value: 'Newspaper'
+      },
       label: 'ニュース',
       action: 'navigate',
       url: '/news'
     },
     {
       id: 'events',
-      icon: 'Calendar',
+      icon: {
+        type: 'lucide',
+        value: 'Calendar'
+      },
       label: 'イベント',
       action: 'navigate',
       url: '/events'
@@ -140,7 +158,10 @@ const threeItemsWithDisabledConfig: MenuConfig = {
   items: [
     {
       id: 'ai-faq',
-      icon: 'MessageCircle',
+      icon: {
+        type: 'component',
+        value: 'AiChatbotIcon'
+      },
       label: 'AI FAQ',
       action: 'navigate',
       url: '/faq',
@@ -148,7 +169,10 @@ const threeItemsWithDisabledConfig: MenuConfig = {
     },
     {
       id: 'request-materials',
-      icon: 'FileText',
+      icon: {
+        type: 'lucide',
+        value: 'FileText'
+      },
       label: '資料請求',
       action: 'navigate',
       url: '/request-materials',
@@ -156,7 +180,10 @@ const threeItemsWithDisabledConfig: MenuConfig = {
     },
     {
       id: 'ai-consultation',
-      icon: 'Phone',
+      icon: {
+        type: 'lucide',
+        value: 'Phone'
+      },
       label: 'AI電話相談',
       action: 'navigate',
       url: '/consultation',

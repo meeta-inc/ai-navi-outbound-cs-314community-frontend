@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { X, MessageCircle, FileText, Phone } from 'lucide-react';
+import { X, Info } from 'lucide-react';
 import { Icon } from '../../atoms/Icon/Icon';
 import { useLocale } from '../../../contexts/LocaleContext';
 import type { MenuConfig, MenuItem } from '../../../shared/config/menuConfig';
@@ -14,12 +14,6 @@ interface MenuModalProps {
   onMenuItemClick?: (item: MenuItem) => void;
 }
 
-// 아이콘 매핑
-const iconMap: Record<string, any> = {
-  MessageCircle,
-  FileText,
-  Phone,
-};
 
 export function MenuModal({
   isOpen,
@@ -131,20 +125,18 @@ export function MenuModal({
                   }
                 `}
                 style={item.disabled && menuConfig.items.length !== 4 ? {
-                  padding: '25px 36px'
+                  padding: '25px 20px',
+                  minWidth: '100px'
                 } : menuConfig.items.length !== 4 ? {
-                  padding: '25px 36px'
+                  padding: '25px 20px',
+                  minWidth: '100px'
                 } : undefined}
               >
                 <Icon
-                  config={{
-                    type: 'lucide',
-                    value: item.icon,
-                    fallback: iconMap[item.icon] || MessageCircle
-                  }}
+                  config={item.icon}
                   className={`w-6 h-6 ${colors.text}`}
                 />
-                <span className={`text-xs font-medium ${colors.text} text-center leading-tight`}>
+                <span className={`text-xs font-medium ${colors.text} text-center leading-tight whitespace-nowrap`}>
                   {item.label}
                 </span>
               </button>
@@ -155,10 +147,13 @@ export function MenuModal({
           {menuConfig.cta && (
             <button
               onClick={() => {
-                if (onMenuItemClick) {
+                if (onMenuItemClick && menuConfig.cta) {
                   onMenuItemClick({
                     id: 'cta',
-                    icon: 'Star',
+                    icon: {
+                      type: 'lucide',
+                      value: 'Star'
+                    },
                     label: menuConfig.cta.label,
                     action: menuConfig.cta.action,
                     url: menuConfig.cta.url
@@ -176,7 +171,7 @@ export function MenuModal({
                 config={{
                   type: 'lucide',
                   value: 'Info',
-                  fallback: MessageCircle
+                  fallback: Info
                 }}
                 className="w-5 h-5 text-white"
               />
