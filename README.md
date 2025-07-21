@@ -8,7 +8,9 @@
 - **AI 챗봇 상담**: 학습 관련 질문과 기술적 문의 지원
 - **타이핑 애니메이션**: 자연스러운 대화 느낌의 UI
 - **반응형 디자인**: 모바일과 데스크톱 모두 지원
-- **게스트 사용**: 로그인 없이 바로 사용 가능
+- **보안 통신**: JWE 암호화를 통한 안전한 API 통신
+- **AWS 통합**: Cognito Identity Pool, KMS를 활용한 보안 강화
+- **학년별 맞춤 대응**: 학년 선택 기능을 통한 맞춤형 응답
 
 ## 🛠 기술 스택
 
@@ -20,29 +22,37 @@
 - **State Management**: React Context API
 - **HTTP Client**: Fetch API
 - **Cookie Management**: js-cookie
+- **AWS SDK**: Cognito Identity, KMS, STS
+- **Security**: JWE (JSON Web Encryption) with jose library
 
 ## 📁 프로젝트 구조
 
 ```
 src/
-├── components/          # 재사용 가능한 컴포넌트
-│   ├── common/         # 공통 컴포넌트 (NavigationHeader)
-│   ├── layout/         # 레이아웃 컴포넌트
-│   └── ui/             # UI 컴포넌트 (ChatMessage, ChatInput, QuickReply, TypewriterText)
-├── contexts/           # React Context (LocaleContext)
-├── hooks/              # 커스텀 훅 (useChat)
+├── components/          # 재사용 가능한 컴포넌트 (Atomic Design)
+│   ├── atoms/          # 기본 UI 컴포넌트 (Button, Icon, Typography)
+│   ├── molecules/      # 복합 컴포넌트 (ChatBubble, InputField, UserAvatar)
+│   ├── organisms/      # 기능 컴포넌트 (ChatMessage, ChatInput, NavigationHeader)
+│   └── templates/      # 레이아웃 템플릿 (ChatLayout)
+├── contexts/           # React Context (LocaleContext, ThemeContext)
+├── hooks/              # 커스텀 훅 (useChat, useTheme, useKeyboardState)
 ├── locales/            # 다국어 번역 파일
 │   ├── ja/            # 일본어
 │   ├── ko/            # 한국어
 │   └── en/            # 영어
 ├── pages/              # 페이지 컴포넌트 (MainPage)
 ├── services/           # API 및 비즈니스 로직
-│   ├── api/           # API 관련 (chat, user)
-│   ├── auth/          # 인증 관련
-│   └── config/        # 환경설정
-├── styles/             # 글로벌 스타일
+│   ├── api/           # API 관련 (chat, user, questions)
+│   ├── auth/          # 인증 관련 (token)
+│   └── jwe/           # JWE 암호화 서비스
+├── shared/             # 공유 설정 및 상수
+│   ├── config/        # 앱 설정 (app, chat, header, menu, theme)
+│   └── constants/     # 상수 정의 (grade)
 ├── types/              # TypeScript 타입 정의
-└── utils/              # 유틸리티 함수
+├── dev/                # 개발 전용 (프로덕션에서 제외)
+│   ├── components/    # 개발 도구 컴포넌트
+│   └── pages/         # 테스트 페이지 (CognitoTestPage, JWETestPage)
+└── assets/             # 정적 자산 (icons, images)
 ```
 
 ## 🚀 시작하기
@@ -79,6 +89,19 @@ src/
    npm run lint
    ```
 
+## 🛠 개발 도구
+
+### 개발 전용 페이지 (Dev Tools)
+개발 환경에서만 접근 가능한 테스트 도구들이 제공됩니다:
+
+- **JWE 테스트**: `/dev/jwe-test` - JWE 토큰 생성 및 암호화 테스트
+- **Cognito 테스트**: `/dev/cognito-test` - AWS Cognito 인증 테스트
+
+이 페이지들은:
+- 개발 환경에서만 표시됩니다 (`NODE_ENV=development`)
+- 프로덕션 빌드에서는 자동으로 제외됩니다
+- AWS 자격증명과 KMS 키 테스트가 가능합니다
+
 ## 🌍 다국어 지원
 
 ### 언어 전환
@@ -113,12 +136,75 @@ function Component() {
 ## 🔧 API 연동
 
 ### 환경 변수 설정
-`.env` 파일에 API 엔드포인트를 설정하세요:
+`.env` 파일에 필요한 환경변수를 설정하세요:
 
 ```env
-VITE_API_URL=https://api.example.com
-VITE_CHAT_API_URL=https://chat-api.example.com
+# API 엔드포인트
+VITE_API_BASE_URL=https://your-api-gateway-url.execute-api.region.amazonaws.com/stage
+VITE_CHAT_API_URL=https://your-chat-api-url.execute-api.region.amazonaws.com/stage
+
+# UI 설정
+VITE_ACCENT_COLOR=green
+VITE_SHOW_NAVIGATION_HEADER=true
+VITE_SHOW_TIMESTAMP=true
+VITE_SHOW_GRADE_SELECTION=true
+
+# AWS Cognito Identity Pool
+VITE_COGNITO_IDENTITY_POOL_ID=region:identity-pool-id
+
+# AWS KMS 설정 (JWE 암호화용)
+VITE_KMS_KEY_ID=alias/your-kms-key-alias
+VITE_KMS_KEY_ARN=arn:aws:kms:region:account-id:key/key-id
+
+# AWS 리전 설정
+VITE_AWS_REGION=ap-northeast-1
+VITE_NODE_ENV=development
+
+# JWE 설정
+VITE_CLIENT_ID=your-client-id
+VITE_APP_ID=your-app-id
+
+# AWS 역할 ARN (Frontend 역할)
+VITE_FRONTEND_ROLE_ARN=arn:aws:iam::account-id:role/your-frontend-role
+
+# AWS 자격증명 (개발 환경에서만 사용)
+# VITE_AWS_ACCESS_KEY_ID=your_access_key_here
+# VITE_AWS_SECRET_ACCESS_KEY=your_secret_key_here
+
+# AWS Profile 설정 (개발 환경)
+VITE_AWS_PROFILE=your-aws-profile
 ```
+
+### 환경변수 설명
+
+#### 필수 설정
+- **VITE_API_BASE_URL**: 메인 API Gateway 엔드포인트
+- **VITE_CHAT_API_URL**: 채팅 전용 API 엔드포인트
+- **VITE_COGNITO_IDENTITY_POOL_ID**: AWS Cognito Identity Pool ID
+- **VITE_AWS_REGION**: AWS 리전 (기본값: ap-northeast-1)
+
+#### JWE 암호화 설정
+- **VITE_KMS_KEY_ID**: KMS 암호화 키 별칭
+- **VITE_KMS_KEY_ARN**: KMS 키의 전체 ARN
+- **VITE_CLIENT_ID**: 클라이언트 식별자
+- **VITE_APP_ID**: 애플리케이션 식별자
+
+#### 개발 환경 설정
+- **VITE_AWS_PROFILE**: AWS CLI 프로필 이름 (AWS 자격증명 대신 사용 권장)
+- **VITE_AWS_ACCESS_KEY_ID/SECRET_ACCESS_KEY**: 직접 자격증명 (보안상 권장하지 않음)
+- **VITE_FRONTEND_ROLE_ARN**: Frontend 역할 ARN (AssumeRole에 사용)
+
+#### UI 설정
+- **VITE_ACCENT_COLOR**: 테마 색상 (green, blue, purple 등)
+- **VITE_SHOW_NAVIGATION_HEADER**: 상단 네비게이션 표시 여부
+- **VITE_SHOW_TIMESTAMP**: 메시지 타임스탬프 표시 여부
+- **VITE_SHOW_GRADE_SELECTION**: 학년 선택 기능 활성화 여부
+
+### 보안 주의사항
+1. **절대 `.env` 파일을 Git에 커밋하지 마세요** (이미 `.gitignore`에 포함됨)
+2. AWS 자격증명은 가능한 AWS Profile을 사용하세요
+3. 프로덕션 환경에서는 IAM Role 기반 인증을 사용하세요
+4. 민감한 정보는 AWS Secrets Manager나 Parameter Store 사용을 고려하세요
 
 ## 🎨 FAQ 카테고리 아이콘 설정
 
