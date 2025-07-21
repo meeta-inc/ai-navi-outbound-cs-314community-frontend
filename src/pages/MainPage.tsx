@@ -371,6 +371,7 @@ function MainPage() {
                   <TopQuestions
                     categoryId={selectedCategory.id}
                     categoryTitle={t(selectedCategory.textKey)}
+                    grade={selectedGrade || 'high'}
                     onQuestionSelect={handleTopQuestionSelect}
                     onBackToCategories={handleBackToCategories}
                     userId="Hyunse0001"
