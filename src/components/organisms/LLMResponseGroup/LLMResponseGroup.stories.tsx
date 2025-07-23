@@ -89,7 +89,7 @@ const responseWithAttachments: LLMResponse = {
       text: '문법 가이드를 확인해보세요.',
       attachment: {
         type: 'link',
-        url: 'https://example.com/grammar',
+        url: '#grammar-guide',
         title: '문법 가이드',
         description: '기초 영어 문법을 학습할 수 있는 가이드입니다.'
       }
@@ -99,9 +99,9 @@ const responseWithAttachments: LLMResponse = {
       text: '교재 이미지도 함께 확인하세요.',
       attachment: {
         type: 'image',
-        url: 'https://example.com/textbook.jpg',
+        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzRBOTBFMiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7qt5Dtsr4g7ZGc7KeAPC90ZXh0Pjwvc3ZnPg==',
         title: '교재 표지',
-        thumbnail: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=교재+표지'
+        thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzRBOTBFMiIvPjx0ZXh0IHg9IjE1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7qt5Dtsr4g7ZGc7KeAPC90ZXh0Pjwvc3ZnPg=='
       }
     },
     {
@@ -192,7 +192,7 @@ const allAttachmentTypesResponse: LLMResponse = {
       text: '링크 첨부파일입니다.',
       attachment: {
         type: 'link',
-        url: 'https://example.com/guide',
+        url: '#learning-guide',
         title: '학습 가이드',
         description: '상세한 학습 가이드를 확인하세요.'
       }
@@ -202,9 +202,9 @@ const allAttachmentTypesResponse: LLMResponse = {
       text: '이미지 첨부파일입니다.',
       attachment: {
         type: 'image',
-        url: 'https://example.com/diagram.jpg',
+        url: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI0U3NEMzQyIvPjx0ZXh0IHg9IjE1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7rsojtsoUg64uk7J207Ja065+8PC90ZXh0Pjwvc3ZnPg==',
         title: '문법 다이어그램',
-        thumbnail: 'https://via.placeholder.com/300x200/E74C3C/FFFFFF?text=문법+다이어그램'
+        thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI0U3NEMzQyIvPjx0ZXh0IHg9IjE1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7rsojtsoUg64uk7J207Ja065+8PC90ZXh0Pjwvc3ZnPg=='
       }
     },
     {
@@ -212,10 +212,10 @@ const allAttachmentTypesResponse: LLMResponse = {
       text: '동영상 첨부파일입니다.',
       attachment: {
         type: 'video',
-        url: 'https://example.com/lesson.mp4',
+        url: '#lesson-video',
         title: '영어 학습 동영상',
         description: '기초 영어 회화를 배울 수 있는 동영상입니다.',
-        thumbnail: 'https://via.placeholder.com/300x200/27AE60/FFFFFF?text=학습+동영상'
+        thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzI3QUU2MCIvPjx0ZXh0IHg9IjE1MCIgeT0iMTA1IiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7tlansiKUg64+Z7JuB7IOBPC90ZXh0Pjwvc3ZnPg=='
       }
     },
     {
@@ -223,7 +223,7 @@ const allAttachmentTypesResponse: LLMResponse = {
       text: '파일 첨부파일입니다.',
       attachment: {
         type: 'file',
-        url: 'https://example.com/worksheet.pdf',
+        url: '#worksheet-pdf',
         title: '학습 워크시트.pdf',
         description: 'PDF 형태의 학습 워크시트입니다.'
       }
@@ -283,7 +283,7 @@ const realWorldResponse: LLMResponse = {
       text: '현재완료는 과거에 시작된 동작이 현재까지 지속되거나 현재에 영향을 미치는 시제입니다.',
       attachment: {
         type: 'link',
-        url: 'https://example.com/present-perfect',
+        url: '#present-perfect-guide',
         title: '현재완료 상세 가이드',
         description: '현재완료 시제의 모든 것을 배워보세요.'
       }
@@ -293,7 +293,7 @@ const realWorldResponse: LLMResponse = {
       text: '예문과 함께 연습해보세요.',
       attachment: {
         type: 'file',
-        url: 'https://example.com/practice.pdf',
+        url: '#practice-pdf',
         title: '현재완료 연습문제.pdf',
         description: '다양한 예문과 연습문제가 포함된 PDF입니다.'
       }

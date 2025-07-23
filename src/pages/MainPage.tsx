@@ -286,7 +286,12 @@ function MainPage() {
           value={newMessage}
           onChange={setNewMessage}
           onSend={handleSendClick}
-          disabled={isTyping}
+          disabled={isTyping || (showGradeSelection && !selectedGrade)}
+          placeholder={
+            showGradeSelection && !selectedGrade 
+              ? 'まずは学年を選択してください'
+              : undefined
+          }
           onMenuItemClick={handleMenuItemClick}
         />
       }
