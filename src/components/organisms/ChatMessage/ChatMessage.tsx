@@ -1,36 +1,55 @@
-import React from 'react';
-import type { Message } from '../../../types';
-import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
+import type { Message, LLMResponse } from '../../../types';
 import { getAccentColor, getShowTimestamp } from '../../../shared/config/app.config';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { UserAvatar } from '../../molecules/UserAvatar';
 import { ChatBubble } from '../../molecules/ChatBubble';
+import { LLMResponseGroup } from '../LLMResponseGroup';
 
 interface ChatMessageProps {
   message: Message;
   isTyping?: boolean;
   onTypingComplete?: () => void;
   hideAvatar?: boolean;
+  // LLM 응답 지원을 위한 추가 props
+  llmResponse?: LLMResponse;
+  enableLLMTyping?: boolean;
 }
 
-export function ChatMessage({ message, isTyping = false, onTypingComplete, hideAvatar = false }: ChatMessageProps) {
+export function ChatMessage({ 
+  message, 
+  isTyping = false, 
+  onTypingComplete, 
+  hideAvatar = false,
+  llmResponse,
+  enableLLMTyping = true
+}: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
   const showTimestamp = getShowTimestamp();
-  const colors = getColorClasses(accentColor);
   const isBot = message.type === 'bot';
 
   if (isBot) {
     return (
       <div className="box-border content-stretch flex flex-col items-start justify-start max-w-[287px] p-0 relative shrink-0 w-[287px]">
         {!hideAvatar && <UserAvatar accentColor={accentColor} />}
-        <ChatBubble
-          content={message.content}
-          isBot={true}
-          accentColor={accentColor}
-          isTyping={isTyping}
-          onTypingComplete={onTypingComplete}
-        />
+        
+        {/* LLM 응답이 있으면 LLMResponseGroup 사용, 없으면 기존 ChatBubble 사용 */}
+        {llmResponse ? (
+          <LLMResponseGroup
+            response={llmResponse}
+            accentColor={accentColor}
+            enableTyping={enableLLMTyping && isTyping}
+            onComplete={onTypingComplete}
+          />
+        ) : (
+          <ChatBubble
+            content={message.content}
+            isBot={true}
+            accentColor={accentColor}
+            isTyping={isTyping}
+            onTypingComplete={onTypingComplete}
+          />
+        )}
       </div>
     );
   }

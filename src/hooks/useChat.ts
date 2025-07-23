@@ -3,10 +3,11 @@ import { Download } from 'lucide-react';
 import { sendChatMessage } from '../services/api/chat';
 import { getColorClasses } from '../shared/config/theme.config';
 import { getAccentColor } from "../shared/config/app.config";
-import type { Message } from '../types';
+import type { Message, LLMResponse } from '../types';
 
 interface UseChatOptions {
   userId: string;
+  gradeId?: string;
   onError?: (error: Error) => void;
   onTypingComplete?: () => void;
 }
@@ -15,9 +16,10 @@ interface ProcessedChatResponse {
   message: string;
   toolName?: string;
   toolInput?: any;
+  llmResponse?: LLMResponse;
 }
 
-export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
+export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatOptions) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -40,11 +42,12 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
 
   const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
     try {
-      const response = await sendChatMessage(messageContent || newMessage, userId);
+      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId);
       return {
         message: response.response,
         toolName: response.tool?.name,
-        toolInput: response.tool?.input
+        toolInput: response.tool?.input,
+        llmResponse: response.llmResponse
       };
     } catch (error) {
       console.error('Error sending message:', error);
@@ -76,7 +79,8 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
       setCurrentlyTyping({
         message: response.message,
         toolName: response.toolName,
-        toolInput: response.toolInput
+        toolInput: response.toolInput,
+        llmResponse: response.llmResponse
       });
     } catch (error) {
       setMessages(prev => [...prev, {
@@ -115,15 +119,27 @@ export function useChat({ userId, onError, onTypingComplete }: UseChatOptions) {
 
   const completeTyping = () => {
     if (currentlyTyping) {
-      // 기본 메시지 추가
-      const botMessage: Message = {
-        id: Date.now().toString(),
-        type: 'bot',
-        content: currentlyTyping.message,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, botMessage]);
+      // LLM 응답이 있는 경우 특별 처리
+      if (currentlyTyping.llmResponse) {
+        // LLM 응답의 경우 메시지 content는 비워두고 llmResponse 정보만 저장
+        const botMessage: Message = {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: '', // LLM 응답의 경우 content는 비워둠
+          timestamp: new Date(),
+          llmResponse: currentlyTyping.llmResponse
+        };
+        setMessages(prev => [...prev, botMessage]);
+      } else {
+        // 기존 메시지 추가
+        const botMessage: Message = {
+          id: Date.now().toString(),
+          type: 'bot',
+          content: currentlyTyping.message,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, botMessage]);
+      }
 
       // 툴에 따른 추가 UI 렌더링
       if (currentlyTyping.toolName) {
