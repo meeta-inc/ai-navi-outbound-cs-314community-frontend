@@ -50,6 +50,7 @@ function MainPage() {
     addUserMessage
   } = useChat({
     userId: 'Hyunse0001', // 실제 사용자 ID
+    gradeId: selectedGrade || 'high', // 선택된 학년 또는 기본값
     onError: (error) => {
       console.error('Chat error:', error);
     },
@@ -306,6 +307,7 @@ function MainPage() {
                 <ChatMessage 
                   message={message} 
                   hideAvatar={message.type === 'bot' && !isFirstBotMessage}
+                  llmResponse={message.llmResponse}
                 />
               
               {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) */}
@@ -394,6 +396,8 @@ function MainPage() {
               isTyping={true}
               onTypingComplete={completeTyping}
               hideAvatar={messages.some(m => m.type === 'bot')}
+              llmResponse={currentlyTyping.llmResponse}
+              enableLLMTyping={true}
             />
           )}
           
