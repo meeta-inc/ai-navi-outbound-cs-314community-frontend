@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ChatMessage } from './ChatMessage';
+import type { LLMResponse } from '../../../types';
 
 const meta: Meta<typeof ChatMessage> = {
   title: 'Organisms/ChatMessage',
@@ -23,6 +24,14 @@ const meta: Meta<typeof ChatMessage> = {
     onTypingComplete: {
       action: 'typing-completed',
       description: '타이핑 완료 시 호출되는 콜백 함수',
+    },
+    llmResponse: {
+      control: 'object',
+      description: 'LLM 응답 객체 (봇 메시지만)',
+    },
+    enableLLMTyping: {
+      control: 'boolean',
+      description: 'LLM 응답 타이핑 효과 활성화 여부',
     },
   },
   tags: ['autodocs'],
@@ -226,6 +235,168 @@ export const Conversation: Story = {
     docs: {
       description: {
         story: '실제 대화 흐름을 보여주는 예시입니다.',
+      },
+    },
+  },
+};
+
+// LLM 응답 예시 데이터
+const llmResponseExample: LLMResponse = {
+  response: [
+    {
+      type: 'main',
+      text: '안녕하세요! 영어 문법에 대한 답변을 드릴게요.',
+      attachment: null
+    },
+    {
+      type: 'sub',
+      text: '3.14コミュニティ에서는 기초부터 고급까지 학습 가능합니다.',
+      attachment: {
+        type: 'link',
+        url: 'https://example.com/grammar',
+        title: '문법 가이드',
+        description: '기초 영어 문법을 학습할 수 있는 가이드입니다.'
+      }
+    },
+    {
+      type: 'cta',
+      text: '더 궁금한 점이 있으시면 말씀해주세요!',
+      attachment: null
+    }
+  ],
+  tool: null
+};
+
+const llmResponseWithAttachments: LLMResponse = {
+  response: [
+    {
+      type: 'main',
+      text: '영어 학습 자료를 준비했습니다.',
+      attachment: null
+    },
+    {
+      type: 'sub',
+      text: '교재 이미지를 확인해보세요.',
+      attachment: {
+        type: 'image',
+        url: 'https://example.com/textbook.jpg',
+        title: '교재 표지',
+        thumbnail: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=교재+표지'
+      }
+    },
+    {
+      type: 'sub',
+      text: 'PDF 자료도 다운로드하세요.',
+      attachment: {
+        type: 'file',
+        url: 'https://example.com/grammar-guide.pdf',
+        title: '문법 가이드.pdf',
+        description: 'PDF 형태의 상세한 문법 가이드입니다.'
+      }
+    },
+    {
+      type: 'cta',
+      text: '학습을 시작해보세요!',
+      attachment: null
+    }
+  ],
+  tool: 'study_materials'
+};
+
+// LLM 응답 스토리들
+export const LLMResponse: Story = {
+  args: {
+    message: {
+      id: 'llm-1',
+      type: 'bot',
+      content: '', // LLM 응답이 있을 때는 content는 무시됨
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseExample,
+    isTyping: false,
+    enableLLMTyping: true,
+  },
+};
+
+export const LLMResponseWithTyping: Story = {
+  args: {
+    message: {
+      id: 'llm-2',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseExample,
+    isTyping: true,
+    enableLLMTyping: true,
+  },
+};
+
+export const LLMResponseWithAttachments: Story = {
+  args: {
+    message: {
+      id: 'llm-3',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseWithAttachments,
+    isTyping: false,
+    enableLLMTyping: true,
+  },
+};
+
+export const LLMResponseAttachmentsWithTyping: Story = {
+  args: {
+    message: {
+      id: 'llm-4',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseWithAttachments,
+    isTyping: true,
+    enableLLMTyping: true,
+  },
+};
+
+// 혼합 대화 예시
+export const ConversationWithLLM: Story = {
+  render: () => (
+    <div className="space-y-4 max-w-md">
+      <ChatMessage
+        message={{
+          id: 'conv-1',
+          type: 'user',
+          content: '영어 문법에 대해 질문이 있어요.',
+          timestamp: new Date(Date.now() - 300000),
+        }}
+      />
+      <ChatMessage
+        message={{
+          id: 'conv-2',
+          type: 'bot',
+          content: '',
+          timestamp: new Date(Date.now() - 240000),
+        }}
+        llmResponse={llmResponseExample}
+        isTyping={false}
+        enableLLMTyping={true}
+      />
+      <ChatMessage
+        message={{
+          id: 'conv-3',
+          type: 'user',
+          content: '감사합니다! 자료가 도움이 되네요.',
+          timestamp: new Date(Date.now() - 180000),
+        }}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'LLM 응답이 포함된 실제 대화 흐름 예시입니다.',
       },
     },
   },
