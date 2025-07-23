@@ -58,6 +58,11 @@ export function ChatInput({
   };
 
   const handleMenuClick = () => {
+    // disabled 상태일 때는 메뉴 열기 방지
+    if (disabled) {
+      return;
+    }
+    
     // 키보드가 열려있으면 키보드가 닫힐 때까지 대기
     if (isKeyboardOpen) {
       // input에서 포커스 제거
@@ -87,10 +92,19 @@ export function ChatInput({
       {/* Menu Button */}
       <Button
         onClick={handleMenuClick}
-        className={`w-8 h-8 sm:w-[35px] sm:h-[35px] flex justify-center items-center flex-shrink-0 transition-colors ${colors.backgroundHover} hover:text-white group`}
+        disabled={disabled}
+        className={`w-8 h-8 sm:w-[35px] sm:h-[35px] flex justify-center items-center flex-shrink-0 transition-colors ${
+          disabled 
+            ? 'cursor-not-allowed' 
+            : `${colors.backgroundHover} hover:text-white group`
+        }`}
         aria-label="메뉴"
       >
-        <CategoryIcon className={`w-6 h-6 ${colors.textBlack} group-hover:text-white`} />
+        <CategoryIcon className={`w-6 h-6 transition-colors ${
+          disabled 
+            ? 'text-gray-400' 
+            : `${colors.textBlack} group-hover:text-white`
+        }`} />
       </Button>
       
       {/* Input Field */}
