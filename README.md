@@ -1,5 +1,12 @@
 # CS 교육 지원 챗봇 프론트엔드
 
+[![CI/CD Pipeline](https://github.com/meeta-inc/ai-navi-outbound-cs-314community-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/meeta-inc/ai-navi-outbound-cs-314community-frontend/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/meeta-inc/ai-navi-outbound-cs-314community-frontend/branch/main/graph/badge.svg)](https://codecov.io/gh/meeta-inc/ai-navi-outbound-cs-314community-frontend)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![React](https://img.shields.io/badge/React-18.3-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)
+![Jest Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+
 연성회 외부생 위한 CS(Customer Support) 챗봇 웹 애플리케이션입니다.
 
 ## 🌟 주요 기능
@@ -84,10 +91,71 @@ src/
    npm run preview
    ```
 
-5. **린트 검사**
+5. **테스트 실행**
+   ```bash
+   # Jest 단위 테스트
+   npm test
+   
+   # 커버리지 포함 테스트
+   npm run test:coverage
+   
+   # 감시 모드 테스트
+   npm run test:watch
+   ```
+
+6. **린트 검사**
    ```bash
    npm run lint
    ```
+
+7. **Storybook 실행**
+   ```bash
+   npm run storybook
+   ```
+
+## 🧪 테스트 및 품질 보증
+
+### Jest 단위 테스트
+71개의 테스트 케이스로 높은 품질을 보장합니다:
+
+```bash
+# 모든 테스트 실행
+npm test
+
+# 커버리지 확인 (90% 이상 목표)
+npm run test:coverage
+
+# 특정 파일 테스트
+npm test ChatMessage.test.tsx
+
+# 감시 모드로 개발 중 테스트
+npm run test:watch
+```
+
+**테스트 종류:**
+- **컴포넌트 테스트**: React Testing Library를 사용한 UI 컴포넌트 테스트
+- **API 서비스 테스트**: Mock을 활용한 서비스 로직 테스트
+- **유틸리티 테스트**: 헬퍼 함수와 유틸리티 테스트
+- **설정 테스트**: 앱 설정과 상수 검증
+
+### Storybook 컴포넌트 개발
+```bash
+# Storybook 개발 서버 실행
+npm run storybook
+
+# 정적 빌드 생성
+npm run build-storybook
+
+# 시각적 회귀 테스트
+npm run test-storybook
+```
+
+### CI/CD 자동화
+- **GitHub Actions**: Node.js 18.x, 20.x, 22.x 매트릭스 테스트
+- **ESLint**: 코드 품질 및 스타일 검사
+- **Jest**: 자동화된 단위 테스트 실행
+- **Codecov**: 테스트 커버리지 추적 및 리포팅
+- **Chromatic**: Storybook 시각적 회귀 테스트
 
 ## 🛠 개발 도구
 
