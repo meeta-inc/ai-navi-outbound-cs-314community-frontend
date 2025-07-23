@@ -29,3 +29,6 @@ public
 *storybook.log
 storybook-static
 .env
+
+# 테스트 커버리지 파일
+coverage/
