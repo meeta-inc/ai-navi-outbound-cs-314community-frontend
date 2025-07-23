@@ -4,3 +4,4 @@ export * from './FAQCategory';
 export * from './QuickReply';
 export * from './TopQuestions';
 export * from './NavigationHeader';
+export * from './LLMResponseGroup';

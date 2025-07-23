@@ -4,114 +4,162 @@ import { useLocale } from '../../../contexts/LocaleContext';
 import { getColorClasses } from '../../../shared/config/theme.config';
 import { getAccentColor } from "../../../shared/config/app.config";
 import { Icon } from '../../atoms/Icon';
-import { getIconConfig, IconConfig } from '../../../shared/config/iconConfig';
+import { IconConfig } from '../../../shared/config/iconConfig';
+import { getEnabledFAQCategories, FAQCategoryConfig } from '../../../shared/config/faqCategories.config';
+
+// 상수 정의
+const STYLES = {
+  FONT_FAMILY: "'Noto Sans', 'Noto Sans JP', sans-serif",
+  CONTAINER: "bg-gray-50 w-full max-w-[320px]",
+  HEADER: "mb-[7px] pl-5",
+  DESCRIPTION: "text-[12px] font-medium leading-[16px] tracking-[0.6px]",
+  CATEGORIES_CONTAINER: "flex flex-col gap-[7px] items-start",
+  CATEGORY_WRAPPER: "pl-5 w-full",
+  BUTTON_BASE: "inline-flex items-center gap-2.5 max-w-[257px] pl-2.5 pr-5 py-2.5 rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left",
+  ICON_CONTAINER: "w-5 h-5 flex items-center justify-center",
+  ICON: "w-4 h-4",
+  TEXT_SPAN: "font-semibold flex-1 min-w-0"
+} as const;
 
 export interface FAQCategoryItem {
   id: string;
   textKey: string;
   valueKey: string;
   iconConfig?: IconConfig;
-  icon?: React.ReactNode; // 백워드 호환성을 위해 유지
+  /** @deprecated 백워드 호환성을 위해 유지. iconConfig 사용을 권장합니다. */
+  icon?: React.ReactNode;
 }
 
 interface FAQCategoryProps {
+  /** 커스텀 카테고리 목록. 제공되지 않으면 환경변수 설정 기반 기본 카테고리 사용 */
   categories?: FAQCategoryItem[];
+  /** 카테고리 선택 시 호출되는 콜백 함수 */
   onCategorySelect: (category: FAQCategoryItem) => void;
+  /** 카테고리 섹션 설명 텍스트. 제공되지 않으면 기본 번역값 사용 */
   description?: string;
+  /** 컨테이너에 추가할 CSS 클래스명 */
   className?: string;
 }
 
+/**
+ * 환경변수 설정을 기반으로 기본 카테고리 목록을 생성합니다.
+ * @returns FAQCategoryItem 배열
+ */
 const createDefaultCategories = (): FAQCategoryItem[] => {
-  const iconConfig = getIconConfig();
+  const categoryConfigs = getEnabledFAQCategories();
   
-  return [
-    {
-      id: 'category1',
-      textKey: 'chat.faq.category1.title',
-      valueKey: 'chat.faq.category1.message',
-      iconConfig: iconConfig.category1
-    },
-    {
-      id: 'category2',
-      textKey: 'chat.faq.category2.title',
-      valueKey: 'chat.faq.category2.message',
-      iconConfig: iconConfig.category2
-    },
-    {
-      id: 'category3',
-      textKey: 'chat.faq.category3.title',
-      valueKey: 'chat.faq.category3.message',
-      iconConfig: iconConfig.category3
-    },
-    {
-      id: 'category4',
-      textKey: 'chat.faq.category4.title',
-      valueKey: 'chat.faq.category4.message',
-      iconConfig: iconConfig.category4
-    },
-    {
-      id: 'other',
-      textKey: 'chat.faq.other.title',
-      valueKey: 'chat.faq.other.message',
-      iconConfig: iconConfig.other
-    }
-  ];
+  return categoryConfigs.map((config: FAQCategoryConfig): FAQCategoryItem => ({
+    id: config.id,
+    textKey: config.textKey,
+    valueKey: config.valueKey,
+    iconConfig: config.iconConfig
+  }));
 };
 
+/**
+ * 카테고리 아이콘을 렌더링합니다.
+ * @param category 카테고리 아이템
+ * @returns 렌더링할 아이콘 JSX 엘리먼트
+ */
+const renderCategoryIcon = (category: FAQCategoryItem): React.ReactNode => {
+  if (category.iconConfig) {
+    return (
+      <Icon 
+        config={category.iconConfig} 
+        className={STYLES.ICON}
+      />
+    );
+  }
+  
+  // 백워드 호환성 지원
+  if (category.icon) {
+    return category.icon;
+  }
+  
+  // 기본 아이콘
+  return <MessageCircleMore className={STYLES.ICON} />;
+};
+
+/**
+ * FAQ 카테고리 선택 컴포넌트
+ * 
+ * 환경변수 설정 기반으로 동적으로 카테고리를 표시하며,
+ * 사용자가 관심 있는 FAQ 카테고리를 선택할 수 있도록 합니다.
+ * 
+ * @param props FAQCategoryProps
+ * @returns JSX.Element
+ */
 export function FAQCategory({ 
   categories,
   onCategorySelect,
   description,
   className = ""
 }: FAQCategoryProps) {
+  // 상태 및 설정 초기화
   const defaultCategories = createDefaultCategories();
   const finalCategories = categories || defaultCategories;
   const { t } = useLocale();
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
-
+  
   const displayDescription = description || t('chat.faq.description');
 
   return (
-    <div className={`bg-gray-50 w-full max-w-[320px] ${className}`}>
-      {/* Header Section */}
-      <div className="mb-[7px] pl-5">
+    <div className={`${STYLES.CONTAINER} ${className}`}>
+      {/* 헤더 섹션 */}
+      <div className={STYLES.HEADER}>
         <p 
-          className={`${colors.textMuted} text-[12px] font-medium leading-[16px] tracking-[0.6px]`}
-          style={{ fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif" }}
+          className={`${colors.textMuted} ${STYLES.DESCRIPTION}`}
+          style={{ fontFamily: STYLES.FONT_FAMILY }}
         >
           📚{displayDescription}
         </p>
       </div>
 
-      {/* Categories Section */}
-      <div className="flex flex-col gap-[7px] items-start">
+      {/* 카테고리 섹션 */}
+      <div className={STYLES.CATEGORIES_CONTAINER}>
         {finalCategories.map((category) => (
-          <div key={category.id} className="pl-5 w-full">
-            <button
-              onClick={() => onCategorySelect(category)}
-              className={`${colors.background} ${colors.textWhite} inline-flex items-center gap-2.5 max-w-[257px] pl-2.5 pr-5 py-2.5 rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left`}
-              style={{ 
-                fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
-              }}
-            >
-              <div className="w-5 h-5 flex items-center justify-center">
-                {category.iconConfig ? (
-                  <Icon 
-                    config={category.iconConfig} 
-                    className="w-4 h-4"
-                  />
-                ) : (
-                  category.icon || <MessageCircleMore className="w-4 h-4" />
-                )}
-              </div>
-              <span className="font-semibold flex-1 min-w-0">
-                {t(category.textKey)}
-              </span>
-            </button>
-          </div>
+          <CategoryButton
+            key={category.id}
+            category={category}
+            colors={colors}
+            onCategorySelect={onCategorySelect}
+            t={t}
+          />
         ))}
       </div>
     </div>
   );
 }
+
+/**
+ * 개별 카테고리 버튼 컴포넌트
+ */
+interface CategoryButtonProps {
+  category: FAQCategoryItem;
+  colors: ReturnType<typeof getColorClasses>;
+  onCategorySelect: (category: FAQCategoryItem) => void;
+  t: (key: string) => string;
+}
+
+const CategoryButton: React.FC<CategoryButtonProps> = ({
+  category,
+  colors,
+  onCategorySelect,
+  t
+}) => (
+  <div className={STYLES.CATEGORY_WRAPPER}>
+    <button
+      onClick={() => onCategorySelect(category)}
+      className={`${colors.background} ${colors.textWhite} ${STYLES.BUTTON_BASE}`}
+      style={{ fontFamily: STYLES.FONT_FAMILY }}
+    >
+      <div className={STYLES.ICON_CONTAINER}>
+        {renderCategoryIcon(category)}
+      </div>
+      <span className={STYLES.TEXT_SPAN}>
+        {t(category.textKey)}
+      </span>
+    </button>
+  </div>
+);
