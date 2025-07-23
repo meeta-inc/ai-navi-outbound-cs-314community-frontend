@@ -269,176 +269,7 @@ VITE_AWS_PROFILE=your-aws-profile
 - **VITE_SHOW_GRADE_SELECTION**: 학년 선택 기능 활성화 여부
 
 ### 보안 주의사항
-1. **절대 `.env` 파일을 Git에 커밋하지 마세요** (이미 `.gitignore`에 포함됨)
-2. AWS 자격증명은 가능한 AWS Profile을 사용하세요
-3. 프로덕션 환경에서는 IAM Role 기반 인증을 사용하세요
-4. 민감한 정보는 AWS Secrets Manager나 Parameter Store 사용을 고려하세요
-
-## 🎨 FAQ 카테고리 아이콘 설정
-
-FAQ 카테고리의 아이콘을 클라이언트별로 커스터마이징할 수 있습니다.
-
-### 기본 아이콘 타입
-
-시스템에서 지원하는 4가지 아이콘 타입:
-
-1. **lucide**: Lucide React 아이콘 라이브러리
-2. **url**: 외부 SVG/이미지 URL
-3. **svg**: 인라인 SVG 문자열
-4. **component**: React 컴포넌트
-
-### 환경변수 설정
-
-`.env` 파일에 `VITE_FAQ_ICONS` 변수를 설정하세요:
-
-#### 1. Lucide 아이콘 사용 (기본)
-```env
-VITE_FAQ_ICONS={"category1":{"type":"lucide","value":"BookOpen"},"category2":{"type":"lucide","value":"Users"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-#### 2. 외부 이미지 URL 사용
-```env
-VITE_FAQ_ICONS={"category1":{"type":"url","value":"https://cdn.example.com/icons/classes.svg"},"category2":{"type":"url","value":"https://cdn.example.com/icons/teachers.svg"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-#### 3. 인라인 SVG 사용
-```env
-VITE_FAQ_ICONS={"category1":{"type":"svg","value":"<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M12 2L2 7v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7L12 2z\"/></svg>"},"category2":{"type":"lucide","value":"Users"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-#### 4. 커스텀 React 컴포넌트 사용
-```env
-VITE_FAQ_ICONS={"category1":{"type":"component","value":"CustomIcon"},"category2":{"type":"lucide","value":"Users"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-### 폴백 아이콘 설정
-
-아이콘 로딩에 실패했을 때 사용할 폴백 아이콘을 설정할 수 있습니다:
-
-```env
-VITE_FAQ_ICONS={"category1":{"type":"url","value":"https://example.com/icon.svg","fallback":"BookOpen"},"category2":{"type":"lucide","value":"Users"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-### 자주 사용되는 Lucide 아이콘
-
-교육 관련 아이콘 예시:
-
-```
-교육 관련:
-- BookOpen (책)
-- GraduationCap (졸업모)
-- School (학교)
-- Users (사용자들)
-- User (사용자)
-- Lightbulb (전구)
-
-성과 관련:
-- Trophy (트로피)
-- Award (상장)
-- Star (별)
-- TrendingUp (상승 트렌드)
-- BarChart (차트)
-- Target (타겟)
-
-업무 관련:
-- FileText (문서)
-- Clipboard (클립보드)
-- Calendar (달력)
-- Clock (시계)
-- CheckCircle (체크)
-
-기타:
-- MessageCircle (메시지)
-- HelpCircle (도움말)
-- Info (정보)
-- Settings (설정)
-- MoreHorizontal (더보기)
-```
-
-### 커스텀 React 컴포넌트 아이콘 추가
-
-1. **컴포넌트 생성**
-```typescript
-// src/components/icons/CustomIcon.tsx
-import React from 'react';
-
-interface CustomIconProps {
-  className?: string;
-}
-
-export const CustomIcon: React.FC<CustomIconProps> = ({ className }) => {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2L2 7v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7L12 2z"/>
-    </svg>
-  );
-};
-
-export const SchoolIcon: React.FC<CustomIconProps> = ({ className }) => {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
-    </svg>
-  );
-};
-
-export const TeacherIcon: React.FC<CustomIconProps> = ({ className }) => {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-      <path d="M12.5 13c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5z"/>
-    </svg>
-  );
-};
-```
-
-2. **DynamicIcon 컴포넌트에 등록**
-```typescript
-// src/components/ui/DynamicIcon.tsx
-import { CustomIcon, SchoolIcon, TeacherIcon } from '../icons/CustomIcon';
-
-const componentMap = {
-  CustomIcon: CustomIcon,
-  SchoolIcon: SchoolIcon,
-  TeacherIcon: TeacherIcon,
-  // 추가 컴포넌트들...
-};
-
-// component 타입 처리 부분에서 사용
-case 'component':
-  const Component = componentMap[config.value as keyof typeof componentMap];
-  return Component ? <Component className={className} /> : null;
-```
-
-3. **환경변수에 설정**
-```env
-VITE_FAQ_ICONS={"category1":{"type":"component","value":"SchoolIcon"},"category2":{"type":"component","value":"TeacherIcon"},"category3":{"type":"lucide","value":"Trophy"},"category4":{"type":"lucide","value":"FileText"},"other":{"type":"lucide","value":"MoreHorizontal"}}
-```
-
-#### 사용 가능한 내장 커스텀 아이콘
-
-프로젝트에 이미 포함된 커스텀 아이콘들:
-- `CustomIcon`: 기본 홈 아이콘
-- `SchoolIcon`: 학교 건물 아이콘
-- `TeacherIcon`: 선생님 아이콘
-- `ImageIcon`: 이미지 아이콘 (Image.svg)
-
-### 카테고리별 기본 매핑
-
-현재 카테고리 구조:
-- `category1`: 첫 번째 카테고리 (기본: 授業について - 수업 관련)
-- `category2`: 두 번째 카테고리 (기본: 講師について - 강사 관련)
-- `category3`: 세 번째 카테고리 (기본: 塾の実績について - 학원 실적)
-- `category4`: 네 번째 카테고리 (기본: 宿題について - 숙제 관련)
-- `other`: 기타 카테고리
-
-### 주의사항
-
-1. **JSON 형식**: 환경변수는 유효한 JSON 형식이어야 합니다
-2. **따옴표**: 모든 키와 값은 따옴표로 감싸야 합니다
-3. **한 줄 작성**: 환경변수는 한 줄로 작성해야 합니다
-4. **재시작 필요**: 환경변수 변경 후 개발 서버를 재시작해야 합니다
-5. **URL 이미지**: CORS 정책을 준수하는 URL을 사용해야 합니다
+보안 관련 자세한 내용은 [보안 지침 문서](docs/rule/security-guidelines.md)를 참조하세요.
 
 ### 챗봇 API 사용
 ```typescript
@@ -462,63 +293,22 @@ console.log(response.tool);     // 도구 사용 정보 (선택적)
 }
 ```
 
-## 🎨 컴포넌트 사용 예시
+## 🎨 컴포넌트 설정 및 사용법
 
-### 채팅 메시지
+컴포넌트 설정 및 사용법에 대한 자세한 내용은 [컴포넌트 설정 지침 문서](docs/rule/component-configuration.md)를 참조하세요.
+
+### 주요 컴포넌트 간단 예시
+
 ```typescript
-import ChatMessage from './components/ui/ChatMessage';
+// 채팅 메시지
+<ChatMessage message={message} isTyping={false} />
 
-<ChatMessage 
-  message={{
-    id: '1',
-    type: 'bot',
-    content: '안녕하세요!',
-    timestamp: new Date()
-  }}
-  isTyping={true}
-  onTypingComplete={() => console.log('타이핑 완료')}
-/>
+// 채팅 입력
+<ChatInput value={text} onChange={setText} onSend={handleSend} />
+
+// 빠른 답변
+<QuickReply show={true} onReplyClick={handleReply} />
 ```
-
-### 빠른 답변 버튼
-```typescript
-import QuickReply from './components/ui/QuickReply';
-
-<QuickReply 
-  show={true}
-  onReplyClick={(reply) => console.log(reply)}
-/>
-```
-
-### 채팅 훅 사용
-```typescript
-import { useChat } from './hooks/useChat';
-
-function ChatComponent() {
-  const {
-    messages,
-    newMessage,
-    setNewMessage,
-    isTyping,
-    handleSendMessage,
-    completeTyping
-  } = useChat({
-    userId: 'guest-123',
-    onError: (error) => console.error(error)
-  });
-
-  return (
-    // 채팅 UI 렌더링
-  );
-}
-```
-
-## 🔒 보안
-
-- 쿠키는 `secure`와 `sameSite: 'strict'` 옵션으로 보안 설정
-- API 토큰은 안전하게 쿠키에 저장
-- XSS 방지를 위한 적절한 sanitization
-- 게스트 사용자를 위한 임시 ID 생성
 
 ## 📱 브라우저 지원
 

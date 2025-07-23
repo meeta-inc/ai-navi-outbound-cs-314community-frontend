@@ -1,14 +1,36 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ChatInput } from './ChatInput';
+import { LocaleProvider } from '../../../contexts/LocaleContext';
 
 const meta: Meta<typeof ChatInput> = {
   title: 'Organisms/ChatInput',
   component: ChatInput,
+  decorators: [
+    (Story) => (
+      <LocaleProvider>
+        <div className="h-screen bg-gray-50 flex flex-col justify-end">
+          <Story />
+        </div>
+      </LocaleProvider>
+    ),
+  ],
   parameters: {
-    layout: 'centered',
+    layout: 'fullscreen',
     docs: {
       description: {
-        component: '채팅 입력 컴포넌트입니다. 카테고리 버튼, 입력 필드, 전송 버튼을 포함합니다.',
+        component: `
+채팅 입력 컴포넌트입니다. 학년 선택 상태에 따라 활성화/비활성화됩니다.
+
+## 주요 기능
+- 메시지 입력 및 전송
+- 메뉴 버튼 (학년 선택 후 활성화)
+- Enter 키를 통한 메시지 전송
+- 학년 미선택 시 비활성화 상태
+
+## 사용 시나리오
+1. **학년 미선택 상태**: 입력창과 메뉴 버튼이 비활성화되어 사용자가 먼저 학년을 선택하도록 유도
+2. **학년 선택 완료**: 모든 기능이 활성화되어 정상적인 채팅 가능
+      `,
       },
     },
   },
@@ -125,6 +147,99 @@ export const ReadyToSend: Story = {
     docs: {
       description: {
         story: '텍스트가 입력된 상태에서는 전송 버튼이 활성화됩니다.',
+      },
+    },
+  },
+};
+
+// 이슈 32번 관련: 학년 미선택 시 비활성화 상태
+export const GradeNotSelected: Story = {
+  args: {
+    value: '',
+    disabled: true,
+    placeholder: 'まずは学年を選択してください',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**학년 미선택 상태** - 이슈 #32 구현
+
+학년이 선택되지 않은 상태입니다:
+- 입력창이 비활성화되어 텍스트 입력 불가
+- 메뉴 버튼이 비활성화되어 클릭 불가  
+- 전송 버튼이 비활성화됨
+- 플레이스홀더가 학년 선택을 유도하는 메시지로 표시
+
+이는 후속 플로우의 복잡한 분기를 제거하기 위한 UX 개선입니다.
+        `,
+      },
+    },
+  },
+};
+
+// 타이핑 중 일시 비활성화
+export const TypingInProgress: Story = {
+  args: {
+    value: '방금 전송한 메시지입니다.',
+    disabled: true,
+    placeholder: 'AI가 답변 중입니다...',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**AI 응답 대기 중 상태**
+
+AI가 응답을 생성하는 동안 일시적으로 비활성화된 상태입니다:
+- 사용자가 연속으로 메시지를 보내는 것을 방지
+- AI 응답 완료 후 다시 활성화됨
+        `,
+      },
+    },
+  },
+};
+
+// 메뉴 버튼 상태 확인용
+export const MenuButtonStates: Story = {
+  args: {
+    value: '메뉴 버튼 상태를 확인해보세요',
+    disabled: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**메뉴 버튼 상태 테스트**
+
+메뉴 버튼의 활성화/비활성화 상태를 확인할 수 있습니다:
+- disabled를 false로 설정하면 메뉴 버튼이 활성화됩니다
+- disabled를 true로 설정하면 메뉴 버튼이 비활성화되고 회색으로 표시됩니다
+        `,
+      },
+    },
+  },
+};
+
+// 학년 선택 완료 후 정상 상태
+export const GradeSelected: Story = {
+  args: {
+    value: '',
+    disabled: false,
+    placeholder: 'どのようなことを知りたいですか？',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: `
+**학년 선택 완료 상태**
+
+학년이 선택된 후 정상적으로 채팅이 가능한 상태입니다:
+- 모든 버튼이 활성화됨
+- 입력창에서 자유롭게 텍스트 입력 가능
+- Enter 키로 메시지 전송 가능
+- 메뉴 버튼 클릭 가능
+        `,
       },
     },
   },
