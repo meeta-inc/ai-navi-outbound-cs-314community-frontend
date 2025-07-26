@@ -83,12 +83,13 @@ export function MenuModal({
     >
       <div
         ref={modalRef}
+        data-testid="menu-modal"
         className={`
           ${colors.bgLight} shadow-xl
           transform transition-transform duration-300 ease-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
-          w-full max-w-lg mx-auto
-          sm:max-w-md sm:mb-4
+          w-full mx-auto
+          sm:w-[500px] sm:max-w-[500px] sm:mb-4
         `}
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         onClick={(e) => e.stopPropagation()}
