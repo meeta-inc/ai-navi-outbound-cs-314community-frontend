@@ -61,6 +61,13 @@ export function MenuModal({
   const handleMenuItemClick = (item: MenuItem) => {
     if (item.disabled) return;
     
+    // 외부 링크인 경우 새 탭에서 열기
+    if (item.action === 'external-link' && item.url) {
+      window.open(item.url, '_blank', 'noopener,noreferrer');
+      onClose();
+      return;
+    }
+    
     if (onMenuItemClick) {
       onMenuItemClick(item);
     }
@@ -147,6 +154,13 @@ export function MenuModal({
           {menuConfig.cta && (
             <button
               onClick={() => {
+                // CTA 버튼도 외부 링크 처리
+                if (menuConfig.cta?.action === 'external-link' && menuConfig.cta.url) {
+                  window.open(menuConfig.cta.url, '_blank', 'noopener,noreferrer');
+                  onClose();
+                  return;
+                }
+                
                 if (onMenuItemClick && menuConfig.cta) {
                   onMenuItemClick({
                     id: 'cta',

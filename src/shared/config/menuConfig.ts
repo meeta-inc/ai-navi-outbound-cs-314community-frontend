@@ -40,8 +40,8 @@ export const defaultMenuConfig: MenuConfig = {
         value: 'FileText'
       },
       label: '資料請求',
-      action: 'navigate',
-      url: '/request-materials'
+      action: 'external-link',
+      url: 'https://www.314community.com/inquiry/'
     },
     {
       id: 'ai-consultation',
@@ -56,8 +56,8 @@ export const defaultMenuConfig: MenuConfig = {
   ],
   cta: {
     label: '無料体験に応募する',
-    action: 'navigate',
-    url: '/free-trial'
+    action: 'external-link',
+    url: 'https://lp-mur2.314community.com/'
   }
 };
 
