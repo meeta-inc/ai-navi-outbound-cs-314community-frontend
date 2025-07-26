@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LLMResponseGroup } from './LLMResponseGroup';
 import { LLMResponse } from '../../../types';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 // Mock CTAButtons component
 jest.mock('../../molecules/CTAButtons', () => ({
@@ -236,6 +237,87 @@ describe('LLMResponseGroup 컴포넌트', () => {
 
       expect(onMainCTAClick).toHaveBeenCalledTimes(1);
       expect(onSubCTAClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('에러 핸들링', () => {
+    it('HTTP 상태코드가 200이 아닌 경우 에러 메시지를 표시해야 한다', () => {
+      const errorResponse: LLMResponse = {
+        response: [],
+        tool: null,
+        status: 500
+      };
+
+      render(
+        <LLMResponseGroup 
+          response={errorResponse}
+          enableTyping={false}
+        />
+      );
+
+      expect(screen.getByText(ERROR_MESSAGES.LLM_TEMPORARY_ERROR)).toBeInTheDocument();
+    });
+
+    it('응답이 빈 배열인 경우 에러 메시지를 표시해야 한다', () => {
+      const emptyResponse: LLMResponse = {
+        response: [],
+        tool: null
+      };
+
+      render(
+        <LLMResponseGroup 
+          response={emptyResponse}
+          enableTyping={false}
+        />
+      );
+
+      expect(screen.getByText(ERROR_MESSAGES.LLM_TEMPORARY_ERROR)).toBeInTheDocument();
+    });
+
+    it('에러 상황에서는 CTA 버튼이 표시되지 않아야 한다', () => {
+      const errorResponse: LLMResponse = {
+        response: [],
+        tool: null,
+        status: 404
+      };
+
+      render(
+        <LLMResponseGroup 
+          response={errorResponse}
+          enableTyping={false}
+          showCTAAfterComplete={true}
+        />
+      );
+
+      expect(screen.queryByTestId('cta-buttons')).not.toBeInTheDocument();
+    });
+
+    it('네트워크 에러 시나리오 (status 500)', async () => {
+      const networkErrorResponse: LLMResponse = {
+        response: [],
+        tool: null,
+        status: 500
+      };
+
+      const onComplete = jest.fn();
+
+      render(
+        <LLMResponseGroup 
+          response={networkErrorResponse}
+          enableTyping={true}
+          onComplete={onComplete}
+        />
+      );
+
+      // 타이핑 애니메이션이 완료된 후 에러 메시지가 표시되는지 확인
+      await waitFor(() => {
+        const errorBubble = screen.getByTestId('bubble-text');
+        expect(errorBubble.textContent).toBe(ERROR_MESSAGES.LLM_TEMPORARY_ERROR);
+      }, { timeout: 3000 });
+      
+      // 타이핑 애니메이션이 있는 경우도 에러 메시지가 표시되는지 확인
+      const errorBubble = screen.getByTestId('main-bubble');
+      expect(errorBubble).toBeInTheDocument();
     });
   });
 });
