@@ -11,6 +11,7 @@ export interface Message {
 export interface LLMResponse {
   response: BubbleResponse[];
   tool?: string | null;
+  status?: number; // HTTP 상태코드 (200이 아닌 경우 에러 처리)
 }
 
 export interface BubbleResponse {
