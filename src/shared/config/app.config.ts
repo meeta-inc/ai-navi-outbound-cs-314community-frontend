@@ -66,6 +66,49 @@ export const getShowGradeSelection = () => {
   return true;
 };
 
+export interface CTAButtonConfig {
+  title: string;
+  action: {
+    type: 'link' | 'FAQ' | 'pdfDownload';
+    detail: string;
+  };
+}
+
+export interface CTAButtonsConfig {
+  main: CTAButtonConfig;
+  sub: CTAButtonConfig;
+}
+
+export const getCTAButtonsConfig = (): CTAButtonsConfig => {
+  const ctaButtonsConfig = import.meta.env.VITE_CTA_BUTTONS;
+  
+  try {
+    if (ctaButtonsConfig) {
+      return JSON.parse(ctaButtonsConfig);
+    }
+  } catch (error) {
+    console.warn('Failed to parse VITE_CTA_BUTTONS, using default configuration');
+  }
+  
+  // 기본값
+  return {
+    main: {
+      title: "資料請求する",
+      action: {
+        type: "link",
+        detail: "https://www.314community.com/inquiry/"
+      }
+    },
+    sub: {
+      title: "もう少し質問する",
+      action: {
+        type: "FAQ",
+        detail: ""
+      }
+    }
+  };
+};
+
 export const getAppConfig = () => {
   return {
     apiUrl: getApiUrl(),

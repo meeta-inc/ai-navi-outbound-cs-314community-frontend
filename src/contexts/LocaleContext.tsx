@@ -9,7 +9,7 @@ interface LocaleContextType {
   isLoading: boolean;
 }
 
-const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
+export const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
 // JSON 파일들을 동적으로 import
 const loadTranslations = async () => {
