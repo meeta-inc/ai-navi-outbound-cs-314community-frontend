@@ -235,6 +235,12 @@ function MainPage() {
   const handleMenuItemClick = (item: any) => {
     console.log('Menu item clicked:', item);
     
+    // 외부 링크 처리
+    if (item.action === 'external-link' && item.url) {
+      window.open(item.url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    
     // FAQ 메뉴 클릭 시 처리
     if (item.id === 'ai-faq') {
       // 1. 유저 메시지로 라벨 표시
