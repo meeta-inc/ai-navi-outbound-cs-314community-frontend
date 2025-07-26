@@ -12,6 +12,7 @@ interface LLMResponseGroupProps {
   onMainCTAClick?: () => void;
   onSubCTAClick?: () => void;
   showCTAAfterComplete?: boolean; // 모든 버블 완료 후 CTA 표시 여부
+  onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
 }
 
 export function LLMResponseGroup({ 
@@ -21,11 +22,12 @@ export function LLMResponseGroup({
   onComplete,
   onMainCTAClick,
   onSubCTAClick,
-  showCTAAfterComplete = false
+  showCTAAfterComplete = false,
+  onCTADisplayed
 }: LLMResponseGroupProps) {
   const [currentBubbleIndex, setCurrentBubbleIndex] = useState(0);
   const [completedBubbles, setCompletedBubbles] = useState<number[]>([]);
-  const [showCTA, setShowCTA] = useState(false);
+  const [allBubblesCompleted, setAllBubblesCompleted] = useState(false);
   
   // 각 버블의 타이핑 완료 처리
   const handleBubbleComplete = (index: number) => {
@@ -36,8 +38,14 @@ export function LLMResponseGroup({
       setCurrentBubbleIndex(index + 1);
     } else {
       // 모든 버블 완료
+      setAllBubblesCompleted(true);
+      // CTA가 표시될 예정이면 스크롤 콜백 호출
       if (showCTAAfterComplete) {
-        setShowCTA(true);
+        setTimeout(() => {
+          if (onCTADisplayed) {
+            onCTADisplayed();
+          }
+        }, 100); // CTA 렌더링 후 스크롤
       }
       if (onComplete) {
         onComplete();
@@ -50,9 +58,15 @@ export function LLMResponseGroup({
     if (!enableTyping) {
       setCurrentBubbleIndex(response.response.length - 1);
       setCompletedBubbles(response.response.map((_, i) => i));
-      // 타이핑 비활성화이고 CTA 표시 옵션이 true인 경우 즉시 CTA 표시
+      // 타이핑 비활성화인 경우 즉시 완료 상태로 설정
+      setAllBubblesCompleted(true);
+      // CTA가 표시될 예정이면 스크롤 콜백 호출
       if (showCTAAfterComplete) {
-        setShowCTA(true);
+        setTimeout(() => {
+          if (onCTADisplayed) {
+            onCTADisplayed();
+          }
+        }, 100); // CTA 렌더링 후 스크롤
       }
     }
   }, [enableTyping, response.response.length, showCTAAfterComplete]);
@@ -96,7 +110,7 @@ export function LLMResponseGroup({
       })}
       
       {/* CTA Buttons */}
-      {showCTA && (
+      {showCTAAfterComplete && allBubblesCompleted && (
         <CTAButtons
           show={true}
           onMainClick={handleMainCTA}
