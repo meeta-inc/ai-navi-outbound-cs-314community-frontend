@@ -3,6 +3,7 @@ import { ChatBubble } from '../../molecules/ChatBubble';
 import { CTAButtons } from '../../molecules/CTAButtons';
 import { LLMResponse } from '../../../types';
 import { AccentColor } from '../../../shared/config/theme.config';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 interface LLMResponseGroupProps {
   response: LLMResponse;
@@ -82,6 +83,25 @@ export function LLMResponseGroup({
       onSubCTAClick();
     }
   };
+
+  // 에러 조건 체크: HTTP 상태코드가 200이 아니거나 응답이 빈 배열인 경우
+  const isError = (response.status !== undefined && response.status !== 200) || !response.response || response.response.length === 0;
+  
+  // 에러 상황일 때 에러 메시지 표시
+  if (isError) {
+    return (
+      <div className="flex flex-col gap-1">
+        <ChatBubble
+          content={ERROR_MESSAGES.LLM_TEMPORARY_ERROR}
+          isBot={true}
+          accentColor={accentColor}
+          bubbleType="main"
+          isTyping={enableTyping}
+          onTypingComplete={onComplete}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-1">
