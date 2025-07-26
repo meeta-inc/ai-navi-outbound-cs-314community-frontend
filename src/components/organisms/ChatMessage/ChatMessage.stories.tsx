@@ -33,6 +33,18 @@ const meta: Meta<typeof ChatMessage> = {
       control: 'boolean',
       description: 'LLM 응답 타이핑 효과 활성화 여부',
     },
+    showCTAAfterComplete: {
+      control: 'boolean',
+      description: '응답 완료 후 CTA 버튼 표시 여부',
+    },
+    onMainCTAClick: {
+      action: 'main-cta-clicked',
+      description: '메인 CTA 버튼 클릭 시 호출되는 콜백',
+    },
+    onSubCTAClick: {
+      action: 'sub-cta-clicked',
+      description: '서브 CTA 버튼 클릭 시 호출되는 콜백',
+    },
   },
   tags: ['autodocs'],
 };
@@ -397,6 +409,208 @@ export const ConversationWithLLM: Story = {
     docs: {
       description: {
         story: 'LLM 응답이 포함된 실제 대화 흐름 예시입니다.',
+      },
+    },
+  },
+};
+
+// CTA 기능을 위한 LLM 응답 데이터
+const llmResponseForCTA: LLMResponse = {
+  response: [
+    {
+      type: 'main',
+      text: 'これで3回目の回答になります。',
+      attachment: null
+    },
+    {
+      type: 'sub', 
+      text: '3.14コミュニティでは様々な学習サポートを提供しています。',
+      attachment: null
+    },
+    {
+      type: 'cta',
+      text: 'さらに詳しい情報をお求めでしたら、お気軽にお声かけください！',
+      attachment: null
+    }
+  ],
+  tool: null
+};
+
+// CTA 버튼 기능 스토리들
+export const WithCTAButtons: Story = {
+  args: {
+    message: {
+      id: 'cta-1',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseForCTA,
+    isTyping: false,
+    enableLLMTyping: true,
+    showCTAAfterComplete: true,
+    onMainCTAClick: () => console.log('Main CTA clicked: 資料請求する'),
+    onSubCTAClick: () => console.log('Sub CTA clicked: もう少し質問する'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '3번째 LLM 응답 후 CTA 버튼이 표시되는 예시입니다.',
+      },
+    },
+  },
+};
+
+export const WithCTAButtonsAndTyping: Story = {
+  args: {
+    message: {
+      id: 'cta-2',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseForCTA,
+    isTyping: true,
+    enableLLMTyping: true,
+    showCTAAfterComplete: true,
+    onMainCTAClick: () => console.log('Main CTA clicked: 資料請求する'),
+    onSubCTAClick: () => console.log('Sub CTA clicked: もう少し질문する'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '타이핑 애니메이션 완료 후 CTA 버튼이 표시되는 예시입니다.',
+      },
+    },
+  },
+};
+
+export const WithoutCTAButtons: Story = {
+  args: {
+    message: {
+      id: 'cta-3',
+      type: 'bot',
+      content: '',
+      timestamp: new Date(),
+    },
+    llmResponse: llmResponseForCTA,
+    isTyping: false,
+    enableLLMTyping: true,
+    showCTAAfterComplete: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'CTA 버튼이 표시되지 않는 일반적인 LLM 응답 예시입니다.',
+      },
+    },
+  },
+};
+
+// 다양한 테마에서 CTA 버튼 확인
+export const CTAWithDifferentThemes: Story = {
+  render: () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium mb-2">Orange Theme (Default)</h3>
+        <ChatMessage
+          message={{
+            id: 'theme-orange',
+            type: 'bot',
+            content: '',
+            timestamp: new Date(),
+          }}
+          llmResponse={llmResponseForCTA}
+          isTyping={false}
+          enableLLMTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={() => console.log('Orange theme - Main CTA')}
+          onSubCTAClick={() => console.log('Orange theme - Sub CTA')}
+        />
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '다양한 테마 색상에서 CTA 버튼이 어떻게 표시되는지 확인할 수 있습니다.',
+      },
+    },
+  },
+};
+
+// 3번째 응답 시나리오 시뮬레이션
+export const ThirdResponseScenario: Story = {
+  render: () => (
+    <div className="space-y-4 max-w-md">
+      <ChatMessage
+        message={{
+          id: 'scenario-1',
+          type: 'user',
+          content: '첫 번째 질문입니다.',
+          timestamp: new Date(Date.now() - 600000),
+        }}
+      />
+      <ChatMessage
+        message={{
+          id: 'scenario-2',
+          type: 'bot',
+          content: '',
+          timestamp: new Date(Date.now() - 540000),
+        }}
+        llmResponse={llmResponseExample}
+        isTyping={false}
+        enableLLMTyping={false}
+        showCTAAfterComplete={false}
+      />
+      <ChatMessage
+        message={{
+          id: 'scenario-3',
+          type: 'user',
+          content: '두 번째 질문입니다.',
+          timestamp: new Date(Date.now() - 480000),
+        }}
+      />
+      <ChatMessage
+        message={{
+          id: 'scenario-4',
+          type: 'bot',
+          content: '',
+          timestamp: new Date(Date.now() - 420000),
+        }}
+        llmResponse={llmResponseExample}
+        isTyping={false}
+        enableLLMTyping={false}
+        showCTAAfterComplete={false}
+      />
+      <ChatMessage
+        message={{
+          id: 'scenario-5',
+          type: 'user',
+          content: '세 번째 질문입니다.',
+          timestamp: new Date(Date.now() - 360000),
+        }}
+      />
+      <ChatMessage
+        message={{
+          id: 'scenario-6',
+          type: 'bot',
+          content: '',
+          timestamp: new Date(Date.now() - 300000),
+        }}
+        llmResponse={llmResponseForCTA}
+        isTyping={false}
+        enableLLMTyping={false}
+        showCTAAfterComplete={true}
+        onMainCTAClick={() => console.log('3rd response - Main CTA')}
+        onSubCTAClick={() => console.log('3rd response - Sub CTA')}
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '실제 사용 시나리오: 3번째 AI 응답 후 CTA 버튼이 표시되는 전체 대화 흐름입니다.',
       },
     },
   },

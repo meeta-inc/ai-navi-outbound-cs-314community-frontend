@@ -34,6 +34,10 @@ function MainPage() {
   const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<GradeType | null>(null);
   const [showOnboardingMessage, setShowOnboardingMessage] = useState(false);
+  
+  // CTA 관련 상태
+  const [latestCTAMessageId, setLatestCTAMessageId] = useState<string | null>(null);
+  const [hideAllCTA, setHideAllCTA] = useState(false);
 
   const {
     messages,
@@ -103,6 +107,20 @@ function MainPage() {
       isInitialized.current = true;
     }
   }, [t, addWelcomeMessage, isLoading]);
+
+  // 최신 LLM 응답 메시지 ID 업데이트
+  useEffect(() => {
+    const llmMessages = messages.filter(m => m.type === 'bot' && m.llmResponse);
+    if (llmMessages.length > 0) {
+      const latestLLMMessage = llmMessages[llmMessages.length - 1];
+      // 새로운 LLM 메시지가 추가된 경우에만 상태 업데이트
+      if (latestLLMMessage.id !== latestCTAMessageId) {
+        setLatestCTAMessageId(latestLLMMessage.id);
+        // 새로운 LLM 메시지가 추가되면 CTA 표시 재활성화
+        setHideAllCTA(false);
+      }
+    }
+  }, [messages, latestCTAMessageId]);
 
   const handleQuickReplyClick = async (text: string) => {
     setNewMessage(text);
@@ -232,6 +250,37 @@ function MainPage() {
     await handleSendMessage();
   };
 
+  // CTA 버튼 클릭 핸들러
+  const handleMainCTAClick = () => {
+    console.log('Main CTA clicked: 資料請求する');
+    // 메인 CTA는 이미 CTAButtons 컴포넌트에서 외부 링크로 처리됨
+  };
+
+  const handleSubCTAClick = () => {
+    // 즉시 모든 CTA 숨기기
+    setHideAllCTA(true);
+    
+    // CTA 서브 버튼용 FAQ 카테고리 표시 (유저 메시지는 "もう少し質問する"로)
+    const subCTAText = 'もう少し質問する';
+    const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
+    
+    // 유저 메시지 추가
+    addUserMessage(subCTAText, false);
+    
+    // 타이핑 봇 메시지 추가
+    setTimeout(() => {
+      setWaitingForFAQCategories(true);
+      addTypingBotMessage(whatWouldYouLikeToKnow);
+    }, 100);
+  };
+
+  // CTA 표시 완료 후 스크롤 핸들러
+  const handleCTADisplayed = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   const handleMenuItemClick = (item: any) => {
     console.log('Menu item clicked:', item);
     
@@ -309,9 +358,9 @@ function MainPage() {
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           {messages.map((message, index) => {
             // 첫 번째 봇 메시지인지 확인
-            const botMessages = messages.filter(m => m.type === 'bot');
             const firstBotMessageIndex = messages.findIndex(m => m.type === 'bot');
             const isFirstBotMessage = message.type === 'bot' && index === firstBotMessageIndex;
+            
             
             return (
               <div key={message.id}>
@@ -319,6 +368,13 @@ function MainPage() {
                   message={message} 
                   hideAvatar={message.type === 'bot' && !isFirstBotMessage}
                   llmResponse={message.llmResponse}
+                  // 최신 LLM 응답에서만 CTA 버튼 표시
+                  {...(message.llmResponse ? {
+                    showCTAAfterComplete: message.id === latestCTAMessageId && !hideAllCTA,
+                    onMainCTAClick: handleMainCTAClick,
+                    onSubCTAClick: handleSubCTAClick,
+                    onCTADisplayed: handleCTADisplayed
+                  } : {})}
                 />
               
               {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) */}

@@ -31,6 +31,18 @@ const meta: Meta<typeof LLMResponseGroup> = {
       action: 'all-bubbles-completed',
       description: '모든 버블 완료 시 호출되는 콜백',
     },
+    showCTAAfterComplete: {
+      control: 'boolean',
+      description: '모든 버블 완료 후 CTA 버튼 표시 여부',
+    },
+    onMainCTAClick: {
+      action: 'main-cta-clicked',
+      description: '메인 CTA 버튼 클릭 시 호출되는 콜백',
+    },
+    onSubCTAClick: {
+      action: 'sub-cta-clicked',
+      description: '서브 CTA 버튼 클릭 시 호출되는 콜백',
+    },
   },
   tags: ['autodocs'],
 };
@@ -312,5 +324,86 @@ export const RealWorldScenario: Story = {
     response: realWorldResponse,
     accentColor: 'orange',
     enableTyping: true,
+  },
+};
+
+// CTA 버튼 기능 시연
+const thirdResponseForCTA: LLMResponse = {
+  response: [
+    {
+      type: 'main',
+      text: 'これで3回目の回答になります。',
+      attachment: null
+    },
+    {
+      type: 'sub', 
+      text: '3.14コミュニティでは様々な学習サポートを提供しています。',
+      attachment: null
+    },
+    {
+      type: 'cta',
+      text: 'さらに詳しい情報をお求めでしたら、お気軽にお声かけください！',
+      attachment: null
+    }
+  ],
+  tool: null
+};
+
+export const WithCTAButtons: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'orange',
+    enableTyping: false,
+    showCTAAfterComplete: true,
+    onMainCTAClick: () => console.log('Main CTA clicked: Navigate to inquiry page'),
+    onSubCTAClick: () => console.log('Sub CTA clicked: Show more questions'),
+  },
+};
+
+export const WithCTAButtonsAndTyping: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'green',
+    enableTyping: true,
+    showCTAAfterComplete: true,
+    onMainCTAClick: () => console.log('Main CTA clicked: Navigate to inquiry page'),
+    onSubCTAClick: () => console.log('Sub CTA clicked: Show more questions'),
+  },
+};
+
+export const WithoutCTAButtons: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'blue',
+    enableTyping: false,
+    showCTAAfterComplete: false,
+  },
+};
+
+// 다양한 테마에서 CTA 버튼 확인
+export const CTAWithBlueTheme: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'blue',
+    enableTyping: false,
+    showCTAAfterComplete: true,
+  },
+};
+
+export const CTAWithGreenTheme: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'green',
+    enableTyping: false,
+    showCTAAfterComplete: true,
+  },
+};
+
+export const CTAWithPurpleTheme: Story = {
+  args: {
+    response: thirdResponseForCTA,
+    accentColor: 'purple',
+    enableTyping: false,
+    showCTAAfterComplete: true,
   },
 };

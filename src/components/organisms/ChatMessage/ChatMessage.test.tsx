@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ChatMessage } from './ChatMessage';
 import { LLMResponse, Message } from '../../../types';
@@ -11,6 +11,17 @@ jest.mock('../../../contexts/LocaleContext', () => ({
 jest.mock('../../../shared/config/app.config', () => ({
   getAccentColor: () => 'orange',
   getShowTimestamp: () => true,
+}));
+
+// Mock CTAButtons component
+jest.mock('../../molecules/CTAButtons', () => ({
+  CTAButtons: ({ show, onMainClick, onSubClick }: any) => 
+    show ? (
+      <div data-testid="cta-buttons">
+        <button onClick={onMainClick} data-testid="main-cta">資料請求する</button>
+        <button onClick={onSubClick} data-testid="sub-cta">もう少し質問する</button>
+      </div>
+    ) : null
 }));
 
 describe('ChatMessage 컴포넌트', () => {
@@ -206,6 +217,101 @@ describe('ChatMessage 컴포넌트', () => {
       expect(screen.getByTestId('main-bubble')).toBeInTheDocument();
       expect(screen.getByTestId('sub-bubble')).toBeInTheDocument();
       expect(screen.getByTestId('cta-bubble')).toBeInTheDocument();
+    });
+  });
+
+  describe('CTA 버튼 기능', () => {
+    it('showCTAAfterComplete가 true일 때 CTA 버튼이 표시되어야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <ChatMessage 
+          message={mockBotMessage} 
+          llmResponse={mockLLMResponse}
+          enableLLMTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      expect(screen.getByTestId('cta-buttons')).toBeInTheDocument();
+      expect(screen.getByTestId('main-cta')).toBeInTheDocument();
+      expect(screen.getByTestId('sub-cta')).toBeInTheDocument();
+    });
+
+    it('showCTAAfterComplete가 false일 때 CTA 버튼이 표시되지 않아야 한다', () => {
+      render(
+        <ChatMessage 
+          message={mockBotMessage} 
+          llmResponse={mockLLMResponse}
+          enableLLMTyping={false}
+          showCTAAfterComplete={false}
+        />
+      );
+
+      expect(screen.queryByTestId('cta-buttons')).not.toBeInTheDocument();
+    });
+
+    it('CTA 버튼 클릭 시 올바른 콜백이 호출되어야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <ChatMessage 
+          message={mockBotMessage} 
+          llmResponse={mockLLMResponse}
+          enableLLMTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      const mainButton = screen.getByTestId('main-cta');
+      const subButton = screen.getByTestId('sub-cta');
+
+      fireEvent.click(mainButton);
+      fireEvent.click(subButton);
+
+      expect(onMainCTAClick).toHaveBeenCalledTimes(1);
+      expect(onSubCTAClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('LLM 응답이 없을 때는 CTA 버튼이 표시되지 않아야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <ChatMessage 
+          message={mockBotMessage}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      expect(screen.queryByTestId('cta-buttons')).not.toBeInTheDocument();
+    });
+
+    it('CTA 버튼이 올바른 accentColor와 함께 표시되어야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <ChatMessage 
+          message={mockBotMessage} 
+          llmResponse={mockLLMResponse}
+          enableLLMTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      // CTA 버튼이 렌더링되는지 확인 (실제 색상은 CTAButtons 컴포넌트에서 테스트됨)
+      expect(screen.getByTestId('cta-buttons')).toBeInTheDocument();
     });
   });
 });
