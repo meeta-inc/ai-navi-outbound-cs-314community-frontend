@@ -1,8 +1,19 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { LLMResponseGroup } from './LLMResponseGroup';
 import { LLMResponse } from '../../../types';
+
+// Mock CTAButtons component
+jest.mock('../../molecules/CTAButtons', () => ({
+  CTAButtons: ({ show, onMainClick, onSubClick }: any) => 
+    show ? (
+      <div data-testid="cta-buttons">
+        <button onClick={onMainClick} data-testid="main-cta">資料請求する</button>
+        <button onClick={onSubClick} data-testid="sub-cta">もう少し質問する</button>
+      </div>
+    ) : null
+}));
 
 describe('LLMResponseGroup 컴포넌트', () => {
   const mockResponse: LLMResponse = {
@@ -168,6 +179,63 @@ describe('LLMResponseGroup 컴포넌트', () => {
 
       const mainBubble = screen.getByTestId('main-bubble');
       expect(mainBubble).toHaveClass('bg-navi-blue-sub2');
+    });
+  });
+
+  describe('CTA 버튼 기능', () => {
+    it('showCTAAfterComplete가 true이고 타이핑 비활성화된 경우 CTA 버튼이 즉시 표시되어야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <LLMResponseGroup 
+          response={mockResponse}
+          enableTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      expect(screen.getByTestId('cta-buttons')).toBeInTheDocument();
+      expect(screen.getByTestId('main-cta')).toBeInTheDocument();
+      expect(screen.getByTestId('sub-cta')).toBeInTheDocument();
+    });
+
+    it('showCTAAfterComplete가 false인 경우 CTA 버튼이 표시되지 않아야 한다', () => {
+      render(
+        <LLMResponseGroup 
+          response={mockResponse}
+          enableTyping={false}
+          showCTAAfterComplete={false}
+        />
+      );
+
+      expect(screen.queryByTestId('cta-buttons')).not.toBeInTheDocument();
+    });
+
+    it('CTA 버튼 클릭 시 콜백이 호출되어야 한다', () => {
+      const onMainCTAClick = jest.fn();
+      const onSubCTAClick = jest.fn();
+
+      render(
+        <LLMResponseGroup 
+          response={mockResponse}
+          enableTyping={false}
+          showCTAAfterComplete={true}
+          onMainCTAClick={onMainCTAClick}
+          onSubCTAClick={onSubCTAClick}
+        />
+      );
+
+      const mainButton = screen.getByTestId('main-cta');
+      const subButton = screen.getByTestId('sub-cta');
+
+      fireEvent.click(mainButton);
+      fireEvent.click(subButton);
+
+      expect(onMainCTAClick).toHaveBeenCalledTimes(1);
+      expect(onSubCTAClick).toHaveBeenCalledTimes(1);
     });
   });
 });
