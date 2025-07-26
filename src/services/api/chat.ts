@@ -74,25 +74,11 @@ export const sendChatMessage = async (message: string, userId: string, gradeId?:
   } catch (error) {
     console.error('채팅 메시지 전송 중 오류:', error);
     
-    // JWE 토큰 생성 실패해도 기본 채팅 요청은 진행 (폴백)
-    console.log('JWE 토큰 없이 기본 채팅 요청 시도');
-    
-    // 환경변수에서 clientId, appId 가져오기
-    const clientId = import.meta.env.VITE_CLIENT_ID || 'RS000001';
-    const appId = import.meta.env.VITE_APP_ID || '0001';
-    
-    const response = await fetchApi('/students/chat', {
-      method: 'POST',
-      body: JSON.stringify({
-        clientId,
-        appId,
-        gradeId: gradeId || 'high', // 기본값 high
-        userId,
-        message,
-      }),
+    // HTTP 에러 또는 네트워크 에러 발생 시 에러 응답 반환
+    return normalizeResponse({
+      response: [],
+      status: 500 // 에러 상태코드 설정
     });
-
-    return normalizeResponse(response);
   }
 };
 
@@ -104,6 +90,11 @@ export const getChatHistory = async (userId: string): Promise<ChatMessage[]> => 
 export const isLLMResponse = (response: any): response is LLMResponse => {
   if (!response || typeof response !== 'object') {
     return false;
+  }
+  
+  // 에러 상태인 경우도 LLM 응답으로 처리 (status가 있고 response가 빈 배열)
+  if (response.status && (!response.response || response.response.length === 0)) {
+    return true;
   }
   
   if (!Array.isArray(response.response) || response.response.length === 0) {
@@ -123,7 +114,10 @@ export const normalizeResponse = (response: any): ExtendedChatResponse => {
   if (isLLMResponse(response)) {
     return {
       response: '', // LLM 응답의 경우 기존 response 필드는 빈 문자열
-      llmResponse: response,
+      llmResponse: {
+        ...response,
+        status: response.status || 200 // 상태코드가 없으면 기본 200
+      },
       timestamp: (response as any).timestamp
     };
   }

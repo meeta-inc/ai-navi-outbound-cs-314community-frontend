@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ChatBubble } from './ChatBubble';
 import type { AccentColor } from '../../../shared/config/theme.config';
+import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
 
 const meta: Meta<typeof ChatBubble> = {
   title: 'Molecules/ChatBubble',
@@ -258,4 +259,131 @@ export const LLMSubBubbleWithTyping: Story = {
     bubbleType: 'sub',
     isTyping: true,
   },
+};
+
+// ========== LLM 에러 메시지 스토리들 ==========
+
+/**
+ * LLM 에러 상황에서 표시되는 기본 에러 메시지입니다.
+ * 빈 응답이나 HTTP 에러 시 사용됩니다.
+ */
+export const LLMErrorMessage: Story = {
+  args: {
+    content: ERROR_MESSAGES.LLM_TEMPORARY_ERROR,
+    isBot: true,
+    accentColor: 'red',
+    bubbleType: 'main',
+    isTyping: false,
+  },
+};
+
+/**
+ * 타이핑 효과가 적용된 LLM 에러 메시지입니다.
+ */
+export const LLMErrorMessageWithTyping: Story = {
+  args: {
+    content: ERROR_MESSAGES.LLM_TEMPORARY_ERROR,
+    isBot: true,
+    accentColor: 'red',
+    bubbleType: 'main',
+    isTyping: true,
+  },
+};
+
+/**
+ * 한국어 버전의 LLM 에러 메시지입니다.
+ */
+export const LLMErrorMessageKorean: Story = {
+  args: {
+    content: ERROR_MESSAGES.LLM_TEMPORARY_ERROR_KO,
+    isBot: true,
+    accentColor: 'red',
+    bubbleType: 'main',
+    isTyping: false,
+  },
+};
+
+/**
+ * Orange 테마의 LLM 에러 메시지입니다.
+ */
+export const LLMErrorMessageOrange: Story = {
+  args: {
+    content: ERROR_MESSAGES.LLM_TEMPORARY_ERROR,
+    isBot: true,
+    accentColor: 'orange',
+    bubbleType: 'main',
+    isTyping: false,
+  },
+};
+
+/**
+ * Blue 테마의 LLM 에러 메시지입니다.
+ */
+export const LLMErrorMessageBlue: Story = {
+  args: {
+    content: ERROR_MESSAGES.LLM_TEMPORARY_ERROR,
+    isBot: true,
+    accentColor: 'blue',
+    bubbleType: 'main',
+    isTyping: false,
+  },
+};
+
+/**
+ * 다양한 LLM 에러 시나리오들을 보여주는 스토리입니다.
+ */
+export const LLMErrorScenarios: Story = {
+  render: () => (
+    <div className="space-y-4 max-w-md">
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">일반적인 LLM 에러 (Red)</h3>
+        <ChatBubble
+          content={ERROR_MESSAGES.LLM_TEMPORARY_ERROR}
+          isBot={true}
+          accentColor="red"
+          bubbleType="main"
+        />
+      </div>
+      
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">네트워크 에러 (Orange)</h3>
+        <ChatBubble
+          content="ネットワーク接続に問題があります。インターネット接続を確認してください。"
+          isBot={true}
+          accentColor="orange"
+          bubbleType="main"
+        />
+      </div>
+      
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">서버 에러 (Red)</h3>
+        <ChatBubble
+          content="サーバーエラーが発生しました。しばらく待ってから再度お試しください。"
+          isBot={true}
+          accentColor="red"
+          bubbleType="main"
+        />
+      </div>
+      
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">타임아웃 에러 (Blue)</h3>
+        <ChatBubble
+          content="リクエストがタイムアウトしました。時間をおいて再度お試しください。"
+          isBot={true}
+          accentColor="blue"
+          bubbleType="main"
+        />
+      </div>
+      
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-2">한국어 에러 메시지</h3>
+        <ChatBubble
+          content={ERROR_MESSAGES.LLM_TEMPORARY_ERROR_KO}
+          isBot={true}
+          accentColor="red"
+          bubbleType="main"
+        />
+      </div>
+    </div>
+  ),
 };
