@@ -13,6 +13,11 @@ interface ChatMessageProps {
   // LLM 응답 지원을 위한 추가 props
   llmResponse?: LLMResponse;
   enableLLMTyping?: boolean;
+  // CTA 관련 props
+  showCTAAfterComplete?: boolean;
+  onMainCTAClick?: () => void;
+  onSubCTAClick?: () => void;
+  onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
 }
 
 export function ChatMessage({ 
@@ -21,7 +26,11 @@ export function ChatMessage({
   onTypingComplete, 
   hideAvatar = false,
   llmResponse,
-  enableLLMTyping = true
+  enableLLMTyping = true,
+  showCTAAfterComplete = false,
+  onMainCTAClick,
+  onSubCTAClick,
+  onCTADisplayed
 }: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
@@ -40,6 +49,10 @@ export function ChatMessage({
             accentColor={accentColor}
             enableTyping={enableLLMTyping && isTyping}
             onComplete={onTypingComplete}
+            showCTAAfterComplete={showCTAAfterComplete}
+            onMainCTAClick={onMainCTAClick}
+            onSubCTAClick={onSubCTAClick}
+            onCTADisplayed={onCTADisplayed}
           />
         ) : (
           <ChatBubble
