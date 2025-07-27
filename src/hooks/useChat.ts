@@ -17,6 +17,7 @@ interface ProcessedChatResponse {
   toolName?: string;
   toolInput?: any;
   llmResponse?: LLMResponse;
+  messageId?: string; // 미리 생성된 메시지 ID 저장용
 }
 
 export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatOptions) {
@@ -119,11 +120,14 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
 
   const completeTyping = () => {
     if (currentlyTyping) {
+      // 미리 생성된 메시지 ID 사용 (없으면 새로 생성)
+      const messageId = currentlyTyping.messageId || Date.now().toString();
+      
       // LLM 응답이 있는 경우 특별 처리
       if (currentlyTyping.llmResponse) {
         // LLM 응답의 경우 메시지 content는 비워두고 llmResponse 정보만 저장
         const botMessage: Message = {
-          id: Date.now().toString(),
+          id: messageId,
           type: 'bot',
           content: '', // LLM 응답의 경우 content는 비워둠
           timestamp: new Date(),
@@ -133,7 +137,7 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
       } else {
         // 기존 메시지 추가
         const botMessage: Message = {
-          id: Date.now().toString(),
+          id: messageId,
           type: 'bot',
           content: currentlyTyping.message,
           timestamp: new Date()
@@ -173,18 +177,26 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
     });
   }, []);
 
-  const addTypingBotMessage = useCallback((message: string) => {
-    // 타이핑 효과로 봇 메시지 표시
+  const addTypingBotMessage = useCallback((message: string, llmResponse?: boolean): string => {
+    // 고유 메시지 ID 생성
+    const messageId = Date.now().toString();
+    
+    // 타이핑 효과로 봇 메시지 표시 (메시지 ID 포함)
     setCurrentlyTyping({
       message: message,
       toolName: undefined,
-      toolInput: undefined
+      toolInput: undefined,
+      llmResponse: llmResponse ? { content: message } : undefined,
+      messageId: messageId // 메시지 ID를 포함하여 completeTyping에서 사용
     });
+    
+    return messageId; // 메시지 ID 반환
   }, []);
 
-  const addUserMessage = useCallback((content: string, shouldScroll: boolean = true) => {
+  const addUserMessage = useCallback((content: string, shouldScroll: boolean = true): string => {
+    const messageId = Date.now().toString();
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: messageId,
       type: 'user',
       content: content,
       timestamp: new Date()
@@ -194,6 +206,7 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
     shouldScrollRef.current = shouldScroll;
     
     setMessages(prev => [...prev, userMessage]);
+    return messageId; // 메시지 ID 반환
   }, []);
 
   const addBotMessage = useCallback((content: string | React.ReactNode, shouldScroll: boolean = true) => {
