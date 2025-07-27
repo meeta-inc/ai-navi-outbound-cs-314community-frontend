@@ -38,8 +38,75 @@ jest.mock('./shared/config/app.config', () => ({
 }));
 
 jest.mock('./shared/config/theme.config', () => ({
-  getColorClasses: () => ({
-    primary: 'text-green-600',
-    secondary: 'text-green-500',
-  }),
+  getColorClasses: (accentColor?: string) => {
+    const colorMap: Record<string, any> = {
+      blue: {
+        border: 'border-navi-blue-sub2',
+        text: 'text-navi-blue-main',
+        textHover: 'hover:text-navi-blue-main',
+        bgHover: 'hover:bg-navi-blue-sub2',
+        bgLight: 'bg-navi-blue-sub2',
+        background: 'bg-navi-blue-main',
+        backgroundHover: 'hover:bg-navi-blue-main',
+        ring: 'ring-navi-blue-main',
+        accent: 'text-navi-blue-main',
+        accentSecondary: 'text-navi-blue-sub1',
+        textWhite: 'text-white',
+        textSecondary: 'text-gray-700',
+        textMuted: 'text-gray-500',
+        textBlack: 'text-navi-black',
+        bgWhite: 'bg-white',
+        bgSecondary: 'bg-gray-50',
+        gradient: {
+          from: 'from-navi-blue-sub2',
+          to: 'to-navi-blue-sub1'
+        }
+      },
+      orange: {
+        border: 'border-navi-orange-sub2',
+        text: 'text-navi-orange-main',
+        textHover: 'hover:text-navi-orange-main',
+        bgHover: 'hover:bg-navi-orange-sub2',
+        bgLight: 'bg-navi-orange-sub2',
+        background: 'bg-navi-orange-main',
+        backgroundHover: 'hover:bg-navi-orange-main',
+        ring: 'ring-navi-orange-main',
+        accent: 'text-navi-orange-main',
+        accentSecondary: 'text-navi-orange-sub1',
+        textWhite: 'text-white',
+        textSecondary: 'text-gray-700',
+        textMuted: 'text-gray-500',
+        textBlack: 'text-navi-black',
+        bgWhite: 'bg-white',
+        bgSecondary: 'bg-gray-50',
+        gradient: {
+          from: 'from-navi-orange-sub2',
+          to: 'to-navi-orange-sub1'
+        }
+      },
+      green: {
+        border: 'border-navi-green-sub2',
+        text: 'text-navi-green-main',
+        textHover: 'hover:text-navi-green-main',
+        bgHover: 'hover:bg-navi-green-sub2',
+        bgLight: 'bg-navi-green-sub2',
+        background: 'bg-navi-green-main',
+        backgroundHover: 'hover:bg-navi-green-main',
+        ring: 'ring-navi-green-main',
+        accent: 'text-navi-green-main',
+        accentSecondary: 'text-navi-green-sub1',
+        textWhite: 'text-white',
+        textSecondary: 'text-gray-700',
+        textMuted: 'text-gray-500',
+        textBlack: 'text-navi-black',
+        bgWhite: 'bg-white',
+        bgSecondary: 'bg-gray-50',
+        gradient: {
+          from: 'from-navi-green-sub2',
+          to: 'to-navi-green-sub1'
+        }
+      }
+    };
+    return colorMap[accentColor || 'green'] || colorMap.green;
+  },
 }));
