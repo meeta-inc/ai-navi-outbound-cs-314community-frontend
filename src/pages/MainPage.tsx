@@ -10,6 +10,7 @@ import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
 import { useChat } from '../hooks/useChat';
+import { useActiveComponents } from '../hooks/useActiveComponents';
 import { getAccentColor, getShowNavigationHeader, getShowGradeSelection } from '../shared/config/app.config';
 import { getColorClasses } from '../shared/config/theme.config';
 import { GradeSelection } from '../components/organisms/GradeSelection';
@@ -38,6 +39,14 @@ function MainPage() {
   // CTA 관련 상태
   const [latestCTAMessageId, setLatestCTAMessageId] = useState<string | null>(null);
   const [hideAllCTA, setHideAllCTA] = useState(false);
+  
+  // 메시지 ID 기반 컴포넌트 활성화 관리
+  const {
+    activeComponents,
+    activateComponent,
+    deactivateComponent,
+    isComponentActive
+  } = useActiveComponents();
 
   const {
     messages,
@@ -190,14 +199,19 @@ function MainPage() {
     const otherText = t('chat.quickReplies.other');
     const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
     
+    // 이전 FAQ 카테고리 비활성화
+    deactivateComponent('faqCategories');
+    
     // 유저 메시지 추가
     addUserMessage(otherText, false);
     setShowFigmaQuickReply(false);
     
-    // 타이핑 봇 메시지 추가
+    // 타이핑 봇 메시지 추가하고 메시지 ID로 FAQ 카테고리 활성화
     setTimeout(() => {
       setWaitingForFAQCategories(true);
-      addTypingBotMessage(whatWouldYouLikeToKnow);
+      const messageId = addTypingBotMessage(whatWouldYouLikeToKnow);
+      // 메시지 ID를 사용하여 FAQ 카테고리 활성화
+      activateComponent('faqCategories', messageId);
     }, 100);
   };
 
@@ -229,13 +243,19 @@ function MainPage() {
     const backText = t('chat.faq.backToCategories');
     const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
     
+    // 이전 컴포넌트들 비활성화
+    deactivateComponent('topQuestions');
+    deactivateComponent('faqCategories');
+    
     addUserMessage(backText, false);
     setShowTopQuestions(false);
     setSelectedCategory(null);
     
     setTimeout(() => {
       setWaitingForFAQCategories(true);
-      addTypingBotMessage(whatWouldYouLikeToKnow);
+      const messageId = addTypingBotMessage(whatWouldYouLikeToKnow);
+      // 새로운 메시지 ID로 FAQ 카테고리 활성화
+      activateComponent('faqCategories', messageId);
     }, 100);
   };
 
@@ -260,6 +280,9 @@ function MainPage() {
     // 즉시 모든 CTA 숨기기
     setHideAllCTA(true);
     
+    // 이전 FAQ 카테고리 비활성화
+    deactivateComponent('faqCategories');
+    
     // CTA 서브 버튼용 FAQ 카테고리 표시 (유저 메시지는 "もう少し質問する"로)
     const subCTAText = 'もう少し質問する';
     const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
@@ -267,10 +290,11 @@ function MainPage() {
     // 유저 메시지 추가
     addUserMessage(subCTAText, false);
     
-    // 타이핑 봇 메시지 추가
+    // 타이핑 봇 메시지 추가하고 메시지 ID로 FAQ 카테고리 활성화
     setTimeout(() => {
       setWaitingForFAQCategories(true);
-      addTypingBotMessage(whatWouldYouLikeToKnow);
+      const messageId = addTypingBotMessage(whatWouldYouLikeToKnow);
+      activateComponent('faqCategories', messageId);
     }, 100);
   };
 
@@ -292,6 +316,9 @@ function MainPage() {
     
     // FAQ 메뉴 클릭 시 처리
     if (item.id === 'ai-faq') {
+      // 이전 FAQ 카테고리 비활성화
+      deactivateComponent('faqCategories');
+      
       // 1. 유저 메시지로 라벨 표시
       addUserMessage(item.label, false);
       
@@ -299,7 +326,8 @@ function MainPage() {
       setTimeout(() => {
         const whatWouldYouLikeToKnow = t('chat.faq.whatWouldYouLikeToKnow');
         setWaitingForFAQCategories(true);
-        addTypingBotMessage(whatWouldYouLikeToKnow);
+        const messageId = addTypingBotMessage(whatWouldYouLikeToKnow);
+        activateComponent('faqCategories', messageId);
       }, 100);
     }
     // 다른 메뉴 아이템들 처리
@@ -426,8 +454,8 @@ function MainPage() {
                   />
                 </div>
               )}
-              {/* FAQ 카테고리를 해당 메시지 바로 다음에 표시 */}
-              {message.content === t('chat.faq.whatWouldYouLikeToKnow') && message.type === 'bot' && showFAQCategories && (
+              {/* FAQ 카테고리를 해당 메시지 ID에서만 표시 */}
+              {isComponentActive('faqCategories', message.id) && showFAQCategories && (
                 <div className="mt-4">
                   <FAQCategory 
                     onCategorySelect={handleFAQCategorySelect}
