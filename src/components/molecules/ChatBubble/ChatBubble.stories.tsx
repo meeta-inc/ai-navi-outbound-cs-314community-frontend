@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { within } from '@storybook/testing-library';
 import { ChatBubble } from './ChatBubble';
 import type { AccentColor } from '../../../shared/config/theme.config';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
@@ -258,6 +259,66 @@ export const LLMSubBubbleWithTyping: Story = {
     accentColor: 'orange',
     bubbleType: 'sub',
     isTyping: true,
+  },
+};
+
+// ========== Sub Bubble URL 링크 변환 스토리들 ==========
+
+/**
+ * Sub Bubble에서 URL이 자동으로 링크로 변환되는 예시입니다.
+ */
+export const SubBubbleWithURL: Story = {
+  args: {
+    content: '자세한 내용은 https://www.brainsgym.com/ 에서 확인하세요.',
+    isBot: true,
+    accentColor: 'blue',
+    bubbleType: 'sub',
+    isTyping: false,
+  },
+};
+
+/**
+ * Sub Bubble에서 여러 URL이 포함된 경우의 예시입니다.
+ */
+export const SubBubbleWithMultipleURLs: Story = {
+  args: {
+    content: '공식 사이트: https://example.com 문서: www.docs.example.com',
+    isBot: true,
+    accentColor: 'blue',
+    bubbleType: 'sub',
+    isTyping: false,
+  },
+};
+
+/**
+ * 料金プラン과 (image)가 포함된 Sub Bubble 예시입니다.
+ * (image) 텍스트는 제거되고 PDF 미리보기가 표시됩니다.
+ */
+export const SubBubbleWithPricePlan: Story = {
+  args: {
+    content: '料金プランについて詳しく見る (image)',
+    isBot: true,
+    accentColor: 'green',
+    bubbleType: 'sub',
+    isTyping: false,
+  },
+};
+
+/**
+ * 料金プラン PDF 미리보기가 타이핑 후에 나타나는 예시입니다.
+ */
+export const SubBubbleWithPricePlanTyping: Story = {
+  args: {
+    content: '料金プランの詳細はこちらです (image)',
+    isBot: true,
+    accentColor: 'green',
+    bubbleType: 'sub',
+    isTyping: true,
+  },
+  play: async ({ canvasElement }) => {
+    // 타이핑 애니메이션이 완료될 때까지 대기
+    const canvas = within(canvasElement);
+    await new Promise(resolve => setTimeout(resolve, 3000));
   },
 };
 
