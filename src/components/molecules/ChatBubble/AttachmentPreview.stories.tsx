@@ -8,7 +8,7 @@ const meta: Meta<typeof AttachmentPreview> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'PDF 미리보기를 표시하는 컴포넌트입니다. 클릭하면 전체 화면 PDF 뷰어가 열립니다.',
+        component: 'PDF 미리보기를 표시하는 컴포넌트입니다. PDF.js를 사용하여 실제 PDF의 첫 페이지 썸네일을 생성하고 표시합니다. 클릭하면 전체 화면 PDF 뷰어가 열립니다.',
       },
     },
   },
