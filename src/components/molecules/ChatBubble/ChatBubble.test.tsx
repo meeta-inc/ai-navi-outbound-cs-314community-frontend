@@ -278,6 +278,72 @@ describe('ChatBubble 컴포넌트', () => {
     });
   });
 
+  describe('Sub Bubble URL 변환 기능', () => {
+    it('sub 타입 버블에서 URL이 링크로 변환되어야 한다', () => {
+      render(
+        <ChatBubble
+          content="자세한 내용은 https://www.brainsgym.com/ 에서 확인하세요"
+          isBot={true}
+          accentColor="blue"
+          bubbleType="sub"
+        />
+      );
+
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('href', 'https://www.brainsgym.com/');
+      expect(link).toHaveAttribute('target', '_blank');
+    });
+
+    it('sub 타입이 아닌 버블에서는 URL이 변환되지 않아야 한다', () => {
+      render(
+        <ChatBubble
+          content="자세한 내용은 https://www.brainsgym.com/ 에서 확인하세요"
+          isBot={true}
+          accentColor="blue"
+          bubbleType="main"
+        />
+      );
+
+      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      expect(screen.getByText(/https:\/\/www\.brainsgym\.com\//)).toBeInTheDocument();
+    });
+
+    it('料金プラン과 (image)가 포함된 sub 버블에서 PDF 미리보기가 표시되어야 한다', async () => {
+      render(
+        <ChatBubble
+          content="料金プランについて詳しく見る (image)"
+          isBot={true}
+          accentColor="green"
+          bubbleType="sub"
+          isTyping={false}
+        />
+      );
+
+      // (image) 텍스트가 제거되어야 함
+      expect(screen.queryByText('(image)')).not.toBeInTheDocument();
+      
+      // PDF 미리보기가 표시되어야 함
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /料金プランPDF/ })).toBeInTheDocument();
+      });
+    });
+
+    it('타이핑 중에는 PDF 미리보기가 표시되지 않아야 한다', () => {
+      render(
+        <ChatBubble
+          content="料金プランについて詳しく見る (image)"
+          isBot={true}
+          accentColor="green"
+          bubbleType="sub"
+          isTyping={true}
+        />
+      );
+
+      // 타이핑 중에는 미리보기가 없어야 함
+      expect(screen.queryByRole('button', { name: /料金プランPDF/ })).not.toBeInTheDocument();
+    });
+  });
+
   describe('접근성', () => {
     it('버블 타입에 따라 적절한 ARIA 속성을 가져야 한다', () => {
       render(
