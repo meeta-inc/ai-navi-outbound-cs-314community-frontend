@@ -1,39 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { TopQuestions } from './TopQuestions';
-import { fn } from '@storybook/test';
+import { LocaleProvider } from '../../../contexts/LocaleContext';
 
-// API 모킹을 위한 mock 데이터
-const mockQuestions = {
-  general: [
-    '서비스 이용 방법이 궁금해요',
-    '회원가입은 어떻게 하나요?',
-    '비밀번호를 잊어버렸어요'
-  ],
-  academic: [
-    '수강신청은 언제 시작하나요?',
-    '성적 확인은 어디서 하나요?',
-    '휴학 신청 절차가 궁금합니다'
-  ],
-  technical: [
-    '앱이 실행되지 않아요',
-    '로그인이 안 돼요',
-    '화면이 깨져서 보여요'
-  ],
-  payment: [
-    '결제 수단을 변경하고 싶어요',
-    '환불은 어떻게 받나요?',
-    '결제 내역을 확인하고 싶어요'
-  ],
-  default: [
-    '자주 묻는 질문 1',
-    '자주 묻는 질문 2',
-    '자주 묻는 질문 3'
-  ]
-};
+// Mock function for Storybook actions
+const mockFn = () => () => {};
 
 const meta: Meta<typeof TopQuestions> = {
   title: 'Organisms/TopQuestions',
   component: TopQuestions,
+  decorators: [
+    (Story) => (
+      <LocaleProvider locale="ja">
+        <div style={{ padding: '1rem', backgroundColor: '#f3f4f6' }}>
+          <Story />
+        </div>
+      </LocaleProvider>
+    ),
+  ],
   parameters: {
     layout: 'centered',
     docs: {
@@ -41,20 +24,21 @@ const meta: Meta<typeof TopQuestions> = {
         component: '특정 FAQ 카테고리의 상위 질문들을 표시하는 컴포넌트입니다. 뒤로가기 버튼과 질문 목록을 제공합니다.',
       },
     },
-    msw: {
-      handlers: [
-        // API 모킹 핸들러
-      ],
-    },
   },
   argTypes: {
     categoryId: {
-      control: 'text',
-      description: '카테고리 ID',
+      control: 'select',
+      options: ['curriculum', 'schedule', 'pricing'],
+      description: '카테고리 ID (curriculum, schedule, pricing)',
     },
     categoryTitle: {
       control: 'text',
       description: '카테고리 제목',
+    },
+    grade: {
+      control: 'select',
+      options: ['preschool', 'elementary', 'middle', 'high'],
+      description: '학년 (preschool, elementary, middle, high)',
     },
     onQuestionSelect: {
       action: 'question-selected',
@@ -85,73 +69,109 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    categoryId: 'category1',
-    categoryTitle: '授業について',
+    categoryId: 'curriculum',
+    categoryTitle: '授業・カリキュラム',
+    grade: 'high',
     userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
-export const TeacherCategory: Story = {
+export const HighSchoolCurriculum: Story = {
   args: {
-    categoryId: 'category2',
-    categoryTitle: '講師について',
+    categoryId: 'curriculum',
+    categoryTitle: '授業・カリキュラム',
+    grade: 'high',
     userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
-export const AchievementCategory: Story = {
+export const HighSchoolSchedule: Story = {
   args: {
-    categoryId: 'category3',
-    categoryTitle: '塾の実績について',
+    categoryId: 'schedule',
+    categoryTitle: '通塾・学習時間',
+    grade: 'high',
     userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
-export const HomeworkCategory: Story = {
+export const HighSchoolPricing: Story = {
   args: {
-    categoryId: 'category4',
-    categoryTitle: '宿題について',
+    categoryId: 'pricing',
+    categoryTitle: '料金・制度',
+    grade: 'high',
     userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
-export const OtherCategory: Story = {
+export const MiddleSchoolCurriculum: Story = {
   args: {
-    categoryId: 'other',
-    categoryTitle: 'その他',
+    categoryId: 'curriculum',
+    categoryTitle: '授業・カリキュラム',
+    grade: 'middle',
     userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
+  },
+};
+
+export const ElementaryCurriculum: Story = {
+  args: {
+    categoryId: 'curriculum',
+    categoryTitle: '授業・カリキュラム',
+    grade: 'elementary',
+    userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
+  },
+};
+
+export const PreschoolCurriculum: Story = {
+  args: {
+    categoryId: 'curriculum',
+    categoryTitle: '授業・カリキュラム',
+    grade: 'preschool',
+    userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
 export const LongCategoryTitle: Story = {
   args: {
-    categoryId: 'category1',
-    categoryTitle: '非常に長いカテゴリタイトルを持つFAQセクション',
+    categoryId: 'pricing',
+    categoryTitle: '非常に長いカテゴリタイトルを持つFAQセクション料金・制度について',
+    grade: 'high',
     userId: 'user123',
-  },
-};
-
-export const ShortTitle: Story = {
-  args: {
-    categoryId: 'category2',
-    categoryTitle: 'FAQ',
-    userId: 'user123',
-  },
-};
-
-export const WithEmojiTitle: Story = {
-  args: {
-    categoryId: 'category3',
-    categoryTitle: '📚 学習ガイド',
-    userId: 'user123',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
 
 export const WithCustomClass: Story = {
   args: {
-    categoryId: 'category1',
-    categoryTitle: 'カスタムスタイル',
+    categoryId: 'schedule',
+    categoryTitle: '通塾・学習時間',
+    grade: 'middle',
     userId: 'user123',
     className: 'bg-blue-50 border border-blue-200 rounded-lg',
+    onQuestionSelect: mockFn(),
+    onBackToCategories: mockFn(),
+    onDataLoaded: mockFn(),
   },
 };
