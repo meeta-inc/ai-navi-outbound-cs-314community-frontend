@@ -1,8 +1,8 @@
 import * as pdfjsLib from 'pdfjs-dist';
 
-// PDF.js worker 설정 - 테스트 환경에서는 워커를 사용하지 않음
+// PDF.js worker 설정 - 로컬 파일 사용하여 CORS 문제 해결
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.js';
 }
 
 interface ThumbnailOptions {
@@ -24,15 +24,24 @@ export async function generatePDFThumbnail(
   const { scale = 0.5, width = 165, height = 96 } = options;
 
   try {
-    // CORS 문제 해결을 위한 설정
+    console.log('PDF 썸네일 생성 시작:', pdfUrl);
+    
+    // PDF 문서 로드 - 로컬 worker 사용으로 CORS 문제 해결
     const loadingTask = pdfjsLib.getDocument({
       url: pdfUrl,
-      cMapUrl: `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/cmaps/`,
+      cMapUrl: '/pdfjs/cmaps/',
       cMapPacked: true,
+      disableAutoFetch: false,
+      disableStream: true,
+      disableRange: true,
     });
+    console.log('PDF 로딩 시도:', pdfUrl);
 
     const pdf = await loadingTask.promise;
+    console.log('PDF 로드 완료, 페이지 수:', pdf.numPages);
+    
     const page = await pdf.getPage(1);
+    console.log('첫 번째 페이지 로드 완료');
 
     // Canvas 생성
     const canvas = document.createElement('canvas');
@@ -75,9 +84,18 @@ export async function generatePDFThumbnail(
     // 정리
     pdf.destroy();
     
-    return canvas.toDataURL('image/jpeg', 0.8);
+    const result = canvas.toDataURL('image/jpeg', 0.8);
+    console.log('PDF 썸네일 생성 완료, 크기:', result.length);
+    
+    return result;
   } catch (error) {
     console.error('PDF 썸네일 생성 실패:', error);
+    console.error('에러 상세:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      pdfUrl
+    });
     throw error;
   }
 }
