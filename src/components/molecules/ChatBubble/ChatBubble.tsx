@@ -3,6 +3,7 @@ import { getColorClasses, AccentColor } from '../../../shared/config/theme.confi
 import { TypewriterText } from '../../atoms/Typography';
 import { BubbleResponse, AttachmentData } from '../../../types';
 import { isIOS } from '../../../utils/device';
+import { SubBubbleContent } from './SubBubbleContent';
 
 interface ChatBubbleProps {
   content: string | React.ReactNode;
@@ -51,9 +52,13 @@ export function ChatBubble({
                 onComplete={onTypingComplete}
               />
             ) : (
-              <div className="whitespace-pre-wrap">
-                {typeof displayContent === 'string' ? displayContent : displayContent}
-              </div>
+              bubbleType === 'sub' && typeof displayContent === 'string' ? (
+                <SubBubbleContent content={displayContent} />
+              ) : (
+                <div className="whitespace-pre-wrap">
+                  {typeof displayContent === 'string' ? displayContent : displayContent}
+                </div>
+              )
             )}
           </div>
           
