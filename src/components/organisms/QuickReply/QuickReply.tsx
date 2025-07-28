@@ -106,8 +106,7 @@ export function QuickReply({
       {/* Header Section */}
       <div className="mb-[7px] pl-5">
         <p 
-          className={`${colors.textMuted} text-[12px] font-medium leading-[16px] tracking-[0.6px]`}
-          style={{ fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif" }}
+          className={`${colors.textMuted} meeta-typography-small`}
         >
           {headerText}
         </p>
@@ -138,17 +137,13 @@ export function QuickReply({
               className={`
                 inline-flex items-center justify-start
                 max-w-[257px] p-[10px] rounded-[20px]
-                text-[12px] font-semibold leading-[16px] tracking-[0.6px]
                 transition-all duration-200 hover:opacity-90
-                text-left
+                text-left meeta-typography-mid
                 ${option.type === 'primary' 
                   ? `${colors.background} ${colors.textWhite}` 
                   : `${colors.bgLight} ${colors.textSecondary}`
                 }
               `}
-              style={{ 
-                fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
-              }}
             >
               {option.text}
             </Button>
@@ -163,14 +158,10 @@ export function QuickReply({
                 className="
                   inline-flex items-center justify-start
                   max-w-[257px] p-[10px] rounded-[20px]
-                  text-[12px] font-semibold leading-[16px] tracking-[0.6px]
                   transition-all duration-200 hover:opacity-90
-                  text-left
+                  text-left meeta-typography-mid
                   bg-[#EBEBEB] text-gray-700
                 "
-                style={{ 
-                  fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
-                }}
               >
                 もどる
               </Button>

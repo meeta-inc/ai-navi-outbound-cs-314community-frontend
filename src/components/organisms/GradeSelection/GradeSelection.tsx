@@ -29,13 +29,9 @@ export const GradeSelection: React.FC<GradeSelectionProps> = ({
         <div className="flex flex-row items-center relative size-full">
           <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start pb-[5px] pl-5 pr-0 pt-0 relative w-full">
             <div
-              className={`flex flex-col font-medium justify-center leading-[0] relative shrink-0 ${colors.textMuted} text-[12px] text-left text-nowrap tracking-[0.6px]`}
-              style={{ 
-                fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif",
-                fontVariationSettings: "'CTGR' 0, 'wdth' 100"
-              }}
+              className={`flex flex-col justify-center leading-[0] relative shrink-0 ${colors.textMuted} text-left text-nowrap meeta-typography-small`}
             >
-              <p className="block leading-[16px] whitespace-pre">
+              <p className="block whitespace-pre">
                 {t('onboarding.gradeSelectionHeader')}
               </p>
             </div>
@@ -54,13 +50,9 @@ export const GradeSelection: React.FC<GradeSelectionProps> = ({
                 type="button"
               >
                 <div
-                  className={`flex flex-col font-semibold justify-center leading-[0] relative shrink-0 ${colors.textWhite} text-[12px] text-left text-nowrap tracking-[0.6px]`}
-                  style={{ 
-                    fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif",
-                    fontVariationSettings: "'CTGR' 0, 'wdth' 100"
-                  }}
+                  className={`flex flex-col justify-center leading-[0] relative shrink-0 ${colors.textWhite} text-left text-nowrap meeta-typography-mid`}
                 >
-                  <p className="block leading-[16px] whitespace-pre">
+                  <p className="block whitespace-pre">
                     {grade.emoji}{grade.label}
                   </p>
                 </div>

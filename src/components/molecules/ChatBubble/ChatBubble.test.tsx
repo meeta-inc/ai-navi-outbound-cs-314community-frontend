@@ -294,4 +294,72 @@ describe('ChatBubble 컴포넌트', () => {
       expect(bubble).toHaveAttribute('aria-label', 'AI 응답 메시지');
     });
   });
+
+  describe('Typography 시스템 적용', () => {
+    it('봇 메시지 텍스트에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
+      const { container } = render(
+        <ChatBubble
+          content="Typography 테스트 메시지"
+          isBot={true}
+          accentColor="orange"
+        />
+      );
+
+      // meeta-text-mid-regular 클래스를 가진 요소가 있어야 함
+      const typographyElements = container.querySelectorAll('.meeta-text-mid-regular');
+      expect(typographyElements.length).toBeGreaterThan(0);
+    });
+
+    it('사용자 메시지 텍스트에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
+      const { container } = render(
+        <ChatBubble
+          content="사용자 메시지 Typography 테스트"
+          isBot={false}
+          accentColor="orange"
+        />
+      );
+
+      // meeta-text-mid-regular 클래스를 가진 요소가 있어야 함
+      const typographyElements = container.querySelectorAll('.meeta-text-mid-regular');
+      expect(typographyElements.length).toBeGreaterThan(0);
+    });
+
+    it('첨부파일 링크에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
+      render(
+        <ChatBubble
+          content="첨부파일 테스트"
+          isBot={true}
+          accentColor="orange"
+          attachment={{
+            type: 'link',
+            url: 'https://example.com',
+            title: '링크 제목'
+          }}
+        />
+      );
+
+      // 링크 요소에 meeta-text-mid-regular 클래스가 적용되어야 함
+      const linkElement = screen.getByRole('link');
+      expect(linkElement).toHaveClass('meeta-text-mid-regular');
+    });
+
+    it('첨부파일 다운로드 링크에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
+      render(
+        <ChatBubble
+          content="파일 첨부 테스트"
+          isBot={true}
+          accentColor="orange"
+          attachment={{
+            type: 'file',
+            url: 'https://example.com/file.pdf',
+            title: '파일 다운로드'
+          }}
+        />
+      );
+
+      // 파일 다운로드 링크에 meeta-text-mid-regular 클래스가 적용되어야 함
+      const linkElement = screen.getByRole('link');
+      expect(linkElement).toHaveClass('meeta-text-mid-regular');
+    });
+  });
 });
