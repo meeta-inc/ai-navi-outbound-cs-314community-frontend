@@ -296,7 +296,7 @@ describe('ChatBubble 컴포넌트', () => {
   });
 
   describe('Typography 시스템 적용', () => {
-    it('봇 메시지 텍스트에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+    it('봇 메시지 텍스트에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
       const { container } = render(
         <ChatBubble
           content="Typography 테스트 메시지"
@@ -305,12 +305,12 @@ describe('ChatBubble 컴포넌트', () => {
         />
       );
 
-      // meeta-typography-mid 클래스를 가진 요소가 있어야 함
-      const typographyElements = container.querySelectorAll('.meeta-typography-mid');
+      // meeta-text-mid-regular 클래스를 가진 요소가 있어야 함
+      const typographyElements = container.querySelectorAll('.meeta-text-mid-regular');
       expect(typographyElements.length).toBeGreaterThan(0);
     });
 
-    it('사용자 메시지 텍스트에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+    it('사용자 메시지 텍스트에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
       const { container } = render(
         <ChatBubble
           content="사용자 메시지 Typography 테스트"
@@ -319,12 +319,12 @@ describe('ChatBubble 컴포넌트', () => {
         />
       );
 
-      // meeta-typography-mid 클래스를 가진 요소가 있어야 함
-      const typographyElements = container.querySelectorAll('.meeta-typography-mid');
+      // meeta-text-mid-regular 클래스를 가진 요소가 있어야 함
+      const typographyElements = container.querySelectorAll('.meeta-text-mid-regular');
       expect(typographyElements.length).toBeGreaterThan(0);
     });
 
-    it('첨부파일 링크에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+    it('첨부파일 링크에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
       render(
         <ChatBubble
           content="첨부파일 테스트"
@@ -338,12 +338,12 @@ describe('ChatBubble 컴포넌트', () => {
         />
       );
 
-      // 링크 요소에 meeta-typography-mid 클래스가 적용되어야 함
+      // 링크 요소에 meeta-text-mid-regular 클래스가 적용되어야 함
       const linkElement = screen.getByRole('link');
-      expect(linkElement).toHaveClass('meeta-typography-mid');
+      expect(linkElement).toHaveClass('meeta-text-mid-regular');
     });
 
-    it('첨부파일 다운로드 링크에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+    it('첨부파일 다운로드 링크에 meeta-text-mid-regular 클래스가 적용되어야 한다', () => {
       render(
         <ChatBubble
           content="파일 첨부 테스트"
@@ -357,9 +357,9 @@ describe('ChatBubble 컴포넌트', () => {
         />
       );
 
-      // 파일 다운로드 링크에 meeta-typography-mid 클래스가 적용되어야 함
+      // 파일 다운로드 링크에 meeta-text-mid-regular 클래스가 적용되어야 함
       const linkElement = screen.getByRole('link');
-      expect(linkElement).toHaveClass('meeta-typography-mid');
+      expect(linkElement).toHaveClass('meeta-text-mid-regular');
     });
   });
 });
