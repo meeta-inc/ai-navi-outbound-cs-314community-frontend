@@ -196,4 +196,55 @@ describe('CTAButtons', () => {
     const mainButton = screen.getByText('資料請求する');
     expect(mainButton).toHaveClass('bg-green-500', 'text-white');
   });
+
+  describe('Typography 시스템 적용', () => {
+    it('메인 CTA 버튼에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+      render(
+        <MockLocaleProvider>
+          <CTAButtons 
+            onMainClick={mockOnMainClick}
+            onSubClick={mockOnSubClick}
+            show={true}
+            accentColor="green"
+          />
+        </MockLocaleProvider>
+      );
+
+      const mainButton = screen.getByText('資料請求する');
+      expect(mainButton).toHaveClass('meeta-typography-mid');
+    });
+
+    it('서브 CTA 버튼에 meeta-typography-mid 클래스가 적용되어야 한다', () => {
+      render(
+        <MockLocaleProvider>
+          <CTAButtons 
+            onMainClick={mockOnMainClick}
+            onSubClick={mockOnSubClick}
+            show={true}
+            accentColor="green"
+          />
+        </MockLocaleProvider>
+      );
+
+      const subButton = screen.getByText('もう少し質問する');
+      expect(subButton).toHaveClass('meeta-typography-mid');
+    });
+
+    it('CTA 버튼들은 인라인 폰트 스타일을 사용하지 않아야 한다', () => {
+      const { container } = render(
+        <MockLocaleProvider>
+          <CTAButtons 
+            onMainClick={mockOnMainClick}
+            onSubClick={mockOnSubClick}
+            show={true}
+            accentColor="green"
+          />
+        </MockLocaleProvider>
+      );
+
+      // meeta-typography-mid 클래스를 가진 버튼이 2개 있어야 함
+      const typographyElements = container.querySelectorAll('.meeta-typography-mid');
+      expect(typographyElements.length).toBe(2);
+    });
+  });
 });
