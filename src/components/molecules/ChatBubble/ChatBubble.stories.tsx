@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { within } from '@storybook/testing-library';
 import { ChatBubble } from './ChatBubble';
 import type { AccentColor } from '../../../shared/config/theme.config';
 import { ERROR_MESSAGES } from '../../../shared/constants/errorMessages';
@@ -306,6 +305,7 @@ export const SubBubbleWithPricePlan: Story = {
 
 /**
  * 料金プラン PDF 미리보기가 타이핑 후에 나타나는 예시입니다.
+ * 타이핑 애니메이션이 완료된 후 PDF 미리보기가 표시됩니다.
  */
 export const SubBubbleWithPricePlanTyping: Story = {
   args: {
@@ -314,11 +314,6 @@ export const SubBubbleWithPricePlanTyping: Story = {
     accentColor: 'green',
     bubbleType: 'sub',
     isTyping: true,
-  },
-  play: async ({ canvasElement }) => {
-    // 타이핑 애니메이션이 완료될 때까지 대기
-    const canvas = within(canvasElement);
-    await new Promise(resolve => setTimeout(resolve, 3000));
   },
 };
 
