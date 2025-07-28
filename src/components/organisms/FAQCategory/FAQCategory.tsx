@@ -12,13 +12,13 @@ const STYLES = {
   FONT_FAMILY: "'Noto Sans', 'Noto Sans JP', sans-serif",
   CONTAINER: "bg-gray-50 w-full max-w-[320px]",
   HEADER: "mb-[7px] pl-5",
-  DESCRIPTION: "text-[12px] font-medium leading-[16px] tracking-[0.6px]",
+  DESCRIPTION: "meeta-typography-small",
   CATEGORIES_CONTAINER: "flex flex-col gap-[7px] items-start",
   CATEGORY_WRAPPER: "pl-5 w-full",
-  BUTTON_BASE: "inline-flex items-center gap-2.5 max-w-[257px] pl-2.5 pr-5 py-2.5 rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left",
+  BUTTON_BASE: "inline-flex items-center gap-2.5 max-w-[257px] pl-2.5 pr-5 py-2.5 rounded-[20px] transition-all duration-200 hover:opacity-90 text-left meeta-typography-mid",
   ICON_CONTAINER: "w-5 h-5 flex items-center justify-center",
   ICON: "w-4 h-4",
-  TEXT_SPAN: "font-semibold flex-1 min-w-0"
+  TEXT_SPAN: "flex-1 min-w-0"
 } as const;
 
 export interface FAQCategoryItem {
@@ -110,7 +110,6 @@ export function FAQCategory({
       <div className={STYLES.HEADER}>
         <p 
           className={`${colors.textMuted} ${STYLES.DESCRIPTION}`}
-          style={{ fontFamily: STYLES.FONT_FAMILY }}
         >
           📚{displayDescription}
         </p>
@@ -152,7 +151,6 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
     <button
       onClick={() => onCategorySelect(category)}
       className={`${colors.background} ${colors.textWhite} ${STYLES.BUTTON_BASE}`}
-      style={{ fontFamily: STYLES.FONT_FAMILY }}
     >
       <div className={STYLES.ICON_CONTAINER}>
         {renderCategoryIcon(category)}
