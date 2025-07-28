@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AttachmentPreview } from './AttachmentPreview';
 
@@ -13,17 +13,29 @@ jest.mock('./PDFLightbox', () => ({
     ) : null
 }));
 
+// PDF 썸네일 유틸리티 모킹
+jest.mock('../../../utils/pdfThumbnail', () => ({
+  getCachedPDFThumbnail: jest.fn(() => 
+    Promise.resolve('data:image/jpeg;base64,mocked-thumbnail-data')
+  ),
+}));
+
 describe('AttachmentPreview', () => {
   const defaultProps = {
     pdfUrl: 'https://example.com/test.pdf'
   };
 
-  it('미리보기 버튼을 렌더링한다', () => {
+  it('미리보기 버튼을 렌더링한다', async () => {
     render(<AttachmentPreview {...defaultProps} />);
     
     const button = screen.getByRole('button', { name: /料金プランPDF/ });
     expect(button).toBeInTheDocument();
     expect(button).toHaveClass('sub-bubble-attachment-preview');
+
+    // 썸네일이 로드되면 이미지가 표시되어야 함
+    await waitFor(() => {
+      expect(screen.getByAlt('料金プラン PDF 미리보기')).toBeInTheDocument();
+    });
   });
 
   it('클릭하면 PDFLightbox를 열어준다', () => {
@@ -98,5 +110,39 @@ describe('AttachmentPreview', () => {
     
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('aria-label', '料金プランPDFのプレビュー。クリックで拡大表示');
+  });
+
+  it('로딩 중에는 스피너를 표시한다', () => {
+    render(<AttachmentPreview {...defaultProps} />);
+    
+    expect(screen.getByText('로딩중...')).toBeInTheDocument();
+    expect(screen.getByRole('button').querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('썸네일 로드에 실패하면 기본 아이콘을 표시한다', async () => {
+    const { getCachedPDFThumbnail } = require('../../../utils/pdfThumbnail');
+    getCachedPDFThumbnail.mockRejectedValueOnce(new Error('PDF 로드 실패'));
+
+    render(<AttachmentPreview {...defaultProps} />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText('로딩중...')).not.toBeInTheDocument();
+    });
+
+    // 기본 PDF 아이콘이 표시되어야 함
+    expect(screen.getByText('料金プラン')).toBeInTheDocument();
+    expect(screen.getByRole('button').querySelector('svg')).toBeInTheDocument();
+  });
+
+  it('썸네일이 성공적으로 로드되면 이미지를 표시한다', async () => {
+    render(<AttachmentPreview {...defaultProps} />);
+    
+    await waitFor(() => {
+      const img = screen.getByAlt('料金プラン PDF 미리보기');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', 'data:image/jpeg;base64,mocked-thumbnail-data');
+    });
+
+    expect(screen.getByText('料金プラン')).toBeInTheDocument(); // 라벨도 표시
   });
 });
