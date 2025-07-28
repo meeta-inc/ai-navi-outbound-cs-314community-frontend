@@ -172,9 +172,29 @@ function MainPage() {
       // 학년별 퀵 리플라이 표시
       setTimeout(() => {
         setShowFigmaQuickReply(true);
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        
+        // iOS에서 GradeQuickReply 표시 후 지연된 강제 스크롤
+        if (isIOS()) {
+          // 첫 번째 스크롤 시도 (50ms 후)
+          setTimeout(() => {
+            if (chatContainerRef.current) {
+              const container = chatContainerRef.current;
+              container.scrollTop = container.scrollHeight;
+            }
+          }, 50);
+          
+          // 두 번째 확실한 스크롤 (100ms 후)
+          setTimeout(() => {
+            if (chatContainerRef.current) {
+              const container = chatContainerRef.current;
+              container.scrollTop = container.scrollHeight;
+            }
+          }, 100);
+        } else {
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
       }, 1000);
     }, 500);
   };
