@@ -66,6 +66,28 @@
   }
 }
 
+@layer components {
+  /* ALL/Label Medium/Medium */
+  .meeta-typography-mid {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+    letter-spacing: 0.4px;
+  }
+
+  /* ALL/Label Small/Medium */
+  .meeta-typography-small {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px; /* 133.333% */
+    letter-spacing: 0.6px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

@@ -12,7 +12,7 @@ const STYLES = {
   FONT_FAMILY: "'Noto Sans', 'Noto Sans JP', sans-serif",
   CONTAINER: "bg-gray-50 w-full max-w-[320px]",
   HEADER: "mb-[7px] pl-5",
-  HEADER_TEXT: "text-[12px] font-medium leading-[16px] tracking-[0.6px]",
+  HEADER_TEXT: "meeta-typography-small",
   LOADING_CONTAINER: "flex items-center justify-center py-4",
   LOADING_SPINNER: "w-5 h-5 animate-spin",
   LOADING_TEXT: "ml-2 text-sm text-gray-500",
@@ -20,7 +20,7 @@ const STYLES = {
   ERROR_TEXT: "text-red-500 text-sm",
   QUESTIONS_CONTAINER: "flex flex-col gap-[7px] items-start",
   QUESTION_WRAPPER: "pl-5 w-full",
-  QUESTION_BUTTON: "inline-flex items-center justify-start max-w-[257px] p-[10px] rounded-[20px] text-[12px] font-semibold leading-[16px] tracking-[0.6px] transition-all duration-200 hover:opacity-90 text-left",
+  QUESTION_BUTTON: "inline-flex items-center justify-start max-w-[257px] p-[10px] rounded-[20px] transition-all duration-200 hover:opacity-90 text-left meeta-typography-mid",
   NO_QUESTIONS: "text-gray-500 text-sm"
 } as const;
 
@@ -125,7 +125,6 @@ export function TopQuestions({
       <div className={STYLES.HEADER}>
         <p 
           className={`${colors.textMuted} ${STYLES.HEADER_TEXT}`}
-          style={{ fontFamily: STYLES.FONT_FAMILY }}
         >
           ⭐{topQuestionsTitle}
         </p>
@@ -154,7 +153,6 @@ export function TopQuestions({
               <Button
                 onClick={() => handleQuestionClick(question)}
                 className={`${colors.background} ${colors.textWhite} ${STYLES.QUESTION_BUTTON}`}
-                style={{ fontFamily: STYLES.FONT_FAMILY }}
               >
                 {question}
               </Button>
@@ -170,7 +168,6 @@ export function TopQuestions({
             <Button
               onClick={handleBackClick}
               className={`${colors.bgLight} ${colors.textSecondary} ${STYLES.QUESTION_BUTTON}`}
-              style={{ fontFamily: STYLES.FONT_FAMILY }}
             >
               {backToCategories}
             </Button>
