@@ -186,7 +186,10 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
       message: message,
       toolName: undefined,
       toolInput: undefined,
-      llmResponse: llmResponse ? { content: message } : undefined,
+      llmResponse: llmResponse ? { 
+        response: [{ type: 'main', text: message }],
+        status: 200 
+      } : undefined,
       messageId: messageId // 메시지 ID를 포함하여 completeTyping에서 사용
     });
     
