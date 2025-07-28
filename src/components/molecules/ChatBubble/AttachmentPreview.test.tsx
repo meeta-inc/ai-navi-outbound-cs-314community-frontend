@@ -34,7 +34,7 @@ describe('AttachmentPreview', () => {
 
     // 썸네일이 로드되면 이미지가 표시되어야 함
     await waitFor(() => {
-      expect(screen.getByAlt('料金プラン PDF 미리보기')).toBeInTheDocument();
+      expect(screen.getByAltText('料金プラン PDF 미리보기')).toBeInTheDocument();
     });
   });
 
@@ -97,9 +97,16 @@ describe('AttachmentPreview', () => {
     expect(button).toHaveClass('mt-4');
   });
 
-  it('아이콘과 텍스트를 표시한다', () => {
+  it('아이콘과 텍스트를 표시한다', async () => {
+    const { getCachedPDFThumbnail } = require('../../../utils/pdfThumbnail');
+    getCachedPDFThumbnail.mockRejectedValueOnce(new Error('PDF 로드 실패'));
+
     render(<AttachmentPreview {...defaultProps} />);
     
+    await waitFor(() => {
+      expect(screen.queryByText('로딩중...')).not.toBeInTheDocument();
+    });
+
     expect(screen.getByText('料金プラン')).toBeInTheDocument();
     const svg = screen.getByRole('button').querySelector('svg');
     expect(svg).toBeInTheDocument();
@@ -138,7 +145,7 @@ describe('AttachmentPreview', () => {
     render(<AttachmentPreview {...defaultProps} />);
     
     await waitFor(() => {
-      const img = screen.getByAlt('料金プラン PDF 미리보기');
+      const img = screen.getByAltText('料金プラン PDF 미리보기');
       expect(img).toBeInTheDocument();
       expect(img).toHaveAttribute('src', 'data:image/jpeg;base64,mocked-thumbnail-data');
     });
