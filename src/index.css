@@ -171,3 +171,27 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Sub Bubble Attachment Preview */
+.sub-bubble-attachment-preview {
+  display: flex;
+  width: 165px;
+  height: 96px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  border: 2px solid var(--subtle-light, #AFB1B6);
+  background: var(--background, #EFEFF0);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sub-bubble-attachment-preview:hover {
+  border-color: var(--subtle, #8B8D94);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sub-bubble-attachment-preview:active {
+  transform: translateY(0);
+}
