@@ -3,14 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci --cache .npm --prefer-offline
+        - npm ci
     build:
       commands:
-        - npm run build
+        - npm run build-storybook
   artifacts:
-    baseDirectory: dist
+    baseDirectory: storybook-static
     files:
       - '**/*'
-  cache:
-    paths:
-      - .npm/**/*
