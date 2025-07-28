@@ -3,6 +3,7 @@ import { Download } from 'lucide-react';
 import { sendChatMessage } from '../services/api/chat';
 import { getColorClasses } from '../shared/config/theme.config';
 import { getAccentColor } from "../shared/config/app.config";
+import { isIOS } from '../utils/device';
 import type { Message, LLMResponse } from '../types';
 
 interface UseChatOptions {
@@ -29,9 +30,23 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const shouldScrollRef = useRef<boolean>(true);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // iOS 감지는 이제 유틸리티 함수 사용
+
+  // iOS 최적화된 스크롤 함수
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (isIOS()) {
+        // iOS: 직접 scrollTop 조작으로 더 나은 성능
+        if (chatContainerRef.current) {
+          const container = chatContainerRef.current;
+          container.scrollTop = container.scrollHeight;
+        }
+      } else {
+        // 다른 브라우저: smooth 스크롤 유지
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (shouldScrollRef.current) {
@@ -39,7 +54,42 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
     }
     // 스크롤 후 플래그 리셋
     shouldScrollRef.current = true;
-  }, [messages, currentlyTyping]);
+  }, [messages, currentlyTyping, scrollToBottom]);
+
+  // iOS에서 타이핑 중 지속적인 스크롤 업데이트
+  useEffect(() => {
+    if (isIOS() && currentlyTyping) {
+      let rafId: number;
+      
+      // 강제 스크롤 함수
+      const forceScroll = () => {
+        if (chatContainerRef.current) {
+          const container = chatContainerRef.current;
+          // 스크롤 높이와 현재 위치 계산
+          const scrollHeight = container.scrollHeight;
+          const scrollTop = container.scrollTop;
+          const clientHeight = container.clientHeight;
+          
+          // 최하단이 아니면 강제로 이동
+          if (scrollTop + clientHeight < scrollHeight) {
+            container.scrollTop = scrollHeight;
+          }
+          
+          // 계속 실행
+          rafId = requestAnimationFrame(forceScroll);
+        }
+      };
+      
+      // 스크롤 시작
+      rafId = requestAnimationFrame(forceScroll);
+
+      return () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+        }
+      };
+    }
+  }, [currentlyTyping]);
 
   const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
     try {
