@@ -2,6 +2,7 @@ import React from 'react';
 import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
 import { TypewriterText } from '../../atoms/Typography';
 import { BubbleResponse, AttachmentData } from '../../../types';
+import { isIOS } from '../../../utils/device';
 
 interface ChatBubbleProps {
   content: string | React.ReactNode;
@@ -46,7 +47,7 @@ export function ChatBubble({
             {isTyping && typeof displayContent === 'string' ? (
               <TypewriterText
                 text={displayContent}
-                speed={30}
+                speed={isIOS() ? 50 : 30}
                 onComplete={onTypingComplete}
               />
             ) : (
