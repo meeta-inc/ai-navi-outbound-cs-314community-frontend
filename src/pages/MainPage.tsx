@@ -8,6 +8,7 @@ import { ChatInput } from '../components/organisms/ChatInput';
 import { QuickReply } from '../components/organisms/QuickReply';
 import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
+import { isIOS } from '../utils/device';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
 import { useChat } from '../hooks/useChat';
 import { useActiveComponents } from '../hooks/useActiveComponents';
@@ -381,9 +382,9 @@ function MainPage() {
     >
       <div 
         ref={chatContainerRef}
-        className="h-full overflow-y-auto pb-4"
+        className={`h-full overflow-y-auto pb-4 ${isIOS() ? 'pb-16' : ''}`}
       >
-        <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+        <div className={`max-w-3xl mx-auto px-4 py-6 space-y-4 ${isIOS() ? 'pb-20' : ''}`}>
           {messages.map((message, index) => {
             // 첫 번째 봇 메시지인지 확인
             const firstBotMessageIndex = messages.findIndex(m => m.type === 'bot');
