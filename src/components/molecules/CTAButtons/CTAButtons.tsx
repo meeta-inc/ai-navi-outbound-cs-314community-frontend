@@ -38,14 +38,11 @@ export function CTAButtons({ onMainClick, onSubClick, show, accentColor }: CTABu
             className={`
               inline-flex items-center justify-start
               p-[10px] rounded-[20px]
-              text-[14px] font-medium leading-[20px] tracking-[0.4px]
               transition-all duration-200 hover:opacity-90
               text-left text-nowrap
+              meeta-typography-mid
               ${colors.background} ${colors.textWhite}
             `}
-            style={{ 
-              fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
-            }}
           >
             {ctaConfig.main.title}
           </Button>
@@ -58,14 +55,11 @@ export function CTAButtons({ onMainClick, onSubClick, show, accentColor }: CTABu
             className={`
               inline-flex items-center justify-start
               p-[10px] rounded-[20px]
-              text-[14px] font-medium leading-[20px] tracking-[0.4px]
               transition-all duration-200 hover:opacity-90
               text-left text-nowrap
+              meeta-typography-mid
               ${colors.bgLight} ${colors.textBlack}
             `}
-            style={{ 
-              fontFamily: "'Noto Sans', 'Noto Sans JP', sans-serif"
-            }}
           >
             {ctaConfig.sub.title}
           </Button>

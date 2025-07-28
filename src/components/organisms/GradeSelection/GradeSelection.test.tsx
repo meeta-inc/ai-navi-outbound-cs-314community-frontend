@@ -5,7 +5,7 @@ import { LocaleProvider } from '../../../contexts/LocaleContext';
 
 // Mock locale provider
 const MockedGradeSelection = ({ onGradeSelect }: { onGradeSelect: jest.Mock }) => (
-  <LocaleProvider locale="ja">
+  <LocaleProvider>
     <GradeSelection onGradeSelect={onGradeSelect} />
   </LocaleProvider>
 );

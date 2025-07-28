@@ -40,8 +40,7 @@ export function ChatBubble({
           aria-label="AI 응답 메시지"
         >
           <div
-            className={`${colors.textSecondary} text-[14px] font-normal leading-[20px] max-w-[227px] relative shrink-0 text-left`}
-            style={{ fontFamily: "'Work Sans', 'Noto Sans JP', sans-serif" }}
+            className={`${colors.textSecondary} max-w-[227px] relative shrink-0 text-left meeta-typography-mid`}
             data-testid="bubble-text"
           >
             {isTyping && typeof displayContent === 'string' ? (
@@ -65,7 +64,7 @@ export function ChatBubble({
                   href={attachment.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${colors.text} underline hover:no-underline text-sm`}
+                  className={`${colors.text} underline hover:no-underline meeta-typography-mid`}
                 >
                   {attachment.title || '링크 보기'}
                 </a>
@@ -95,7 +94,7 @@ export function ChatBubble({
                 <a 
                   href={attachment.url}
                   download
-                  className={`${colors.text} underline hover:no-underline text-sm flex items-center gap-1`}
+                  className={`${colors.text} underline hover:no-underline meeta-typography-mid flex items-center gap-1`}
                 >
                   <span>📎</span>
                   {attachment.title || '파일 다운로드'}
@@ -115,8 +114,7 @@ export function ChatBubble({
         <div className="bg-[#ebebeb] box-border content-stretch flex flex-row gap-2 items-start justify-start px-[15px] py-2.5 relative rounded-tl-[10px] rounded-bl-[10px] rounded-br-[10px]">
           <div className="flex items-center justify-center max-w-[227px] relative shrink-0">
             <div
-              className="font-['Work_Sans:Regular',_'Noto_Sans_JP:Regular',_sans-serif] font-normal leading-[20px] relative text-[#303030] text-[14px] text-left"
-              style={{ fontFamily: "'Work Sans', 'Noto Sans JP', sans-serif" }}
+              className="relative text-[#303030] text-left meeta-typography-mid"
             >
               <div className="whitespace-pre-wrap">
                 {typeof content === 'string' ? content : content}
