@@ -383,8 +383,9 @@ function MainPage() {
       <div 
         ref={chatContainerRef}
         className={`h-full overflow-y-auto pb-4 ${isIOS() ? 'pb-16' : ''}`}
+        data-testid="chat-container"
       >
-        <div className={`max-w-3xl mx-auto px-4 py-6 space-y-4 ${isIOS() ? 'pb-20' : ''}`}>
+        <div className={`max-w-3xl mx-auto px-4 py-6 space-y-4 ${isIOS() ? 'pb-20' : ''}`} data-testid="messages-container">
           {messages.map((message, index) => {
             // 첫 번째 봇 메시지인지 확인
             const firstBotMessageIndex = messages.findIndex(m => m.type === 'bot');

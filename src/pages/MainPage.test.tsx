@@ -440,4 +440,93 @@ describe('MainPage 컴포넌트', () => {
       expect(screen.getByTestId('chat-input')).toBeInTheDocument();
     });
   });
+
+  describe('iOS 통합', () => {
+    const setIOSUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+        configurable: true,
+        writable: true
+      });
+    };
+
+    const restoreUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: originalUserAgent,
+        configurable: true,
+        writable: true
+      });
+    };
+
+    let originalUserAgent: string;
+
+    beforeEach(() => {
+      originalUserAgent = navigator.userAgent;
+      setIOSUserAgent();
+    });
+
+    afterEach(() => {
+      restoreUserAgent();
+    });
+
+    it('iOS에서 ChatInput이 정상적으로 통합되어야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      const chatInput = screen.getByTestId('chat-input');
+      expect(chatInput).toBeInTheDocument();
+      expect(chatInput).toBeVisible();
+      
+      // ChatInput의 부모 컨테이너가 iOS에서 fixed positioning을 가져야 함
+      const inputContainer = chatInput.closest('.w-full.bg-white');
+      expect(inputContainer).toBeInTheDocument();
+      
+      // iOS에서는 ChatLayout 외부에 렌더링되어야 함
+      const chatLayout = screen.getByTestId('chat-layout');
+      expect(chatLayout).toBeInTheDocument();
+      
+      // ChatInput이 ChatLayout의 자식이 아니어야 함 (iOS에서)
+      expect(chatLayout.contains(inputContainer!)).toBe(false);
+    });
+
+    it('iOS에서 레이아웃이 적절히 조정되어야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      // iOS 전용 패딩이 적용되어야 함
+      const chatContainer = screen.getByTestId('chat-container');
+      expect(chatContainer.className).toContain('pb-16');
+      
+      const messagesContainer = screen.getByTestId('messages-container');
+      expect(messagesContainer.className).toContain('pb-20');
+    });
+
+    it('iOS에서 safe area가 적용되어야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      const chatInput = screen.getByTestId('chat-input');
+      const inputContainer = chatInput.closest('.w-full.bg-white');
+      
+      // iOS에서 safe area inset이 적용되어야 함
+      expect(inputContainer).toHaveAttribute('style');
+      const style = inputContainer!.getAttribute('style');
+      expect(style).toContain('padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem))');
+    });
+  });
 });
