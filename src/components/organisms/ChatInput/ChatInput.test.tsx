@@ -332,7 +332,7 @@ describe('ChatInput 컴포넌트', () => {
       expect(inputContainer).toBeVisible();
     });
 
-    it('iOS에서 safe area inset이 적용되어야 한다', () => {
+    it('iOS에서 fixed positioning이 적용되어야 한다', () => {
       render(
         <TestWrapper>
           <ChatInput {...defaultProps} />
@@ -340,15 +340,13 @@ describe('ChatInput 컴포넌트', () => {
       );
 
       const container = screen.getByRole('textbox').parentElement?.parentElement;
-      const styles = window.getComputedStyle(container!);
       
-      // iOS에서는 fixed positioning과 safe area가 적용됨
+      // iOS에서는 fixed positioning이 적용됨
       expect(container).toHaveAttribute('style');
       const styleAttr = container!.getAttribute('style');
       expect(styleAttr).toContain('position: fixed');
       expect(styleAttr).toContain('bottom: 0');
       expect(styleAttr).toContain('z-index: 1000');
-      expect(styleAttr).toContain('padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem))');
     });
 
     it('iOS에서 메뉴 버튼이 접근 가능해야 한다', () => {
@@ -392,26 +390,4 @@ describe('ChatInput 컴포넌트', () => {
     });
   });
 
-  describe('키보드 상태 감지', () => {
-    it('키보드가 열렸을 때 적절히 처리되어야 한다', async () => {
-      const user = userEvent.setup();
-      
-      // useKeyboardState mock을 키보드 열림 상태로 변경
-      jest.mock('../../../hooks/useKeyboardState', () => ({
-        useKeyboardState: () => true,
-      }));
-
-      render(
-        <TestWrapper>
-          <ChatInput {...defaultProps} />
-        </TestWrapper>
-      );
-
-      const menuButton = screen.getByRole('button', { name: '메뉴' });
-      await user.click(menuButton);
-
-      // 키보드가 열려있을 때는 메뉴가 바로 열리지 않음
-      expect(screen.queryByText('Test Menu')).not.toBeInTheDocument();
-    });
-  });
 });

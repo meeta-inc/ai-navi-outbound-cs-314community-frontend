@@ -95,7 +95,9 @@ export function ChatInput({
     left: 0,
     right: 0,
     zIndex: 1000,
-    paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))'
+    paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+    background: 'white',
+    borderTop: '1px solid #e5e7eb'
   } : {
     paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
   };
@@ -103,7 +105,7 @@ export function ChatInput({
   return (
     <div 
       className={`w-full bg-white flex justify-center items-end px-2 sm:px-4 py-4 gap-2 sm:gap-3 ${
-        isIOS() ? 'transform-gpu will-change-transform' : ''
+        isIOS() ? 'ios-chat-input-fixed transform-gpu will-change-transform' : ''
       }`}
       style={containerStyle}>
       {/* Menu Button */}
