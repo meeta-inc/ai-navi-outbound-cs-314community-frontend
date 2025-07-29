@@ -1,5 +1,6 @@
 import React from 'react';
 import { isIOS } from '../../../utils/device';
+import { useIOSViewport } from '../../../hooks/useIOSViewport';
 
 interface ChatLayoutProps {
   header?: React.ReactNode;
@@ -23,13 +24,27 @@ export function ChatLayout({
   quickReplies,
   faqCategory
 }: ChatLayoutProps) {
+  const viewportInfo = useIOSViewport();
+
+  // iOS에서 동적 높이 계산
+  const mainContentStyle = isIOS() && viewportInfo.chatContentHeight > 0 ? {
+    height: `${viewportInfo.chatContentHeight}px`,
+    maxHeight: `${viewportInfo.chatContentHeight}px`,
+  } : {};
+
   return (
     <div className={`h-full flex flex-col bg-white ${className}`} data-testid="chat-layout">
       {/* Navigation Header */}
       {showNavigationHeader && header}
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col bg-gray-50 min-h-0" data-testid="main-content-area">
+      <div 
+        className={`flex-1 flex flex-col bg-gray-50 min-h-0 ${
+          isIOS() ? 'ios-dynamic-content' : ''
+        }`} 
+        data-testid="main-content-area"
+        style={mainContentStyle}
+      >
         <div className="flex-1 overflow-y-auto">
           {/* 스토리북 테스트용 messages가 있으면 우선 사용, 없으면 children 사용 */}
           <div className="min-h-full">
