@@ -9,6 +9,7 @@ interface InputFieldProps {
   placeholder?: string;
   disabled?: boolean;
   accentColor: AccentColor;
+  'data-testid'?: string;
 }
 
 export function InputField({
@@ -17,7 +18,8 @@ export function InputField({
   onKeyDown,
   placeholder,
   disabled = false,
-  accentColor
+  accentColor,
+  'data-testid': dataTestId
 }: InputFieldProps) {
   const { t } = useLocale();
   const colors = getColorClasses(accentColor);
@@ -75,6 +77,7 @@ export function InputField({
         }}
         rows={1}
         disabled={disabled}
+        data-testid={dataTestId}
       />
     </div>
   );

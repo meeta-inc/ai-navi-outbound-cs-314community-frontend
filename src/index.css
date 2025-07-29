@@ -195,3 +195,23 @@
 .sub-bubble-attachment-preview:active {
   transform: translateY(0);
 }
+
+/* iOS Safari 100vh 문제 해결 */
+@supports (-webkit-appearance: none) {
+  .ios-chat-layout {
+    height: 100dvh; /* Dynamic Viewport Height */
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* iOS에서 키보드 열림 시 처리 */
+.chat-input-container {
+  transform: translateZ(0); /* 하드웨어 가속 */
+  will-change: transform;
+}
+
+/* iOS Safe Area 지원 */
+.ios-safe-area {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
