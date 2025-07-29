@@ -24,6 +24,7 @@
     "jose": "^6.0.12",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.344.0",
+    "pdfjs-dist": "^5.4.54",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.22.3"

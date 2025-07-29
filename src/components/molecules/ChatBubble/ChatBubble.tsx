@@ -3,6 +3,7 @@ import { getColorClasses, AccentColor } from '../../../shared/config/theme.confi
 import { TypewriterText } from '../../atoms/Typography';
 import { BubbleResponse, AttachmentData } from '../../../types';
 import { isIOS } from '../../../utils/device';
+import { SubBubbleContent } from './SubBubbleContent';
 
 interface ChatBubbleProps {
   content: string | React.ReactNode;
@@ -25,6 +26,13 @@ export function ChatBubble({
   attachment
 }: ChatBubbleProps) {
   const colors = getColorClasses(accentColor);
+  const [localTypingComplete, setLocalTypingComplete] = React.useState(!isTyping);
+  
+  // 타이핑 완료 콜백 처리
+  const handleTypingComplete = React.useCallback(() => {
+    setLocalTypingComplete(true);
+    onTypingComplete?.();
+  }, [onTypingComplete]);
   
   // 150자 제한 (main 타입일 때만)
   const displayContent = bubbleType === 'main' && typeof content === 'string' && content.length > 150 
@@ -48,12 +56,19 @@ export function ChatBubble({
               <TypewriterText
                 text={displayContent}
                 speed={isIOS() ? 50 : 30}
-                onComplete={onTypingComplete}
+                onComplete={handleTypingComplete}
               />
             ) : (
-              <div className="whitespace-pre-wrap">
-                {typeof displayContent === 'string' ? displayContent : displayContent}
-              </div>
+              bubbleType === 'sub' && typeof displayContent === 'string' ? (
+                <SubBubbleContent 
+                  content={displayContent} 
+                  isTypingComplete={localTypingComplete}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap">
+                  {typeof displayContent === 'string' ? displayContent : displayContent}
+                </div>
+              )
             )}
           </div>
           
