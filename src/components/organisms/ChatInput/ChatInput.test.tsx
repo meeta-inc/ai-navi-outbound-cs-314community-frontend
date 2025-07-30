@@ -290,4 +290,104 @@ describe('ChatInput 컴포넌트', () => {
       expect(sendButton).not.toBeDisabled();
     });
   });
+
+  describe('iOS 호환성', () => {
+    // iOS userAgent 설정을 위한 헬퍼 함수
+    const setIOSUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+        configurable: true,
+        writable: true
+      });
+    };
+
+    const restoreUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: originalUserAgent,
+        configurable: true,
+        writable: true
+      });
+    };
+
+    let originalUserAgent: string;
+
+    beforeEach(() => {
+      originalUserAgent = navigator.userAgent;
+      setIOSUserAgent();
+    });
+
+    afterEach(() => {
+      restoreUserAgent();
+    });
+
+    it('iOS에서 ChatInput이 화면에 표시되어야 한다', () => {
+      render(
+        <TestWrapper>
+          <ChatInput {...defaultProps} />
+        </TestWrapper>
+      );
+
+      const inputContainer = screen.getByRole('textbox').parentElement?.parentElement;
+      expect(inputContainer).toBeInTheDocument();
+      expect(inputContainer).toBeVisible();
+    });
+
+    it('iOS에서 fixed positioning이 적용되어야 한다', () => {
+      render(
+        <TestWrapper>
+          <ChatInput {...defaultProps} />
+        </TestWrapper>
+      );
+
+      const container = screen.getByRole('textbox').parentElement?.parentElement;
+      
+      // iOS에서는 fixed positioning이 적용됨
+      expect(container).toHaveAttribute('style');
+      const styleAttr = container!.getAttribute('style');
+      expect(styleAttr).toContain('position: fixed');
+      expect(styleAttr).toContain('bottom: 0');
+      expect(styleAttr).toContain('z-index: 1000');
+    });
+
+    it('iOS에서 메뉴 버튼이 접근 가능해야 한다', () => {
+      render(
+        <TestWrapper>
+          <ChatInput {...defaultProps} />
+        </TestWrapper>
+      );
+
+      const menuButton = screen.getByRole('button', { name: '메뉴' });
+      expect(menuButton).toBeInTheDocument();
+      expect(menuButton).toBeVisible();
+    });
+
+    it('iOS에서 전송 버튼이 접근 가능해야 한다', () => {
+      render(
+        <TestWrapper>
+          <ChatInput {...defaultProps} value="테스트" />
+        </TestWrapper>
+      );
+
+      const sendButton = screen.getByRole('button', { name: /send/i });
+      expect(sendButton).toBeInTheDocument();
+      expect(sendButton).toBeVisible();
+    });
+
+    it('iOS에서 입력 필드가 정상 작동해야 한다', async () => {
+      const user = userEvent.setup();
+      const onChangeMock = jest.fn();
+
+      render(
+        <TestWrapper>
+          <ChatInput {...defaultProps} onChange={onChangeMock} />
+        </TestWrapper>
+      );
+
+      const input = screen.getByRole('textbox');
+      await user.type(input, 'iOS 테스트');
+
+      expect(onChangeMock).toHaveBeenCalled();
+    });
+  });
+
 });

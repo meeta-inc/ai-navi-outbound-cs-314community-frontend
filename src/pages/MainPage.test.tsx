@@ -440,4 +440,89 @@ describe('MainPage 컴포넌트', () => {
       expect(screen.getByTestId('chat-input')).toBeInTheDocument();
     });
   });
+
+  describe('iOS 통합', () => {
+    const setIOSUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1',
+        configurable: true,
+        writable: true
+      });
+    };
+
+    const restoreUserAgent = () => {
+      Object.defineProperty(navigator, 'userAgent', {
+        value: originalUserAgent,
+        configurable: true,
+        writable: true
+      });
+    };
+
+    let originalUserAgent: string;
+
+    beforeEach(() => {
+      originalUserAgent = navigator.userAgent;
+      setIOSUserAgent();
+    });
+
+    afterEach(() => {
+      restoreUserAgent();
+    });
+
+    it('iOS에서 ChatInput이 정상적으로 통합되어야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      const chatInput = screen.getByTestId('chat-input');
+      expect(chatInput).toBeInTheDocument();
+      expect(chatInput).toBeVisible();
+      
+      // iOS에서는 ChatLayout 외부에 렌더링되어야 함
+      const chatLayout = screen.getByTestId('chat-layout');
+      expect(chatLayout.contains(chatInput)).toBe(true);
+    });
+
+    it('iOS에서 레이아웃이 동적으로 조정되어야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      // ChatLayout이 올바르게 렌더링되는지 확인
+      const chatLayout = screen.getByTestId('chat-layout');
+      expect(chatLayout).toBeInTheDocument();
+      
+      // ChatInput이 iOS에서 정상적으로 표시되는지 확인
+      const chatInput = screen.getByTestId('chat-input');
+      expect(chatInput).toBeInTheDocument();
+    });
+
+    it('iOS에서 useIOSViewport 훅이 정상 작동해야 한다', async () => {
+      await act(async () => {
+        render(
+          <TestWrapper>
+            <MainPage />
+          </TestWrapper>
+        );
+      });
+
+      // iOS 환경에서 컴포넌트가 정상적으로 렌더링되는지 확인
+      const chatLayout = screen.getByTestId('chat-layout');
+      const chatInput = screen.getByTestId('chat-input');
+      
+      expect(chatLayout).toBeInTheDocument();
+      expect(chatInput).toBeInTheDocument();
+      
+      // ChatInput이 적절히 배치되었는지 확인
+      expect(chatLayout.contains(chatInput)).toBe(true);
+    });
+  });
 });

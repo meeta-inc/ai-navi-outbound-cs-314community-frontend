@@ -2,9 +2,9 @@ name: Chromatic Visual Tests
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, dev2 ]
   pull_request:
-    branches: [ develop ]
+    branches: [ develop, dev2 ]
 
 jobs:
   chromatic:
