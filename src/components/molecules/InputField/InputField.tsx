@@ -42,7 +42,7 @@ export function InputField({
 
   return (
     <div 
-      className="flex flex-col justify-end items-center flex-1 min-w-0 max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:max-w-[387px]"
+      className="flex flex-col justify-end items-center flex-1 min-w-0 max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:w-[387px] lg:max-w-[387px]"
       style={{
         display: 'flex',
         maxHeight: '300px',
