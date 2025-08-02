@@ -88,13 +88,16 @@ export function InputField({
         style={{
           maxHeight: '270px',
           alignSelf: 'stretch',
-          fontFamily: 'Work Sans',
+          fontFamily: '"Noto Sans", "Work Sans", sans-serif',
           fontSize: '16px',
           fontStyle: 'normal',
           fontWeight: 400,
           lineHeight: '24px',
           width: '100%',
           minHeight: '24px',
+          WebkitAppearance: 'none',
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
         }}
         rows={1}
         disabled={disabled}
