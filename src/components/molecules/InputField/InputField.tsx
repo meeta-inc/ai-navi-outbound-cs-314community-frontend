@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
 
@@ -22,6 +22,7 @@ export function InputField({
   const { t } = useLocale();
   const colors = getColorClasses(accentColor);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isPC, setIsPC] = useState(false);
 
   const adjustTextareaHeight = () => {
     const textarea = textareaRef.current;
@@ -35,6 +36,22 @@ export function InputField({
     adjustTextareaHeight();
   }, [value]);
 
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsPC(window.innerWidth >= 500);
+    };
+
+    // 초기 설정
+    checkScreenSize();
+
+    // 윈도우 리사이즈 이벤트 리스너
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
     adjustTextareaHeight();
@@ -42,7 +59,7 @@ export function InputField({
 
   return (
     <div 
-      className="flex flex-col justify-end items-center flex-1 min-w-0 max-w-[280px] sm:max-w-[320px] md:max-w-[360px] lg:w-[387px] lg:max-w-[387px]"
+      className="flex flex-col justify-end items-center flex-1 min-w-0 max-w-[280px]"
       style={{
         display: 'flex',
         maxHeight: '300px',
@@ -53,6 +70,10 @@ export function InputField({
         gap: '10px',
         borderRadius: '10px',
         background: '#EBEBEB',
+        ...(isPC && {
+          width: '387px',
+          maxWidth: '387px'
+        })
       }}
     >
       <textarea

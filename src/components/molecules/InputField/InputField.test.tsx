@@ -5,8 +5,8 @@
  * PC 환경에서 입력창 너비가 짧은 문제 해결을 위한 테스트입니다.
  * 
  * 테스트 범위:
- * - PC 환경(lg 브레이크포인트)에서 너비 387px 적용
- * - 모바일 환경에서 기존 반응형 디자인 유지
+ * - PC 환경(500px 이상)에서 너비 387px 동적 스타일 적용
+ * - 모바일 환경(500px 미만)에서 기존 반응형 디자인 유지
  * - 입력창 기본 기능 정상 작동
  */
 
@@ -39,17 +39,19 @@ const mockWindowWidth = (width: number) => {
     value: width,
   });
   
-  // matchMedia 모킹 (Tailwind의 미디어 쿼리 테스트용)
-  window.matchMedia = jest.fn().mockImplementation((query) => ({
-    matches: query.includes('min-width: 1024px') ? width >= 1024 : false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
+  // resize 이벤트 모킹을 위한 addEventListener 모킹
+  const mockAddEventListener = jest.fn();
+  const mockRemoveEventListener = jest.fn();
+  
+  Object.defineProperty(window, 'addEventListener', {
+    writable: true,
+    value: mockAddEventListener,
+  });
+  
+  Object.defineProperty(window, 'removeEventListener', {
+    writable: true,
+    value: mockRemoveEventListener,
+  });
 };
 
 describe('InputField', () => {
@@ -110,42 +112,54 @@ describe('InputField', () => {
   });
 
   describe('반응형 디자인 - 이슈 #66', () => {
-    it('모바일 환경에서 최대 너비가 280px이다', () => {
+    it('모바일 환경(500px 미만)에서 최대 너비가 280px이다', () => {
       mockWindowWidth(375); // 모바일 크기
       
       render(<InputField {...defaultProps} />);
       
       const container = screen.getByRole('textbox').parentElement;
       expect(container).toHaveClass('max-w-[280px]');
+      expect(container).not.toHaveStyle('width: 387px');
     });
 
-    it('태블릿 환경에서 최대 너비가 320px이다', () => {
-      mockWindowWidth(640); // sm 브레이크포인트
+    it('PC 환경(500px)에서 너비가 387px로 고정된다', () => {
+      mockWindowWidth(500); // 정확히 500px
       
       render(<InputField {...defaultProps} />);
       
       const container = screen.getByRole('textbox').parentElement;
-      expect(container).toHaveClass('sm:max-w-[320px]');
+      expect(container).toHaveStyle('width: 387px');
+      expect(container).toHaveStyle('max-width: 387px');
     });
 
-    it('중간 화면에서 최대 너비가 360px이다', () => {
-      mockWindowWidth(768); // md 브레이크포인트
+    it('PC 환경(640px)에서 너비가 387px로 고정된다', () => {
+      mockWindowWidth(640); // PC 크기 (500px 이상)
       
       render(<InputField {...defaultProps} />);
       
       const container = screen.getByRole('textbox').parentElement;
-      expect(container).toHaveClass('md:max-w-[360px]');
+      expect(container).toHaveStyle('width: 387px');
+      expect(container).toHaveStyle('max-width: 387px');
     });
 
-    it('PC 환경(lg)에서 너비가 387px로 고정된다', () => {
-      mockWindowWidth(1024); // lg 브레이크포인트
+    it('PC 환경(1024px)에서 너비가 387px로 고정된다', () => {
+      mockWindowWidth(1024); // PC 크기 (500px 이상)
       
       render(<InputField {...defaultProps} />);
       
       const container = screen.getByRole('textbox').parentElement;
-      // 수정 후 예상되는 클래스들
-      expect(container).toHaveClass('lg:w-[387px]');
-      expect(container).toHaveClass('lg:max-w-[387px]');
+      expect(container).toHaveStyle('width: 387px');
+      expect(container).toHaveStyle('max-width: 387px');
+    });
+
+    it('499px에서는 모바일로 간주되어 387px가 적용되지 않는다', () => {
+      mockWindowWidth(499); // 500px 미만
+      
+      render(<InputField {...defaultProps} />);
+      
+      const container = screen.getByRole('textbox').parentElement;
+      expect(container).not.toHaveStyle('width: 387px');
+      expect(container).toHaveClass('max-w-[280px]');
     });
   });
 
