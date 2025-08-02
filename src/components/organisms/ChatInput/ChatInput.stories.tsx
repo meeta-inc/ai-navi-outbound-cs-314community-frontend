@@ -244,3 +244,30 @@ export const GradeSelected: Story = {
     },
   },
 };
+
+// iOS 호환성 - 이슈 #63 관련
+export const IOSCompatible: Story = {
+  args: {
+    value: '',
+    disabled: false,
+    placeholder: 'iOS에서도 정상 작동합니다',
+  },
+  parameters: {
+    viewport: { defaultViewport: 'iphone6' },
+    docs: {
+      description: {
+        story: `
+**iOS 호환성** - 이슈 #63 구현
+
+iOS 환경에서의 ChatInput 동작을 확인할 수 있습니다:
+- fixed positioning으로 화면 하단에 고정
+- Safe Area 지원으로 하단 여백 자동 처리
+- Visual Viewport API를 활용한 정확한 키보드 감지
+- 하드웨어 가속을 통한 부드러운 애니메이션
+
+iOS Safari에서 발생하던 ChatInput이 표시되지 않는 문제를 해결했습니다.
+        `,
+      },
+    },
+  },
+};

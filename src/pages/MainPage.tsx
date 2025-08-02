@@ -10,6 +10,7 @@ import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
 import { isIOS } from '../utils/device';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
+import { IOSViewportDebug } from '../components/molecules/IOSViewportDebug';
 import { useChat } from '../hooks/useChat';
 import { useActiveComponents } from '../hooks/useActiveComponents';
 import { getAccentColor, getShowNavigationHeader, getShowGradeSelection } from '../shared/config/app.config';
@@ -350,41 +351,46 @@ function MainPage() {
   }
 
   return (
-    <ChatLayout
-      showNavigationHeader={showNavigationHeader}
-      header={
-        <NavigationHeader 
-          title={t('common.home')} 
-          accentColor={accentColor}
-          showDynamicHeader={true}
-          clientId="default"
-          onHeaderAction={(action: any) => {
-            if (action.type === 'close') {
-              console.log('Header close action triggered');
+    <>
+      {/* iOS Viewport Debug - 개발용 (배포 시 제거) */}
+      <IOSViewportDebug enabled={process.env.NODE_ENV === 'development'} />
+      
+      <ChatLayout
+        showNavigationHeader={showNavigationHeader}
+        header={
+          <NavigationHeader 
+            title={t('common.home')} 
+            accentColor={accentColor}
+            showDynamicHeader={true}
+            clientId="default"
+            onHeaderAction={(action: any) => {
+              if (action.type === 'close') {
+                console.log('Header close action triggered');
+              }
+            }}
+          />
+        }
+        input={
+          <ChatInput
+            value={newMessage}
+            onChange={setNewMessage}
+            onSend={handleSendClick}
+            disabled={isTyping || (showGradeSelection && !selectedGrade)}
+            placeholder={
+              showGradeSelection && !selectedGrade 
+                ? 'まずは学年を選択してください'
+                : undefined
             }
-          }}
-        />
-      }
-      input={
-        <ChatInput
-          value={newMessage}
-          onChange={setNewMessage}
-          onSend={handleSendClick}
-          disabled={isTyping || (showGradeSelection && !selectedGrade)}
-          placeholder={
-            showGradeSelection && !selectedGrade 
-              ? 'まずは学年を選択してください'
-              : undefined
-          }
-          onMenuItemClick={handleMenuItemClick}
-        />
-      }
-    >
+            onMenuItemClick={handleMenuItemClick}
+          />
+        }
+      >
       <div 
         ref={chatContainerRef}
-        className={`h-full overflow-y-auto pb-4 ${isIOS() ? 'pb-16' : ''}`}
+        className="h-full overflow-y-auto pb-4"
+        data-testid="chat-container"
       >
-        <div className={`max-w-3xl mx-auto px-4 py-6 space-y-4 ${isIOS() ? 'pb-20' : ''}`}>
+        <div className="max-w-3xl mx-auto px-4 py-6 space-y-4" data-testid="messages-container">
           {messages.map((message, index) => {
             // 첫 번째 봇 메시지인지 확인
             const firstBotMessageIndex = messages.findIndex(m => m.type === 'bot');
@@ -503,7 +509,8 @@ function MainPage() {
           <div ref={messagesEndRef} />
         </div>
       </div>
-    </ChatLayout>
+      </ChatLayout>
+    </>
   );
 }
 
