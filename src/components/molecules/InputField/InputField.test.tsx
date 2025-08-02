@@ -8,6 +8,7 @@
  * - PC 환경(500px 이상)에서 너비 387px 동적 스타일 적용
  * - 모바일 환경(500px 미만)에서 기존 반응형 디자인 유지
  * - 입력창 기본 기능 정상 작동
+ * - iOS 환경에서 폰트 렌더링 문제 해결 (이슈 #68)
  */
 
 import React from 'react';
@@ -187,13 +188,26 @@ describe('InputField', () => {
       const textarea = screen.getByRole('textbox');
       expect(textarea).toHaveStyle({
         maxHeight: '270px',
-        fontFamily: 'Work Sans',
+        fontFamily: '"Noto Sans", "Work Sans", sans-serif',
         fontSize: '16px',
         fontWeight: 400,
         lineHeight: '24px',
         width: '100%',
         minHeight: '24px'
       });
+    });
+
+    it('iOS 환경에서 textarea에 추가 스타일이 적용된다', () => {
+      render(<InputField {...defaultProps} />);
+      
+      const textarea = screen.getByRole('textbox');
+      // iOS에서 폰트 렌더링 문제 해결을 위한 스타일
+      const style = window.getComputedStyle(textarea);
+      
+      // React inline styles는 camelCase이지만, 실제 DOM에서는 kebab-case로 변환됨
+      expect(textarea.style.WebkitAppearance).toBe('none');
+      expect(textarea.style.WebkitFontSmoothing).toBe('antialiased');  
+      expect(textarea.style.MozOsxFontSmoothing).toBe('grayscale');
     });
   });
 
