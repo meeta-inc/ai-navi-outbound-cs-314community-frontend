@@ -8,6 +8,7 @@ import { InputField } from '../../molecules/InputField';
 import { MenuModal } from '../MenuModal';
 import { MenuService } from '../../../services/menuService';
 import { useKeyboardState } from '../../../hooks/useKeyboardState';
+import { isIOS } from '../../../utils/device';
 import type { MenuConfig, MenuItem } from '../../../shared/config/menuConfig';
 
 interface ChatInputProps {
@@ -87,8 +88,26 @@ export function ChatInput({
     setIsMenuModalOpen(false);
   };
 
+  // iOS 전용 스타일 적용
+  const containerStyle = isIOS() ? {
+    position: 'fixed' as const,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+    background: 'white',
+    borderTop: '1px solid #e5e7eb'
+  } : {
+    paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'
+  };
+
   return (
-    <div className="w-full bg-white flex justify-center items-end px-2 sm:px-4 py-4 gap-2 sm:gap-3" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+    <div 
+      className={`w-full bg-white flex justify-center items-end px-2 sm:px-4 py-4 gap-2 sm:gap-3 ${
+        isIOS() ? 'ios-chat-input-fixed transform-gpu will-change-transform' : ''
+      }`}
+      style={containerStyle}>
       {/* Menu Button */}
       <Button
         onClick={handleMenuClick}
@@ -115,6 +134,7 @@ export function ChatInput({
         placeholder={placeholder}
         disabled={disabled}
         accentColor={accentColor}
+        data-testid="chat-input"
       />
       
       {/* Send Button */}
