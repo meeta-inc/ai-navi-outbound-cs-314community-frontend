@@ -3,6 +3,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SubBubbleContent } from './SubBubbleContent';
 
+// Mock AttachmentPreview 컴포넌트
+jest.mock('./AttachmentPreview', () => ({
+  AttachmentPreview: ({ attachment, className }: { attachment: any, className?: string }) => (
+    <div data-testid="attachment-preview" data-attachment-type={attachment?.type} className={className}>
+      Attachment: {attachment?.type} - {attachment?.url}
+    </div>
+  )
+}));
+
 describe('SubBubbleContent', () => {
   describe('URL 변환 기능', () => {
     it('http URL을 링크로 변환한다', () => {
@@ -50,66 +59,28 @@ describe('SubBubbleContent', () => {
     });
   });
 
-  describe('料金プラン + (image) 처리', () => {
-    it('料金プラン과 (image)가 포함된 경우 (image) 텍스트를 제거한다', () => {
+  describe('(image) 텍스트 제거 처리', () => {
+    it('(image)가 포함된 경우 (image) 텍스트를 제거한다', () => {
       render(
         <SubBubbleContent 
-          content="料金プランについて詳しく見る (image)" 
+          content="텍스트 내용 (image)" 
           isTypingComplete={true}
         />
       );
       
-      expect(screen.getByText('料金プランについて詳しく見る')).toBeInTheDocument();
+      expect(screen.getByText('텍스트 내용')).toBeInTheDocument();
       expect(screen.queryByText('(image)')).not.toBeInTheDocument();
     });
 
-    it('타이핑이 완료되면 AttachmentPreview를 표시한다', async () => {
-      const { rerender } = render(
-        <SubBubbleContent 
-          content="料金プラン (image)" 
-          isTypingComplete={false}
-        />
-      );
-      
-      // 초기에는 미리보기가 없음
-      expect(screen.queryByRole('button', { name: /料金プランPDF/ })).not.toBeInTheDocument();
-      
-      // 타이핑 완료
-      rerender(
-        <SubBubbleContent 
-          content="料金プラン (image)" 
-          isTypingComplete={true}
-        />
-      );
-      
-      // 미리보기가 표시됨
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /料金プランPDF/ })).toBeInTheDocument();
-      });
-    });
-
-    it('料金プラン이 없으면 (image)를 제거하지 않는다', () => {
+    it('(image)가 없으면 텍스트를 그대로 표시한다', () => {
       render(
         <SubBubbleContent 
-          content="다른 내용 (image)" 
+          content="일반 텍스트입니다" 
           isTypingComplete={true}
         />
       );
       
-      expect(screen.getByText('다른 내용 (image)')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /料金プランPDF/ })).not.toBeInTheDocument();
-    });
-
-    it('(image)가 없으면 미리보기를 표시하지 않는다', () => {
-      render(
-        <SubBubbleContent 
-          content="料金プラン입니다" 
-          isTypingComplete={true}
-        />
-      );
-      
-      expect(screen.getByText('料金プラン입니다')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /料金プランPDF/ })).not.toBeInTheDocument();
+      expect(screen.getByText('일반 텍스트입니다')).toBeInTheDocument();
     });
   });
 
@@ -123,6 +94,111 @@ describe('SubBubbleContent', () => {
       expect(contentDiv).toBeInTheDocument();
       expect(contentDiv).toHaveClass('whitespace-pre-wrap');
       expect(contentDiv).toHaveClass('custom-class');
+    });
+  });
+
+  describe('attachment 기능', () => {
+    it('attachment prop이 없으면 기존 방식으로 동작한다', () => {
+      render(<SubBubbleContent content="일반 텍스트" />);
+      
+      expect(screen.getByText('일반 텍스트')).toBeInTheDocument();
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
+    it('link 타입 attachment는 URL 변환만 수행한다', () => {
+      const linkAttachment = {
+        type: 'link' as const,
+        url: 'https://example.com',
+        title: '예제 사이트'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="확인해보세요 https://example.com" 
+          attachment={linkAttachment}
+        />
+      );
+      
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('href', 'https://example.com');
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
+    it('image 타입 attachment는 텍스트만 표시한다 (AttachmentPreview는 ChatBubble에서 분리 렌더링)', () => {
+      const imageAttachment = {
+        type: 'image' as const,
+        url: 'https://example.com/image.jpg',
+        title: '예제 이미지'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="이미지를 확인하세요" 
+          attachment={imageAttachment}
+          isTypingComplete={true}
+        />
+      );
+      
+      expect(screen.getByText('이미지를 확인하세요')).toBeInTheDocument();
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
+    it('video 타입 attachment는 텍스트만 표시한다 (AttachmentPreview는 ChatBubble에서 분리 렌더링)', () => {
+      const videoAttachment = {
+        type: 'video' as const,
+        url: 'https://example.com/video.mp4',
+        title: '예제 비디오'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="비디오를 확인하세요" 
+          attachment={videoAttachment}
+          isTypingComplete={true}
+        />
+      );
+      
+      expect(screen.getByText('비디오를 확인하세요')).toBeInTheDocument();
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
+    it('타이핑이 완료되지 않으면 image/video attachment 미리보기를 표시하지 않는다', () => {
+      const imageAttachment = {
+        type: 'image' as const,
+        url: 'https://example.com/image.jpg',
+        title: '예제 이미지'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="이미지를 확인하세요" 
+          attachment={imageAttachment}
+          isTypingComplete={false}
+        />
+      );
+      
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
+    it('(image) 텍스트 제거와 attachment 기능이 함께 동작한다', () => {
+      const imageAttachment = {
+        type: 'image' as const,
+        url: 'https://example.com/custom-image.jpg',
+        title: '커스텀 이미지'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="텍스트 내용 (image)" 
+          attachment={imageAttachment}
+          isTypingComplete={true}
+        />
+      );
+      
+      // (image) 텍스트는 제거되고 텍스트만 표시됨 (AttachmentPreview는 ChatBubble에서 분리 렌더링)
+      expect(screen.getByText('텍스트 내용')).toBeInTheDocument();
+      expect(screen.queryByText('(image)')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
     });
   });
 });
