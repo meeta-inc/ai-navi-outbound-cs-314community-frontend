@@ -4,6 +4,7 @@ import { TypewriterText } from '../../atoms/Typography';
 import { BubbleResponse, AttachmentData } from '../../../types';
 import { isIOS } from '../../../utils/device';
 import { SubBubbleContent } from './SubBubbleContent';
+import { AttachmentPreview } from './AttachmentPreview';
 
 interface ChatBubbleProps {
   content: string | React.ReactNode;
@@ -40,6 +41,56 @@ export function ChatBubble({
     : content;
 
   if (isBot) {
+    // Image/Video 첨부파일이 있는 경우 분리 렌더링
+    if (bubbleType === 'sub' && attachment && (attachment.type === 'image' || attachment.type === 'video')) {
+      return (
+        <div className="box-border content-stretch flex flex-col gap-[6px] items-start justify-start pb-0 pl-5 pr-0 pt-[3px] relative shrink-0">
+          {/* 텍스트 버블 */}
+          <div 
+            className={`${colors.bgLight} box-border content-stretch flex flex-col gap-2 max-w-[257px] px-[15px] py-2.5 relative rounded-bl-[10px] rounded-br-[10px] rounded-tr-[10px] shrink-0`}
+            data-testid={`${bubbleType}-bubble`}
+            role="article"
+            aria-label="AI 응답 메시지"
+          >
+            <div
+              className={`${colors.textSecondary} max-w-[227px] relative shrink-0 text-left meeta-text-mid-regular`}
+              data-testid="bubble-text"
+            >
+              {isTyping && typeof displayContent === 'string' ? (
+                <TypewriterText
+                  text={displayContent}
+                  speed={isIOS() ? 50 : 30}
+                  onComplete={handleTypingComplete}
+                />
+              ) : (
+                typeof displayContent === 'string' ? (
+                  <SubBubbleContent 
+                    content={displayContent} 
+                    isTypingComplete={localTypingComplete}
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap">
+                    {displayContent}
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+          
+          {/* 분리된 첨부파일 미리보기 */}
+          {localTypingComplete && (
+            <div className="max-w-[257px]">
+              <AttachmentPreview 
+                attachment={attachment}
+                className="standalone-attachment"
+              />
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 기본 통합 렌더링 (link 타입이나 attachment가 없는 경우)
     return (
       <div className="box-border content-stretch flex flex-col gap-[3px] items-start justify-start pb-0 pl-5 pr-0 pt-[3px] relative shrink-0">
         <div 
@@ -63,6 +114,7 @@ export function ChatBubble({
                 <SubBubbleContent 
                   content={displayContent} 
                   isTypingComplete={localTypingComplete}
+                  attachment={attachment}
                 />
               ) : (
                 <div className="whitespace-pre-wrap">
@@ -71,53 +123,6 @@ export function ChatBubble({
               )
             )}
           </div>
-          
-          {/* 첨부파일 렌더링 */}
-          {attachment && (
-            <div className="mt-2">
-              {attachment.type === 'link' && (
-                <a 
-                  href={attachment.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${colors.text} underline hover:no-underline meeta-text-mid-regular`}
-                >
-                  {attachment.title || '링크 보기'}
-                </a>
-              )}
-              
-              {attachment.type === 'image' && (
-                <img 
-                  src={attachment.thumbnail || attachment.url}
-                  alt={attachment.title || '첨부 이미지'}
-                  className="rounded-md max-w-full h-auto cursor-pointer"
-                  onClick={() => window.open(attachment.url, '_blank')}
-                />
-              )}
-              
-              {attachment.type === 'video' && (
-                <video 
-                  src={attachment.url}
-                  controls
-                  className="rounded-md max-w-full h-auto"
-                  poster={attachment.thumbnail}
-                >
-                  <track kind="captions" />
-                </video>
-              )}
-              
-              {attachment.type === 'file' && (
-                <a 
-                  href={attachment.url}
-                  download
-                  className={`${colors.text} underline hover:no-underline meeta-text-mid-regular flex items-center gap-1`}
-                >
-                  <span>📎</span>
-                  {attachment.title || '파일 다운로드'}
-                </a>
-              )}
-            </div>
-          )}
         </div>
       </div>
     );
