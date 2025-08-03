@@ -177,15 +177,15 @@ export const LLMMainBubbleWithLongText: Story = {
 // 첨부파일이 포함된 버블 스토리
 export const BubbleWithLinkAttachment: Story = {
   args: {
-    content: '문법 가이드를 확인해보세요.',
+    content: '詳しい文法ガイドをご確認ください。 https://example.com/grammar',
     isBot: true,
     accentColor: 'orange',
     bubbleType: 'sub',
     attachment: {
       type: 'link',
       url: 'https://example.com/grammar',
-      title: '문법 가이드',
-      description: '기초 영어 문법을 학습할 수 있는 가이드입니다.'
+      title: '文法ガイド',
+      description: '基礎英語文法を学習できるガイドです。'
     },
     isTyping: false,
   },
@@ -193,15 +193,32 @@ export const BubbleWithLinkAttachment: Story = {
 
 export const BubbleWithImageAttachment: Story = {
   args: {
-    content: '교재 이미지를 확인해보세요.',
+    content: '教材画像をご確認ください。',
     isBot: true,
     accentColor: 'orange',
     bubbleType: 'sub',
     attachment: {
       type: 'image',
-      url: 'https://example.com/textbook.jpg',
-      title: '교재 표지',
-      thumbnail: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=교재+표지'
+      url: 'https://via.placeholder.com/600x400/4A90E2/FFFFFF?text=教材表紙',
+      title: '教材表紙',
+      thumbnail: 'https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=教材表紙'
+    },
+    isTyping: false,
+  },
+};
+
+export const BubbleWithImageAttachmentSeparated: Story = {
+  name: 'Image Attachment - Separated Rendering',
+  args: {
+    content: '画像が分離されて表示されます。',
+    isBot: true,
+    accentColor: 'orange',
+    bubbleType: 'sub',
+    attachment: {
+      type: 'image',
+      url: 'https://via.placeholder.com/600x400/27AE60/FFFFFF?text=分離された画像',
+      title: '分離された画像例',
+      thumbnail: 'https://via.placeholder.com/300x200/27AE60/FFFFFF?text=分離された画像'
     },
     isTyping: false,
   },
@@ -209,16 +226,34 @@ export const BubbleWithImageAttachment: Story = {
 
 export const BubbleWithVideoAttachment: Story = {
   args: {
-    content: '학습 동영상을 시청해보세요.',
+    content: '学習動画をご視聴ください。',
     isBot: true,
     accentColor: 'orange',
     bubbleType: 'sub',
     attachment: {
       type: 'video',
       url: 'https://example.com/lesson.mp4',
-      title: '영어 학습 동영상',
-      description: '기초 영어 회화를 배울 수 있는 동영상입니다.',
-      thumbnail: 'https://via.placeholder.com/300x200/E74C3C/FFFFFF?text=동영상+썸네일'
+      title: '英語学習動画',
+      description: '基礎英語会話を学べる動画です。',
+      thumbnail: 'https://via.placeholder.com/300x200/E74C3C/FFFFFF?text=動画サムネイル'
+    },
+    isTyping: false,
+  },
+};
+
+export const BubbleWithVideoAttachmentSeparated: Story = {
+  name: 'Video Attachment - Separated Rendering',
+  args: {
+    content: '動画が分離されて表示されます。',
+    isBot: true,
+    accentColor: 'orange',
+    bubbleType: 'sub',
+    attachment: {
+      type: 'video',
+      url: 'https://example.com/lesson.mp4',
+      title: '分離された動画例',
+      description: 'テキストバブルと分離されて表示される動画です。',
+      thumbnail: 'https://via.placeholder.com/300x200/9B59B6/FFFFFF?text=分離された動画'
     },
     isTyping: false,
   },
@@ -226,15 +261,15 @@ export const BubbleWithVideoAttachment: Story = {
 
 export const BubbleWithFileAttachment: Story = {
   args: {
-    content: 'PDF 자료를 다운로드해보세요.',
+    content: 'PDF資料をダウンロードしてください。',
     isBot: true,
     accentColor: 'orange',
     bubbleType: 'sub',
     attachment: {
       type: 'file',
       url: 'https://example.com/grammar-guide.pdf',
-      title: '문법 가이드.pdf',
-      description: 'PDF 형태의 상세한 문법 가이드입니다.'
+      title: '文法ガイド.pdf',
+      description: 'PDF形式の詳細な文法ガイドです。'
     },
     isTyping: false,
   },
@@ -290,29 +325,41 @@ export const SubBubbleWithMultipleURLs: Story = {
 };
 
 /**
- * 料金プラン과 (image)가 포함된 Sub Bubble 예시입니다.
- * (image) 텍스트는 제거되고 PDF 미리보기가 표시됩니다.
+ * (image) 텍스트가 포함된 Sub Bubble 예시입니다.
+ * (image) 텍스트는 제거되고 첨부파일이 있는 경우 분리 렌더링됩니다.
  */
-export const SubBubbleWithPricePlan: Story = {
+export const SubBubbleWithImageText: Story = {
   args: {
-    content: '料金プランについて詳しく見る (image)',
+    content: '画像ファイルの詳細情報です (image)',
     isBot: true,
     accentColor: 'green',
     bubbleType: 'sub',
+    attachment: {
+      type: 'image',
+      url: 'https://via.placeholder.com/600x400/2ECC71/FFFFFF?text=画像ファイル',
+      title: '画像ファイル例',
+      thumbnail: 'https://via.placeholder.com/300x200/2ECC71/FFFFFF?text=画像ファイル'
+    },
     isTyping: false,
   },
 };
 
 /**
- * 料金プラン PDF 미리보기가 타이핑 후에 나타나는 예시입니다.
- * 타이핑 애니메이션이 완료된 후 PDF 미리보기가 표시됩니다.
+ * (image) 텍스트와 타이핑 효과가 적용된 예시입니다.
+ * 타이핑 애니메이션이 완료된 후 첨부파일 미리보기가 표시됩니다.
  */
-export const SubBubbleWithPricePlanTyping: Story = {
+export const SubBubbleWithImageTextTyping: Story = {
   args: {
-    content: '料金プランの詳細はこちらです (image)',
+    content: '画像ファイルをアップロードしました (image)',
     isBot: true,
     accentColor: 'green',
     bubbleType: 'sub',
+    attachment: {
+      type: 'image',
+      url: 'https://via.placeholder.com/600x400/F39C12/FFFFFF?text=アップロード画像',
+      title: 'アップロード画像',
+      thumbnail: 'https://via.placeholder.com/300x200/F39C12/FFFFFF?text=アップロード画像'
+    },
     isTyping: true,
   },
 };

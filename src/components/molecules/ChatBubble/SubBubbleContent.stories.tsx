@@ -8,22 +8,26 @@ const meta: Meta<typeof SubBubbleContent> = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Sub Bubble 타입에서 사용되는 콘텐츠 컴포넌트입니다. URL 자동 링크 변환과 料金プラン PDF 미리보기 기능을 제공합니다.',
+        component: 'Sub Bubbleタイプで使用されるコンテンツコンポーネントです。URL自動リンク変換と添付ファイル対応機能を提供します。',
       },
     },
   },
   argTypes: {
     content: {
       control: 'text',
-      description: '표시할 텍스트 내용',
+      description: '表示するテキスト内容',
     },
     className: {
       control: 'text',
-      description: '추가 CSS 클래스',
+      description: '追加CSSクラス',
     },
     isTypingComplete: {
       control: 'boolean',
-      description: '타이핑 애니메이션 완료 여부',
+      description: 'タイピングアニメーション完了状態',
+    },
+    attachment: {
+      control: 'object',
+      description: '添付ファイルデータ',
     },
   },
 };
@@ -32,71 +36,116 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 기본 텍스트 표시입니다.
+ * 基本的なテキスト表示です。
  */
 export const Default: Story = {
   args: {
-    content: '일반 텍스트입니다.',
+    content: '一般的なテキストです。',
     isTypingComplete: true,
   },
 };
 
 /**
- * URL이 자동으로 링크로 변환되는 예시입니다.
+ * URLが自動的にリンクに変換される例です。
  */
 export const WithURL: Story = {
   args: {
-    content: '자세한 내용은 https://www.brainsgym.com/ 에서 확인하세요.',
+    content: '詳細は https://www.brainsgym.com/ でご確認ください。',
     isTypingComplete: true,
   },
 };
 
 /**
- * 여러 URL이 포함된 텍스트입니다.
+ * 複数のURLが含まれるテキストです。
  */
 export const WithMultipleURLs: Story = {
   args: {
-    content: '공식 사이트: https://example.com 문서: www.docs.example.com 지원: http://support.example.com',
+    content: '公式サイト: https://example.com ドキュメント: www.docs.example.com サポート: http://support.example.com',
     isTypingComplete: true,
   },
 };
 
 /**
- * 料金プラン과 (image)가 포함된 경우 PDF 미리보기가 표시됩니다.
+ * (image)テキストが含まれる場合、(image)部分が除去されます。
  */
-export const WithPricePlan: Story = {
+export const WithImageText: Story = {
   args: {
-    content: '料金プランについて詳しく見る (image)',
+    content: '画像ファイルの詳細情報です (image)',
     isTypingComplete: true,
   },
 };
 
 /**
- * 타이핑이 완료되지 않은 상태에서는 PDF 미리보기가 표시되지 않습니다.
+ * リンク添付ファイルの場合、URL変換のみ実行されます。
  */
-export const WithPricePlanNotComplete: Story = {
+export const WithLinkAttachment: Story = {
   args: {
-    content: '料金プランについて詳しく見る (image)',
-    isTypingComplete: false,
-  },
-};
-
-/**
- * 料金プラン과 URL이 함께 포함된 경우입니다.
- */
-export const WithPricePlanAndURL: Story = {
-  args: {
-    content: '料金プランの詳細は https://example.com/plan 에서 확인하세요 (image)',
+    content: '詳細情報は https://example.com/details をご確認ください。',
+    attachment: {
+      type: 'link',
+      url: 'https://example.com/details',
+      title: '詳細情報ページ',
+      description: '詳細な情報を確認できるページです。'
+    },
     isTypingComplete: true,
   },
 };
 
 /**
- * 커스텀 CSS 클래스가 적용된 예시입니다.
+ * 画像添付ファイルの場合、テキストのみ表示されます（AttachmentPreviewはChatBubbleで分離レンダリング）。
+ */
+export const WithImageAttachment: Story = {
+  args: {
+    content: '画像をご確認ください。',
+    attachment: {
+      type: 'image',
+      url: 'https://via.placeholder.com/600x400/3498DB/FFFFFF?text=画像サンプル',
+      title: '画像サンプル',
+      thumbnail: 'https://via.placeholder.com/300x200/3498DB/FFFFFF?text=画像サンプル'
+    },
+    isTypingComplete: true,
+  },
+};
+
+/**
+ * 動画添付ファイルの場合、テキストのみ表示されます（AttachmentPreviewはChatBubbleで分離レンダリング）。
+ */
+export const WithVideoAttachment: Story = {
+  args: {
+    content: '学習動画をご視聴ください。',
+    attachment: {
+      type: 'video',
+      url: 'https://example.com/lesson.mp4',
+      title: '学習動画',
+      description: '英語学習のための動画です。',
+      thumbnail: 'https://via.placeholder.com/300x200/E74C3C/FFFFFF?text=動画サムネイル'
+    },
+    isTypingComplete: true,
+  },
+};
+
+/**
+ * (image)テキスト除去と添付ファイル機能が組み合わされた例です。
+ */
+export const WithImageTextAndAttachment: Story = {
+  args: {
+    content: '画像ファイルをアップロードしました (image)',
+    attachment: {
+      type: 'image',
+      url: 'https://via.placeholder.com/600x400/2ECC71/FFFFFF?text=アップロード画像',
+      title: 'アップロード画像',
+      thumbnail: 'https://via.placeholder.com/300x200/2ECC71/FFFFFF?text=アップロード画像'
+    },
+    isTypingComplete: true,
+  },
+};
+
+/**
+ * カスタムCSSクラスが適用された例です。
  */
 export const WithCustomClass: Story = {
   args: {
-    content: 'CSS 클래스가 적용된 텍스트입니다.',
+    content: 'CSSクラスが適用されたテキストです。',
     className: 'text-blue-600 font-bold',
     isTypingComplete: true,
   },
