@@ -134,7 +134,9 @@ export function LLMResponseGroup({
   };
 
   // 에러 조건 체크: HTTP 상태코드가 200이 아니거나 응답이 빈 배열인 경우
-  const isError = (response.status !== undefined && response.status !== 200) || (!isStreaming && (!response.response || response.response.length === 0));
+  // status가 undefined인 경우는 정상으로 처리 (기본값 200)
+  const status = response.status ?? 200;
+  const isError = (status !== 200) || (!isStreaming && (!response.response || response.response.length === 0));
   
   // 에러 상황일 때 에러 메시지 표시
   if (isError) {
