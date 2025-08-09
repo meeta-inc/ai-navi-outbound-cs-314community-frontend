@@ -85,17 +85,23 @@ jest.mock('../locales/en/common.json', () => ({
 jest.mock('../hooks/useChat', () => ({
   useChat: () => ({
     messages: [],
+    setMessages: jest.fn(),
     newMessage: '',
     setNewMessage: jest.fn(),
     isTyping: false,
+    setIsTyping: jest.fn(),
     currentlyTyping: null,
+    streamingBubbles: [],
+    setStreamingBubbles: jest.fn(),
     messagesEndRef: { current: null },
     chatContainerRef: { current: null },
     handleSendMessage: jest.fn(),
     completeTyping: jest.fn(),
     addWelcomeMessage: jest.fn(),
     addTypingBotMessage: jest.fn(),
-    addUserMessage: jest.fn()
+    addUserMessage: jest.fn(),
+    addBotMessage: jest.fn(),
+    scrollToBottom: jest.fn()
   })
 }));
 
@@ -311,17 +317,23 @@ describe('MainPage 컴포넌트', () => {
       const originalUseChat = require('../hooks/useChat').useChat;
       const mockUseChat = jest.fn(() => ({
         messages: [],
+        setMessages: jest.fn(),
         newMessage: '',
         setNewMessage: jest.fn(),
         isTyping: true, // 타이핑 중 상태
+        setIsTyping: jest.fn(),
         currentlyTyping: null,
+        streamingBubbles: [],
+        setStreamingBubbles: jest.fn(),
         messagesEndRef: { current: null },
         chatContainerRef: { current: null },
         handleSendMessage: jest.fn(),
         completeTyping: jest.fn(),
         addWelcomeMessage: jest.fn(),
         addTypingBotMessage: jest.fn(),
-        addUserMessage: jest.fn()
+        addUserMessage: jest.fn(),
+        addBotMessage: jest.fn(),
+        scrollToBottom: jest.fn()
       }));
 
       require('../hooks/useChat').useChat = mockUseChat;
