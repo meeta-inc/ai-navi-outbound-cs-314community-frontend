@@ -69,6 +69,7 @@ const basicResponse: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -122,6 +123,7 @@ const responseWithAttachments: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -150,6 +152,7 @@ const singleBubbleResponse: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -180,6 +183,7 @@ const longTextResponse: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -246,6 +250,7 @@ const allAttachmentTypesResponse: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -346,6 +351,7 @@ const thirdResponseForCTA: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
