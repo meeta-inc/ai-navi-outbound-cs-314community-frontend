@@ -276,6 +276,7 @@ const llmResponseExample: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
@@ -312,11 +313,12 @@ const llmResponseWithAttachments: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: 'study_materials'
 };
 
 // LLM 응답 스토리들
-export const LLMResponse: Story = {
+export const LLMResponseStory: Story = {
   args: {
     message: {
       id: 'llm-1',
@@ -433,6 +435,7 @@ const llmResponseForCTA: LLMResponse = {
       attachment: null
     }
   ],
+  status: 200,
   tool: null
 };
 
