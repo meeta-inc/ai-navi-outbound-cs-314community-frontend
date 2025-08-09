@@ -33,7 +33,7 @@ export function ChatBubble({
   const handleTypingComplete = React.useCallback(() => {
     setLocalTypingComplete(true);
     onTypingComplete?.();
-  }, [onTypingComplete]);
+  }, [onTypingComplete, bubbleType]);
   
   // 150자 제한 (main 타입일 때만)
   const displayContent = bubbleType === 'main' && typeof content === 'string' && content.length > 150 

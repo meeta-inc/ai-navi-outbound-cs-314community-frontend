@@ -14,6 +14,9 @@ interface LLMResponseGroupProps {
   onSubCTAClick?: () => void;
   showCTAAfterComplete?: boolean; // 모든 버블 완료 후 CTA 표시 여부
   onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
+  streamingBubbles?: any[]; // 스트리밍 모드에서 실시간으로 받은 버블들
+  isStreaming?: boolean; // 스트리밍 모드 여부
+  setIsTyping?: (isTyping: boolean) => void; // 스트리밍 모드에서 타이핑 상태 제어
 }
 
 export function LLMResponseGroup({ 
@@ -24,32 +27,76 @@ export function LLMResponseGroup({
   onMainCTAClick,
   onSubCTAClick,
   showCTAAfterComplete = false,
-  onCTADisplayed
+  onCTADisplayed,
+  streamingBubbles = [],
+  isStreaming = false,
+  setIsTyping
 }: LLMResponseGroupProps) {
   const [currentBubbleIndex, setCurrentBubbleIndex] = useState(0);
   const [completedBubbles, setCompletedBubbles] = useState<number[]>([]);
   const [allBubblesCompleted, setAllBubblesCompleted] = useState(false);
   
+  // 스트리밍 모드일 때는 streamingBubbles 사용, 아니면 response.response 사용
+  const bubblesData = isStreaming ? streamingBubbles : response.response;
+  
   // 각 버블의 타이핑 완료 처리
   const handleBubbleComplete = (index: number) => {
     setCompletedBubbles(prev => [...prev, index]);
     
-    // 다음 버블로 이동
-    if (index < response.response.length - 1) {
-      setCurrentBubbleIndex(index + 1);
-    } else {
-      // 모든 버블 완료
-      setAllBubblesCompleted(true);
-      // CTA가 표시될 예정이면 스크롤 콜백 호출
-      if (showCTAAfterComplete) {
+    // 스트리밍 모드에서는 버블이 대기 중인 경우에만 다음으로 진행
+    if (isStreaming) {
+      // 현재 버블이 완료되고, 대기 중인 다음 버블이 있으면 진행
+      if (index < bubblesData.length - 1) {
+        // 다음 버블의 타이핑 시작
         setTimeout(() => {
-          if (onCTADisplayed) {
-            onCTADisplayed();
+          setCurrentBubbleIndex(index + 1);
+        }, 100); // 약간의 지연으로 자연스러운 전환
+      } else {
+        // 모든 버블 완료
+        setAllBubblesCompleted(true);
+        
+        // 스트리밍 모드에서 타이핑 완료 처리
+        if (isStreaming) {
+          // 최종 메시지 생성을 위해 onComplete 호출
+          if (onComplete) {
+            onComplete();
           }
-        }, 100); // CTA 렌더링 후 스크롤
+          
+          // setIsTyping을 false로 설정
+          if (setIsTyping) {
+            setIsTyping(false);
+          }
+        } else if (onComplete) {
+          onComplete();
+        }
+        
+        if (showCTAAfterComplete) {
+          setTimeout(() => {
+            if (onCTADisplayed) {
+              onCTADisplayed();
+            }
+          }, 100);
+        }
       }
-      if (onComplete) {
-        onComplete();
+    } else {
+      // 기존 모드: 다음 버블로 이동
+      if (index < bubblesData.length - 1) {
+        setTimeout(() => {
+          setCurrentBubbleIndex(index + 1);
+        }, 100);
+      } else {
+        // 모든 버블 완료
+        setAllBubblesCompleted(true);
+        if (showCTAAfterComplete) {
+          setTimeout(() => {
+            if (onCTADisplayed) {
+              onCTADisplayed();
+            }
+          }, 100);
+        }
+        if (onComplete) {
+          onComplete();
+        }
       }
     }
   };
@@ -57,8 +104,8 @@ export function LLMResponseGroup({
   // 타이핑 비활성화시 모든 버블 즉시 표시
   useEffect(() => {
     if (!enableTyping) {
-      setCurrentBubbleIndex(response.response.length - 1);
-      setCompletedBubbles(response.response.map((_, i) => i));
+      setCurrentBubbleIndex(bubblesData.length - 1);
+      setCompletedBubbles(bubblesData.map((_, i) => i));
       // 타이핑 비활성화인 경우 즉시 완료 상태로 설정
       setAllBubblesCompleted(true);
       // CTA가 표시될 예정이면 스크롤 콜백 호출
@@ -70,7 +117,9 @@ export function LLMResponseGroup({
         }, 100); // CTA 렌더링 후 스크롤
       }
     }
-  }, [enableTyping, response.response.length, showCTAAfterComplete]);
+  }, [enableTyping, bubblesData.length, showCTAAfterComplete]);
+
+  // 스트리밍 모드에서 새 버블이 추가될 때 대기열에 추가만 하고, 타이핑 완료 시에만 다음으로 진행
 
   const handleMainCTA = () => {
     if (onMainCTAClick) {
@@ -85,7 +134,7 @@ export function LLMResponseGroup({
   };
 
   // 에러 조건 체크: HTTP 상태코드가 200이 아니거나 응답이 빈 배열인 경우
-  const isError = (response.status !== undefined && response.status !== 200) || !response.response || response.response.length === 0;
+  const isError = (response.status !== undefined && response.status !== 200) || (!isStreaming && (!response.response || response.response.length === 0));
   
   // 에러 상황일 때 에러 메시지 표시
   if (isError) {
@@ -105,25 +154,26 @@ export function LLMResponseGroup({
 
   return (
     <div className="flex flex-col gap-1">
-      {response.response.map((bubble, index) => {
+      {bubblesData.map((bubble, index) => {
         // 현재 인덱스까지의 버블만 표시
         if (index > currentBubbleIndex && enableTyping) {
           return null;
         }
         
-        // 현재 버블이거나 이미 완료된 버블인지 확인
+        // 타이핑 조건 간소화: 현재 버블이고 아직 완료되지 않았으면 타이핑
         const isCurrentBubble = index === currentBubbleIndex;
         const isCompleted = completedBubbles.includes(index);
+        const shouldType = enableTyping && isCurrentBubble && !isCompleted;
         
         return (
           <ChatBubble
-            key={index}
+            key={`${isStreaming ? 'streaming' : 'static'}-${index}`}
             content={bubble.text}
             isBot={true}
             accentColor={accentColor}
             bubbleType={bubble.type}
             attachment={bubble.attachment}
-            isTyping={enableTyping && isCurrentBubble && !isCompleted}
+            isTyping={shouldType}
             onTypingComplete={() => handleBubbleComplete(index)}
           />
         );

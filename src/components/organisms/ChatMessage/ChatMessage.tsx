@@ -18,6 +18,10 @@ interface ChatMessageProps {
   onMainCTAClick?: () => void;
   onSubCTAClick?: () => void;
   onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
+  // 스트리밍 관련 props
+  streamingBubbles?: any[];
+  isStreaming?: boolean;
+  setIsTyping?: (isTyping: boolean) => void; // 스트리밍 모드에서 타이핑 상태 제어
 }
 
 export function ChatMessage({ 
@@ -30,7 +34,10 @@ export function ChatMessage({
   showCTAAfterComplete = false,
   onMainCTAClick,
   onSubCTAClick,
-  onCTADisplayed
+  onCTADisplayed,
+  streamingBubbles = [],
+  isStreaming = false,
+  setIsTyping
 }: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
@@ -42,10 +49,10 @@ export function ChatMessage({
       <div className="box-border content-stretch flex flex-col items-start justify-start max-w-[287px] p-0 relative shrink-0 w-[287px]">
         {!hideAvatar && <UserAvatar accentColor={accentColor} />}
         
-        {/* LLM 응답이 있으면 LLMResponseGroup 사용, 없으면 기존 ChatBubble 사용 */}
-        {llmResponse ? (
+        {/* LLM 응답이 있으면 LLMResponseGroup 사용, 스트리밍 모드면 streamingBubbles 전달, 없으면 기존 ChatBubble 사용 */}
+        {(llmResponse || isStreaming) ? (
           <LLMResponseGroup
-            response={llmResponse}
+            response={llmResponse || { response: [], status: 200 }}
             accentColor={accentColor}
             enableTyping={enableLLMTyping && isTyping}
             onComplete={onTypingComplete}
@@ -53,6 +60,9 @@ export function ChatMessage({
             onMainCTAClick={onMainCTAClick}
             onSubCTAClick={onSubCTAClick}
             onCTADisplayed={onCTADisplayed}
+            streamingBubbles={streamingBubbles}
+            isStreaming={isStreaming}
+            setIsTyping={setIsTyping}
           />
         ) : (
           <ChatBubble

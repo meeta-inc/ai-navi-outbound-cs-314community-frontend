@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Download } from 'lucide-react';
-import { sendChatMessage } from '../services/api/chat';
+import { sendChatMessage, StreamingCallbacks } from '../services/api/chat';
 import { getColorClasses } from '../shared/config/theme.config';
 import { getAccentColor } from "../shared/config/app.config";
 import { isIOS } from '../utils/device';
@@ -11,6 +11,7 @@ interface UseChatOptions {
   gradeId?: string;
   onError?: (error: Error) => void;
   onTypingComplete?: () => void;
+  enableStreaming?: boolean; // 스트리밍 활성화 옵션
 }
 
 interface ProcessedChatResponse {
@@ -21,11 +22,12 @@ interface ProcessedChatResponse {
   messageId?: string; // 미리 생성된 메시지 ID 저장용
 }
 
-export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatOptions) {
+export function useChat({ userId, gradeId, onError, onTypingComplete, enableStreaming = false }: UseChatOptions) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [currentlyTyping, setCurrentlyTyping] = useState<ProcessedChatResponse | null>(null);
+  const [streamingBubbles, setStreamingBubbles] = useState<any[]>([]); // 스트리밍으로 받은 버블들
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const shouldScrollRef = useRef<boolean>(true);
@@ -94,12 +96,16 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
   const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
     try {
       const response = await sendChatMessage(messageContent || newMessage, userId, gradeId);
-      return {
-        message: response.response,
-        toolName: response.tool?.name,
-        toolInput: response.tool?.input,
-        llmResponse: response.llmResponse
-      };
+      if (response) {
+        return {
+          message: response.response,
+          toolName: response.tool?.name,
+          toolInput: response.tool?.input,
+          llmResponse: response.llmResponse
+        };
+      } else {
+        throw new Error('No response received');
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       if (onError) {
@@ -123,7 +129,40 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
     setMessages(prev => [...prev, userMessage]);
     setNewMessage('');
     setIsTyping(true);
+    setStreamingBubbles([]); // 스트리밍 버블 초기화
 
+    try {
+      if (enableStreaming) {
+        // 스트리밍 모드
+        await sendChatMessage(content, userId, gradeId, {
+          enableStreaming: true,
+          callbacks: {
+            onBubble: (bubble) => {
+              setStreamingBubbles(prev => [...prev, bubble]);
+            },
+            onComplete: () => {
+              // 스트리밍 완료 시 - 아직 버블은 유지하고 타이핑 애니메이션 계속 진행
+              // 메시지는 나중에 타이핑 완료 후 추가
+            },
+            onError: (error) => {
+              console.error('Streaming error:', error);
+              // 스트리밍 실패 시 기존 API로 폴백
+              handleFallbackMessage(content);
+            }
+          }
+        });
+      } else {
+        // 기존 방식
+        await handleFallbackMessage(content);
+      }
+    } catch (error) {
+      console.error('Error in handleSendMessage:', error);
+      await handleFallbackMessage(content);
+    }
+  };
+
+  // 폴백 메시지 처리 (기존 방식)
+  const handleFallbackMessage = async (content: string) => {
     try {
       const response = await sendMessage(content);
       
@@ -278,10 +317,14 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
 
   return {
     messages,
+    setMessages,
     newMessage,
     setNewMessage,
     isTyping,
+    setIsTyping, // 스트리밍 모드에서 타이핑 상태 제어용 추가
     currentlyTyping,
+    streamingBubbles, // 스트리밍 버블 상태 추가
+    setStreamingBubbles, // 스트리밍 버블 상태 설정 함수 추가
     messagesEndRef,
     chatContainerRef,
     handleSendMessage,

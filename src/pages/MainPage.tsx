@@ -52,10 +52,14 @@ function MainPage() {
 
   const {
     messages,
+    setMessages,
     newMessage,
     setNewMessage,
     isTyping,
+    setIsTyping,
     currentlyTyping,
+    streamingBubbles,
+    setStreamingBubbles,
     messagesEndRef,
     chatContainerRef,
     handleSendMessage,
@@ -66,6 +70,7 @@ function MainPage() {
   } = useChat({
     userId: 'Hyunse0001', // 실제 사용자 ID
     gradeId: selectedGrade || 'high', // 선택된 학년 또는 기본값
+    enableStreaming: true, // 스트리밍 모드 활성화
     onError: (error) => {
       console.error('Chat error:', error);
     },
@@ -487,7 +492,43 @@ function MainPage() {
             );
           })}
           
-          {currentlyTyping && (
+          {/* 스트리밍 진행 중일 때 실시간 버블 표시 */}
+          {streamingBubbles.length > 0 && isTyping && (
+            <ChatMessage
+              message={{
+                id: 'streaming',
+                type: 'bot',
+                content: '',
+                timestamp: new Date()
+              }}
+              isTyping={true}
+              hideAvatar={messages.some(m => m.type === 'bot')}
+              streamingBubbles={streamingBubbles}
+              isStreaming={true}
+              setIsTyping={setIsTyping}
+              onTypingComplete={() => {
+                // 타이핑 완료 후 최종 메시지 생성
+                const current = streamingBubbles;
+                if (current.length > 0) {
+                  const botMessage = {
+                    id: Date.now().toString(),
+                    type: 'bot' as const,
+                    content: '',
+                    timestamp: new Date(),
+                    llmResponse: {
+                      response: current,
+                      status: 200
+                    }
+                  };
+                  setMessages(prev => [...prev, botMessage]);
+                  setStreamingBubbles([]);
+                }
+              }}
+            />
+          )}
+
+          {/* 기존 타이핑 메시지 (스트리밍이 아닌 경우) */}
+          {currentlyTyping && streamingBubbles.length === 0 && (
             <ChatMessage
               message={{
                 id: 'typing',
@@ -503,7 +544,7 @@ function MainPage() {
             />
           )}
           
-          {isTyping && !currentlyTyping && (
+          {isTyping && !currentlyTyping && streamingBubbles.length === 0 && (
             <TypingIndicator accentColor={accentColor} />
           )}
           <div ref={messagesEndRef} />
