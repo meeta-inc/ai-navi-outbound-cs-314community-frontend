@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { AttachmentPreview } from './AttachmentPreview';
+import React from 'react';
+import { AttachmentData } from '../../../types';
 
 interface SubBubbleContentProps {
   content: string;
   className?: string;
   isTypingComplete?: boolean;
+  attachment?: AttachmentData | null;
 }
 
-export function SubBubbleContent({ content, className, isTypingComplete = true }: SubBubbleContentProps) {
-  const [showPreview, setShowPreview] = useState(false);
-  
-  // 料金プラン + (image) 조건 체크
-  const hasPricePlanImage = content.includes('料金プラン') && content.includes('(image)');
-  
-  // 타이핑 완료 시 미리보기 표시
-  useEffect(() => {
-    if (hasPricePlanImage && isTypingComplete) {
-      setShowPreview(true);
-    }
-  }, [hasPricePlanImage, isTypingComplete]);
-  
+export function SubBubbleContent({ content, className, isTypingComplete = true, attachment }: SubBubbleContentProps) {
   // (image) 텍스트 제거
-  const processedContent = hasPricePlanImage 
+  const processedContent = content.includes('(image)') 
     ? content.replace('(image)', '').trim()
     : content;
+
   // URL을 감지하고 링크로 변환하는 함수
   const convertUrlsToLinks = (text: string): React.ReactNode[] => {
     // URL 패턴 정규식 (http://, https://, www. 로 시작하는 URL 감지)
@@ -66,17 +56,29 @@ export function SubBubbleContent({ content, className, isTypingComplete = true }
     return parts.length > 0 ? parts : [text];
   };
 
+  // attachment type에 따른 렌더링 분기
+  if (attachment) {
+    if (attachment.type === 'link') {
+      // link 타입: URL 변환만 수행
+      return (
+        <div className={`whitespace-pre-wrap ${className || ''}`}>
+          {convertUrlsToLinks(processedContent)}
+        </div>
+      );
+    } else if (attachment.type === 'image' || attachment.type === 'video') {
+      // image/video 타입: 텍스트만 표시 (AttachmentPreview는 ChatBubble에서 분리 렌더링)
+      return (
+        <div className={`whitespace-pre-wrap ${className || ''}`}>
+          {convertUrlsToLinks(processedContent)}
+        </div>
+      );
+    }
+  }
+
+  // attachment가 없는 기본 처리
   return (
-    <>
-      <div className={`whitespace-pre-wrap ${className || ''}`}>
-        {convertUrlsToLinks(processedContent)}
-      </div>
-      {hasPricePlanImage && showPreview && (
-        <AttachmentPreview 
-          pdfUrl="https://www.314community.com/wp-content/uploads/2025/02/kobetsu314-hschool_fees-plan2025.pdf"
-          className="mt-2"
-        />
-      )}
-    </>
+    <div className={`whitespace-pre-wrap ${className || ''}`}>
+      {convertUrlsToLinks(processedContent)}
+    </div>
   );
 }

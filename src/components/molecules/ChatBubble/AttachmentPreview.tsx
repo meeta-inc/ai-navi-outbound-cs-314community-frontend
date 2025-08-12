@@ -1,50 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { PDFLightbox } from './PDFLightbox';
-import { getCachedPDFThumbnail } from '../../../utils/pdfThumbnail';
-import pricePlanImage from '../../../assets/thumbnail/priceplan.png';
+import React, { useState } from 'react';
+import { AttachmentData } from '../../../types';
+import { ImageLightbox } from './ImageLightbox';
 
 interface AttachmentPreviewProps {
-  pdfUrl: string;
+  attachment: AttachmentData;
   className?: string;
 }
 
-export function AttachmentPreview({ pdfUrl, className = '' }: AttachmentPreviewProps) {
+export function AttachmentPreview({ attachment, className = '' }: AttachmentPreviewProps) {
   const [showLightbox, setShowLightbox] = useState(false);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // PDF 썸네일 생성
-  useEffect(() => {
-    const generateThumbnail = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const thumbnail = await getCachedPDFThumbnail(pdfUrl);
-        setThumbnailUrl(thumbnail);
-      } catch (err) {
-        console.error('PDF 썸네일 생성 실패:', err);
-        setError('썸네일을 생성할 수 없습니다');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    generateThumbnail();
-  }, [pdfUrl]);
 
   const handleClick = () => {
-    setShowLightbox(true);
+    if (attachment.type === 'image') {
+      setShowLightbox(true);
+    } else {
+      // 비디오나 다른 타입의 경우 (추후 구현)
+      console.log('Attachment clicked:', attachment);
+    }
   };
 
-  const handleClose = () => {
+  const handleCloseLightbox = () => {
     setShowLightbox(false);
   };
 
   return (
     <>
       <div 
-        className={`sub-bubble-attachment-preview ${className}`}
+        className={`w-full h-32 cursor-pointer rounded-md border border-gray-200 ${className}`}
         onClick={handleClick}
         role="button"
         tabIndex={0}
@@ -53,43 +35,29 @@ export function AttachmentPreview({ pdfUrl, className = '' }: AttachmentPreviewP
             handleClick();
           }
         }}
-        aria-label="料金プランPDFのプレビュー。クリックで拡大表示"
+        aria-label={`${attachment.title || '添付ファイル'}プレビュー。クリックして拡大`}
       >
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500 mb-1"></div>
-            <span className="text-xs">로딩중...</span>
-          </div>
-        ) : error || !thumbnailUrl ? (
-          <div className="relative w-full h-full overflow-hidden rounded-md">
-            <img 
-              src={pricePlanImage} 
-              alt="料金プラン 기본 썸네일"
-              className="w-full h-full object-cover"
-            />
+        <div className="relative w-full h-full overflow-hidden rounded-md">
+          <img 
+            src={attachment.thumbnail || attachment.url} 
+            alt={`${attachment.title || '添付ファイル'}プレビュー`}
+            className="w-full h-full object-cover"
+          />
+          {attachment.title && (
             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs py-1 px-2">
-              料金プラン
+              {attachment.title}
             </div>
-          </div>
-        ) : (
-          <div className="relative w-full h-full overflow-hidden rounded-md">
-            <img 
-              src={thumbnailUrl} 
-              alt="料金プラン PDF 미리보기"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs py-1 px-2">
-              料金プラン
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       
-      {showLightbox && (
-        <PDFLightbox 
-          pdfUrl={pdfUrl}
+      {/* 이미지 라이트박스 */}
+      {attachment.type === 'image' && (
+        <ImageLightbox
+          imageUrl={attachment.url}
           isOpen={showLightbox}
-          onClose={handleClose}
+          onClose={handleCloseLightbox}
+          title={attachment.title}
         />
       )}
     </>
