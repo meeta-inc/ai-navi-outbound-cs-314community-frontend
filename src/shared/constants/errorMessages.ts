@@ -17,7 +17,7 @@ export const ERROR_MESSAGES = {
   /**
    * 한국어 번역 버전 (필요시 사용)
    */
-  LLM_TEMPORARY_ERROR_KO: '죄송합니다😭일시적인 오류가 발생하고 있습니다. 한번 채팅을 닫고 다시 시도해주세요.',
+  LLM_TEMPORARY_ERROR_KO: '申し訳ありません😭一時的なエラーが発生しています。一度チャットを閉じてから再度お試しください。',
 } as const;
 
 /**
