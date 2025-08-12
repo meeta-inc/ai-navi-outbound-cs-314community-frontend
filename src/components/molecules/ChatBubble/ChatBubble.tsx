@@ -50,7 +50,7 @@ export function ChatBubble({
             className={`${colors.bgLight} box-border content-stretch flex flex-col gap-2 max-w-[257px] px-[15px] py-2.5 relative rounded-bl-[10px] rounded-br-[10px] rounded-tr-[10px] shrink-0`}
             data-testid={`${bubbleType}-bubble`}
             role="article"
-            aria-label="AI 응답 메시지"
+            aria-label="AI応答メッセージ"
           >
             <div
               className={`${colors.textSecondary} max-w-[227px] relative shrink-0 text-left meeta-text-mid-regular`}
@@ -97,7 +97,7 @@ export function ChatBubble({
           className={`${colors.bgLight} box-border content-stretch flex flex-col gap-2 max-w-[257px] px-[15px] py-2.5 relative rounded-bl-[10px] rounded-br-[10px] rounded-tr-[10px] shrink-0`}
           data-testid={`${bubbleType}-bubble`}
           role="article"
-          aria-label="AI 응답 메시지"
+          aria-label="AI応答メッセージ"
         >
           <div
             className={`${colors.textSecondary} max-w-[227px] relative shrink-0 text-left meeta-text-mid-regular`}
