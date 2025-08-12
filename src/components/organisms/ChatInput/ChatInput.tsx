@@ -117,7 +117,7 @@ export function ChatInput({
             ? 'cursor-not-allowed' 
             : `${colors.backgroundHover} hover:text-white group`
         }`}
-        aria-label="메뉴"
+        aria-label="メニュー"
       >
         <CategoryIcon className={`w-6 h-6 transition-colors ${
           disabled 
