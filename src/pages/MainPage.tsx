@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useLocale } from '../contexts/LocaleContext';
+import { useClientConfig } from '../contexts/ClientConfigContext';
 import { ChatLayout } from '../components/templates/ChatLayout';
 import { NavigationHeader } from '../components/organisms/NavigationHeader';
 import { ChatMessage } from '../components/organisms/ChatMessage';
@@ -21,6 +22,7 @@ import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/g
 
 function MainPage() {
   const { t, isLoading } = useLocale();
+  const { clientId, appId, clientName, schoolName } = useClientConfig(); // Context에서 설정값 가져오기
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
   const showNavigationHeader = getShowNavigationHeader();
@@ -66,6 +68,8 @@ function MainPage() {
   } = useChat({
     userId: 'Hyunse0001', // 실제 사용자 ID
     gradeId: selectedGrade || 'high', // 선택된 학년 또는 기본값
+    clientId, // 쿼리 파라미터에서 받은 clientId
+    appId, // 쿼리 파라미터에서 받은 appId
     onError: (error) => {
       console.error('Chat error:', error);
     },
@@ -112,12 +116,12 @@ function MainPage() {
   useEffect(() => {
     // 번역이 로드되고 초기화가 아직 되지 않았을 때만 welcome 메시지 추가
     if (!isLoading && !isInitialized.current) {
-      const schoolName = t('chat.schoolName');
+      // 동적 school_name 사용
       const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
       addWelcomeMessage(welcomeMessage);
       isInitialized.current = true;
     }
-  }, [t, addWelcomeMessage, isLoading]);
+  }, [t, addWelcomeMessage, isLoading, schoolName]);
 
   // 최신 LLM 응답 메시지 ID 업데이트
   useEffect(() => {
@@ -359,10 +363,12 @@ function MainPage() {
         showNavigationHeader={showNavigationHeader}
         header={
           <NavigationHeader 
-            title={t('common.home')} 
+            title={`${clientName}CS AI Navi`} 
             accentColor={accentColor}
             showDynamicHeader={true}
-            clientId="default"
+            clientId={clientId}
+            clientName={clientName}
+            schoolName={schoolName}
             onHeaderAction={(action: any) => {
               if (action.type === 'close') {
                 console.log('Header close action triggered');
@@ -416,7 +422,10 @@ function MainPage() {
               {index === 1 && message.type === 'bot' && showGradeSelectionComponent && showGradeSelection && 
                !messages.some(msg => msg.content === 'もどる') && (
                 <div className="mt-4">
-                  <GradeSelection onGradeSelect={handleGradeSelect} />
+                  <GradeSelection 
+                    onGradeSelect={handleGradeSelect} 
+                    clientId={clientId}
+                  />
                 </div>
               )}
               
@@ -424,7 +433,10 @@ function MainPage() {
               {message.type === 'user' && message.content === 'もどる' && showGradeSelectionComponent && 
                index === messages.length - 1 && (
                 <div className="mt-4">
-                  <GradeSelection onGradeSelect={handleGradeSelect} />
+                  <GradeSelection 
+                    onGradeSelect={handleGradeSelect}
+                    clientId={clientId}
+                  />
                 </div>
               )}
               

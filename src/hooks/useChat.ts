@@ -9,6 +9,8 @@ import type { Message, LLMResponse } from '../types';
 interface UseChatOptions {
   userId: string;
   gradeId?: string;
+  clientId?: string;
+  appId?: string;
   onError?: (error: Error) => void;
   onTypingComplete?: () => void;
 }
@@ -21,7 +23,7 @@ interface ProcessedChatResponse {
   messageId?: string; // 미리 생성된 메시지 ID 저장용
 }
 
-export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatOptions) {
+export function useChat({ userId, gradeId, clientId, appId, onError, onTypingComplete }: UseChatOptions) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -93,7 +95,7 @@ export function useChat({ userId, gradeId, onError, onTypingComplete }: UseChatO
 
   const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
     try {
-      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId);
+      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId, clientId, appId);
       return {
         message: response.response,
         toolName: response.tool?.name,
