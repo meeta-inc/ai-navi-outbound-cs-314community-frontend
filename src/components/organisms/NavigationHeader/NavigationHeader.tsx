@@ -12,6 +12,8 @@ interface NavigationHeaderProps {
   title: string;
   accentColor?: AccentColor;
   clientId?: string;
+  clientName?: string;
+  schoolName?: string;
   showLogo?: boolean;
   showDynamicHeader?: boolean;
   onHeaderAction?: (action: HeaderAction) => void;
@@ -20,6 +22,8 @@ interface NavigationHeaderProps {
 export default function NavigationHeader({ 
   accentColor: propAccentColor, 
   clientId = 'default',
+  clientName,
+  schoolName,
   showLogo = true,
   showDynamicHeader = false,
   onHeaderAction
@@ -76,12 +80,18 @@ export default function NavigationHeader({
                 <ArrowLeft className="w-6 h-6" />
               </button>
             )}
-            {showLogo && (
+            {showLogo && schoolName && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   <span className={`text-2xl font-bold ${colors.accent}`}>∞</span>
-                  <span className={`text-xl font-bold ${colors.textSecondary} ml-1`}>3.14</span>
-                  <span className={`text-lg font-medium ${colors.accentSecondary} ml-1`}>community</span>
+                  {schoolName === '3.14 community' ? (
+                    <>
+                      <span className={`text-xl font-bold ${colors.textSecondary} ml-1`}>3.14</span>
+                      <span className={`text-lg font-medium ${colors.accentSecondary} ml-1`}>community</span>
+                    </>
+                  ) : (
+                    <span className={`text-xl font-bold ${colors.textSecondary} ml-1`}>{schoolName}</span>
+                  )}
                 </div>
               </div>
             )}

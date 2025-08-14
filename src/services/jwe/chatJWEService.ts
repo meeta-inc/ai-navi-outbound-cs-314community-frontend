@@ -23,12 +23,16 @@ export class ChatJWEService {
    * @param options 토큰 생성 옵션
    * @returns JWE 헤더 생성 결과
    */
-  async createChatJWEToken(options: JWETokenOptions = {}): Promise<JWEHeaderResult> {
+  async createChatJWEToken(options: JWETokenOptions & { clientId?: string; appId?: string } = {}): Promise<JWEHeaderResult> {
     try {
+      // 옵션으로 받은 clientId, appId가 있으면 사용, 없으면 인스턴스 값 사용
+      const finalClientId = options.clientId || this.clientId;
+      const finalAppId = options.appId || this.appId;
+      
       // 채팅용 페이로드 생성
       const payload: ChatJWEPayload = {
-        client_id: this.clientId,
-        app_id: this.appId,
+        client_id: finalClientId,
+        app_id: finalAppId,
         request_type: 'chat',
         userId: `chat-user-${Date.now()}`,
         sessionId: `chat-session-${Date.now()}`,
@@ -46,8 +50,8 @@ export class ChatJWEService {
       const jweService = this.jweServiceIAM;
 
       console.log('채팅 JWE 토큰 생성 시작:', {
-        client_id: this.clientId,
-        app_id: this.appId,
+        client_id: finalClientId,
+        app_id: finalAppId,
         authMode
       });
 
