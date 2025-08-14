@@ -121,6 +121,49 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
       action: 'navigate',
       url: '/demo'
     }
+  },
+  // MM000002 (名門会) 전용 설정
+  'MM000002': {
+    items: [
+      {
+        id: 'ai-faq',
+        icon: {
+          type: 'component',
+          value: 'AiChatbotIcon'
+        },
+        label: 'AI FAQ',
+        action: 'navigate',
+        url: '/faq',
+        disabled: false
+      },
+      {
+        id: 'request-materials',
+        icon: {
+          type: 'lucide',
+          value: 'FileText'
+        },
+        label: '資料請求',
+        action: 'external-link',
+        url: 'https://meimonkai.co.jp/request/',  // 名門会 자료청구 링크
+        disabled: false
+      },
+      {
+        id: 'ai-consultation',
+        icon: {
+          type: 'lucide',
+          value: 'Phone'
+        },
+        label: 'AI電話相談',
+        action: 'navigate',
+        url: '/consultation',
+        disabled: true
+      }
+    ],
+    cta: {
+      label: '無料体験に応募する',
+      action: 'external-link',
+      url: 'https://meimonkai.co.jp/request/'  // 名門会 무료체험 링크
+    }
   }
 };
 
