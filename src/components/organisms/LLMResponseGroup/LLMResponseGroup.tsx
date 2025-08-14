@@ -14,6 +14,7 @@ interface LLMResponseGroupProps {
   onSubCTAClick?: () => void;
   showCTAAfterComplete?: boolean; // 모든 버블 완료 후 CTA 표시 여부
   onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
+  clientId?: string; // clientId 추가
 }
 
 export function LLMResponseGroup({ 
@@ -24,7 +25,8 @@ export function LLMResponseGroup({
   onMainCTAClick,
   onSubCTAClick,
   showCTAAfterComplete = false,
-  onCTADisplayed
+  onCTADisplayed,
+  clientId
 }: LLMResponseGroupProps) {
   const [currentBubbleIndex, setCurrentBubbleIndex] = useState(0);
   const [completedBubbles, setCompletedBubbles] = useState<number[]>([]);
@@ -136,6 +138,7 @@ export function LLMResponseGroup({
           onMainClick={handleMainCTA}
           onSubClick={handleSubCTA}
           accentColor={accentColor}
+          clientId={clientId}
         />
       )}
     </div>

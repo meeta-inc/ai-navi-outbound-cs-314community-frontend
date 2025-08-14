@@ -9,6 +9,8 @@ import { ChatInput } from '../components/organisms/ChatInput';
 import { QuickReply } from '../components/organisms/QuickReply';
 import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
+import { MenuModal } from '../components/organisms/MenuModal';
+import { MenuService } from '../services/menuService';
 import { isIOS } from '../utils/device';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
 import { IOSViewportDebug } from '../components/molecules/IOSViewportDebug';
@@ -382,6 +384,7 @@ function MainPage() {
             onChange={setNewMessage}
             onSend={handleSendClick}
             disabled={isTyping || (showGradeSelection && !selectedGrade)}
+            clientId={clientId}
             placeholder={
               showGradeSelection && !selectedGrade 
                 ? 'まずは学年を選択してください'
@@ -409,6 +412,7 @@ function MainPage() {
                   message={message} 
                   hideAvatar={message.type === 'bot' && !isFirstBotMessage}
                   llmResponse={message.llmResponse}
+                  clientId={clientId}
                   // 최신 LLM 응답에서만 CTA 버튼 표시
                   {...(message.llmResponse ? {
                     showCTAAfterComplete: message.id === latestCTAMessageId && !hideAllCTA,
@@ -512,6 +516,7 @@ function MainPage() {
               hideAvatar={messages.some(m => m.type === 'bot')}
               llmResponse={currentlyTyping.llmResponse}
               enableLLMTyping={true}
+              clientId={clientId}
             />
           )}
           
