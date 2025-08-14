@@ -8,12 +8,13 @@ interface CTAButtonsProps {
   onSubClick: () => void;
   show: boolean;
   accentColor?: AccentColor;
+  clientId?: string;
 }
 
-export function CTAButtons({ onMainClick, onSubClick, show, accentColor }: CTAButtonsProps) {
+export function CTAButtons({ onMainClick, onSubClick, show, accentColor, clientId }: CTAButtonsProps) {
   const defaultAccentColor = getAccentColor();
   const colors = getColorClasses(accentColor || defaultAccentColor);
-  const ctaConfig = getCTAButtonsConfig();
+  const ctaConfig = getCTAButtonsConfig(clientId);
 
   if (!show) return null;
 
