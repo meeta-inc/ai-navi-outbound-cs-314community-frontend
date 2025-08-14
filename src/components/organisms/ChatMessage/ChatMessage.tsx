@@ -18,6 +18,7 @@ interface ChatMessageProps {
   onMainCTAClick?: () => void;
   onSubCTAClick?: () => void;
   onCTADisplayed?: () => void; // CTA 표시 완료 후 스크롤 콜백
+  clientId?: string; // clientId 추가
 }
 
 export function ChatMessage({ 
@@ -30,7 +31,8 @@ export function ChatMessage({
   showCTAAfterComplete = false,
   onMainCTAClick,
   onSubCTAClick,
-  onCTADisplayed
+  onCTADisplayed,
+  clientId
 }: ChatMessageProps) {
   const { locale } = useLocale();
   const accentColor = getAccentColor();
@@ -53,6 +55,7 @@ export function ChatMessage({
             onMainCTAClick={onMainCTAClick}
             onSubCTAClick={onSubCTAClick}
             onCTADisplayed={onCTADisplayed}
+            clientId={clientId}
           />
         ) : (
           <ChatBubble

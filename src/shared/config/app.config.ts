@@ -79,7 +79,27 @@ export interface CTAButtonsConfig {
   sub: CTAButtonConfig;
 }
 
-export const getCTAButtonsConfig = (): CTAButtonsConfig => {
+export const getCTAButtonsConfig = (clientId?: string): CTAButtonsConfig => {
+  // MM000002 (名門会) 전용 설정
+  if (clientId === 'MM000002') {
+    return {
+      main: {
+        title: "資料請求する",
+        action: {
+          type: "link",
+          detail: "https://meimonkai.co.jp/request/"  // 名門会 자료청구 링크
+        }
+      },
+      sub: {
+        title: "もう少し質問する",
+        action: {
+          type: "FAQ",
+          detail: ""
+        }
+      }
+    };
+  }
+  
   const ctaButtonsConfig = import.meta.env.VITE_CTA_BUTTONS;
   
   try {
