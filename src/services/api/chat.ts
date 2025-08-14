@@ -29,11 +29,17 @@ export interface ExtendedChatResponse extends ChatResponse {
   llmResponse?: LLMResponse;
 }
 
-export const sendChatMessage = async (message: string, userId: string, gradeId?: string): Promise<ExtendedChatResponse> => {
+export const sendChatMessage = async (
+  message: string, 
+  userId: string, 
+  gradeId?: string,
+  clientId?: string,
+  appId?: string
+): Promise<ExtendedChatResponse> => {
   try {
-    // JWE 토큰 생성 (client_id, app_id 암호화)
+    // JWE 토큰 생성 (client_id, app_id 암호화) - 파라미터로 받은 clientId, appId 사용
     console.log('채팅 메시지 전송 시작 - JWE 토큰 생성 중...');
-    const jweResult = await chatJWEService.createChatJWEToken();
+    const jweResult = await chatJWEService.createChatJWEToken({ clientId, appId });
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -52,16 +58,16 @@ export const sendChatMessage = async (message: string, userId: string, gradeId?:
       console.warn('JWE 토큰 생성 실패, 토큰 없이 요청 진행:', jweResult.error);
     }
 
-    // 환경변수에서 clientId, appId 가져오기
-    const clientId = import.meta.env.VITE_CLIENT_ID || 'RS000001';
-    const appId = import.meta.env.VITE_APP_ID || '0001';
+    // 파라미터로 받은 clientId, appId 사용, 없으면 환경변수 사용
+    const finalClientId = clientId || import.meta.env.VITE_CLIENT_ID || 'RS000001';
+    const finalAppId = appId || import.meta.env.VITE_APP_ID || '0001';
     
     const response = await fetchApi('/students/chat', {
       method: 'POST',
       headers,
       body: JSON.stringify({
-        clientId,
-        appId,
+        clientId: finalClientId,
+        appId: finalAppId,
         gradeId: gradeId || 'high', // 기본값 high
         userId,
         message,
