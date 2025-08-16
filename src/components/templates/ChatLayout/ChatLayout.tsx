@@ -26,8 +26,8 @@ export function ChatLayout({
 }: ChatLayoutProps) {
   const viewportInfo = useIOSViewport();
 
-  // iOS에서 동적 높이 계산
-  const mainContentStyle = isIOS() && viewportInfo.chatContentHeight > 0 ? {
+  // iOS에서 동적 높이 계산 (헤더가 있을 때만 적용)
+  const mainContentStyle = isIOS() && showNavigationHeader && viewportInfo.chatContentHeight > 0 ? {
     height: `${viewportInfo.chatContentHeight}px`,
     maxHeight: `${viewportInfo.chatContentHeight}px`,
   } : {};
@@ -37,11 +37,11 @@ export function ChatLayout({
       {/* Navigation Header */}
       {showNavigationHeader && header}
       
-      {/* Main Content Area */}
+      {/* Main Content Area - iOS에서 헤더가 없을 때 전체 높이 사용 */}
       <div 
         className={`flex-1 flex flex-col bg-gray-50 min-h-0 ${
           isIOS() ? 'ios-dynamic-content' : ''
-        }`} 
+        } ${!showNavigationHeader && isIOS() ? 'h-full' : ''}`} 
         data-testid="main-content-area"
         style={mainContentStyle}
       >
