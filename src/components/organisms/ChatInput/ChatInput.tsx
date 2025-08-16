@@ -95,7 +95,7 @@ export function ChatInput({
     left: 0,
     right: 0,
     zIndex: 1000,
-    // paddingBottom 제거 - CSS 클래스에서 처리
+    paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
     background: 'white',
     borderTop: '1px solid #e5e7eb'
   } : {
