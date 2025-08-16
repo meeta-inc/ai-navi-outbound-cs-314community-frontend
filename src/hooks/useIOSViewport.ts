@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { isIOS } from '../utils/device';
+import { getShowNavigationHeader } from '../shared/config/app.config';
 
 interface IOSViewportInfo {
   hasAddressBar: boolean;
@@ -38,13 +39,17 @@ export function useIOSViewport(): IOSViewportInfo {
       // 주소 표시창 높이 계산 (대략적)
       const addressBarHeight = hasAddressBar ? screenHeight - innerHeight : 0;
       
+      // NavigationHeader가 비활성화된 경우 헤더 공간 고려
+      const showNavigationHeader = getShowNavigationHeader();
+      const headerSpaceBonus = !showNavigationHeader ? 60 : 0; // 헤더가 없을 때 60px 추가 공간 활용
+      
       // ChatInput 높이 (약 80px) + safe area + 여유 공간
       const chatInputHeight = 80;
       const safeAreaBottom = 34; // iPhone의 일반적인 safe area bottom
       const extraPadding = 20;
       
       // 채팅 내용 영역의 실제 사용 가능한 높이
-      const chatContentHeight = visualViewportHeight - chatInputHeight - safeAreaBottom - extraPadding;
+      const chatContentHeight = visualViewportHeight - chatInputHeight - safeAreaBottom - extraPadding + headerSpaceBonus;
 
       setViewportInfo({
         hasAddressBar,
