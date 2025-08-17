@@ -33,9 +33,7 @@ function MainPage() {
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
   const [showFAQCategories, setShowFAQCategories] = useState(false);
   const [waitingForFAQCategories, setWaitingForFAQCategories] = useState(false);
-  const [showTopQuestions, setShowTopQuestions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [waitingForTopQuestions, setWaitingForTopQuestions] = useState(false);
   
   // 온보딩 관련 상태
   const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
@@ -105,13 +103,6 @@ function MainPage() {
         }, 500);
       }
       
-      // Top 질문 대기 중이면 표시
-      if (waitingForTopQuestions) {
-        setTimeout(() => {
-          setShowTopQuestions(true);
-          setWaitingForTopQuestions(false);
-        }, 500);
-      }
     }
   });
 
@@ -227,21 +218,26 @@ function MainPage() {
     const categoryTitle = t(category.textKey);
     const categorySelectedMessage = t('chat.faq.categorySelected', { category: categoryTitle });
     
+    // 이전 컴포넌트들 비활성화
+    deactivateComponent('faqCategories');
+    deactivateComponent('topQuestions');
+    
     // 1. 유저 메시지로 선택한 카테고리 표시
     addUserMessage(categoryTitle, false);
     setShowFAQCategories(false);
     setSelectedCategory(category);
     
-    // 2. 봇 메시지 타이핑 애니메이션으로 표시
+    // 2. 봇 메시지 타이핑 애니메이션으로 표시하고 메시지 ID로 TopQuestions 활성화
     setTimeout(() => {
-      setWaitingForTopQuestions(true);
-      addTypingBotMessage(categorySelectedMessage);
+      const messageId = addTypingBotMessage(categorySelectedMessage);
+      // 메시지 ID를 사용하여 TopQuestions 활성화
+      activateComponent('topQuestions', messageId);
     }, 100);
   };
 
   const handleTopQuestionSelect = async (question: string) => {
     // 4. 각 top 질문을 클릭하면 유저 메시지로 표시 후 LLM 송신
-    setShowTopQuestions(false);
+    deactivateComponent('topQuestions');
     setSelectedCategory(null);
     await handleSendMessage(question);
   };
@@ -256,7 +252,6 @@ function MainPage() {
     deactivateComponent('faqCategories');
     
     addUserMessage(backText, false);
-    setShowTopQuestions(false);
     setSelectedCategory(null);
     
     setTimeout(() => {
@@ -485,8 +480,8 @@ function MainPage() {
                   />
                 </div>
               )}
-              {/* Top 질문을 해당 메시지 바로 다음에 표시 */}
-              {selectedCategory && message.content === t('chat.faq.categorySelected', { category: t(selectedCategory.textKey) }) && message.type === 'bot' && showTopQuestions && (
+              {/* Top 질문을 메시지 ID 기반으로 표시 */}
+              {selectedCategory && isComponentActive('topQuestions', message.id) && (
                 <div className="mt-4">
                   <TopQuestions
                     categoryId={selectedCategory.id}
