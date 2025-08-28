@@ -4,6 +4,7 @@ import { useLocale } from '../../../contexts/LocaleContext';
 import { getColorClasses } from '../../../shared/config/theme.config';
 import { getAccentColor } from "../../../shared/config/app.config";
 import { updateQuestionStats } from '../../../services/api/questions';
+import { getTopQuestions as getTopQuestionsAPI, isFaqApiEnabled } from '../../../services/api/faq';
 import { Button } from '../../atoms/Button';
 import { GRADE_CATEGORY_QUESTIONS, GradeType, CategoryType, Question } from '../../../shared/constants/gradeQuestions.constants';
 
@@ -62,34 +63,58 @@ export function TopQuestions({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // 학년별 질문 가져오기 (임시로 상수 사용, 향후 API 연동 예정)
+  // 학년별 질문 가져오기
   useEffect(() => {
     const loadQuestions = async () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        // TODO: 향후 서버 API 연동 시 아래 코드로 교체
-        // const data = await getTopQuestionsByCategory(categoryId, grade, userId);
-        // setQuestions(data.questions);
-        
-        // 임시: gradeQuestions.constants에서 데이터 가져오기
-        const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId];
-        
-        if (gradeQuestions && gradeQuestions.length > 0) {
-          // 베스트 질문 우선 정렬
-          const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+        // FAQ API가 활성화된 경우 새로운 API 사용
+        if (isFaqApiEnabled()) {
+          const apiResponse = await getTopQuestionsAPI(grade, categoryId);
           
-          // 질문 텍스트만 추출
-          const questionTexts = sortedQuestions.map(q => q.text);
-          setQuestions(questionTexts);
+          if (apiResponse && apiResponse.items) {
+            // API 응답에서 질문 텍스트만 추출
+            const questionTexts = apiResponse.items.map(item => item.question);
+            setQuestions(questionTexts);
+          } else {
+            // API 응답이 없으면 기존 로컬 데이터 사용
+            throw new Error('API response is empty');
+          }
         } else {
-          setQuestions([]);
+          // FAQ API가 비활성화된 경우 기존 로컬 데이터 사용
+          const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId];
+          
+          if (gradeQuestions && gradeQuestions.length > 0) {
+            // 베스트 질문 우선 정렬
+            const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+            
+            // 질문 텍스트만 추출
+            const questionTexts = sortedQuestions.map(q => q.text);
+            setQuestions(questionTexts);
+          } else {
+            setQuestions([]);
+          }
         }
       } catch (err) {
         console.error('Failed to load questions:', err);
         setError('エラーが発生しました');
-        setQuestions([]);
+        
+        // 에러 발생 시 로컬 데이터로 폴백
+        try {
+          const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId];
+          if (gradeQuestions && gradeQuestions.length > 0) {
+            const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+            const questionTexts = sortedQuestions.map(q => q.text);
+            setQuestions(questionTexts);
+          } else {
+            setQuestions([]);
+          }
+        } catch (fallbackErr) {
+          console.error('Fallback also failed:', fallbackErr);
+          setQuestions([]);
+        }
       } finally {
         setIsLoading(false);
         // 데이터 로딩이 완료되면 스크롤 트리거

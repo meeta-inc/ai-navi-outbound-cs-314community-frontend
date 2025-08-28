@@ -4,6 +4,7 @@ import { useLocale } from '../../../contexts/LocaleContext';
 import { getColorClasses, AccentColor } from '../../../shared/config/theme.config';
 import { getAccentColor } from "../../../shared/config/app.config";
 import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from '../../../services/api/questions';
+import { getQuickReplyQuestions as getQuickReplyQuestionsAPI, isFaqApiEnabled } from '../../../services/api/faq';
 import { Button } from '../../atoms/Button';
 import type { GradeType } from '../../../shared/constants/grade.constants';
 
@@ -51,15 +52,46 @@ export function QuickReply({
         setIsLoading(true);
         setError(null);
         try {
-          const data = await getQuickReplyQuestions(userId, grade);
-          setApiData({
-            header: data.header,
-            questions: data.questions.map(q => ({
-              id: q.id,
-              text: t(q.text), // 로컬라이즈 키를 실제 텍스트로 변환
-              type: q.type
-            }))
-          });
+          // FAQ API가 활성화된 경우 새로운 API 사용
+          // grade가 있고 FAQ API가 활성화된 경우에만 API 호출
+          if (grade && isFaqApiEnabled()) {
+            const apiResponse = await getQuickReplyQuestionsAPI(grade);
+            
+            if (apiResponse && apiResponse.items) {
+              // API 응답을 QuickReplyOption 형식으로 변환
+              const questions: QuickReplyOption[] = apiResponse.items.map((item, index) => ({
+                id: item.faqId,
+                text: item.question,
+                type: 'primary' as const
+              }));
+              
+              // "그외" 버튼 추가
+              questions.push({
+                id: 'other',
+                text: t('chat.quickReplies.other'),
+                type: 'secondary' as const
+              });
+              
+              setApiData({
+                header: t('chat.quickReplies.header'),
+                questions
+              });
+            } else {
+              // API 응답이 없으면 기존 로컬 데이터 사용
+              throw new Error('API response is empty');
+            }
+          } else {
+            // FAQ API가 비활성화된 경우 기존 로직 사용
+            const data = await getQuickReplyQuestions(userId, grade);
+            setApiData({
+              header: data.header,
+              questions: data.questions.map(q => ({
+                id: q.id,
+                text: t(q.text), // 로컬라이즈 키를 실제 텍스트로 변환
+                type: q.type
+              }))
+            });
+          }
         } catch (err) {
           console.error('Failed to fetch quick reply questions:', err);
           setError(t('chat.quickReplies.error'));
