@@ -1,5 +1,10 @@
 import { MenuConfig } from '../shared/config/menuConfig';
 
+// AI 음성 상담 기능 활성화 여부 확인
+const isVoiceConsultationEnabled = (): boolean => {
+  return import.meta.env.VITE_ENABLE_VOICE_CONSULTATION === 'true';
+};
+
 // 고객사별 메뉴 설정 저장소 (실제로는 백엔드 API나 데이터베이스에서 관리)
 const clientMenuConfigs: Record<string, MenuConfig> = {
   'default': {
@@ -32,10 +37,10 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
           type: 'lucide',
           value: 'Phone'
         },
-        label: 'AI電話相談',
-        action: 'navigate',
+        label: 'AI音声相談',
+        action: 'voice-input',  // 음성 입력 액션으로 변경
         url: '/consultation',
-        disabled: true  // 예시로 비활성화
+        disabled: !isVoiceConsultationEnabled()  // 환경 변수에 따라 활성화/비활성화
       }
     ],
     cta: {
@@ -153,10 +158,10 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
           type: 'lucide',
           value: 'Phone'
         },
-        label: 'AI電話相談',
-        action: 'navigate',
+        label: 'AI音声相談',
+        action: 'voice-input',  // 음성 입력 액션으로 변경
         url: '/consultation',
-        disabled: true
+        disabled: !isVoiceConsultationEnabled()  // 환경 변수에 따라 활성화/비활성화
       }
     ],
     cta: {
