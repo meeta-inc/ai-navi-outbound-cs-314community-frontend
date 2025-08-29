@@ -255,7 +255,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
               key={bar}
               className={`w-1 rounded-full ${
                 isRecording 
-                  ? 'bg-gradient-to-t from-green-400 to-green-600' 
+                  ? colors.background
                   : 'bg-gray-300'
               }`}
               animate={{
@@ -355,9 +355,9 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
               {/* Waveform visualization */}
               <div className="bg-gray-50 rounded-3xl p-6 mb-6 relative overflow-hidden">
                 {/* Background gradient effect */}
-                <div className={`absolute inset-0 opacity-10 ${
+                <div className={`absolute inset-0 opacity-20 ${
                   isRecording 
-                    ? 'bg-gradient-to-br from-green-400 to-blue-500' 
+                    ? `bg-gradient-to-br ${colors.gradient.from} ${colors.gradient.to}`
                     : 'bg-gradient-to-br from-gray-300 to-gray-400'
                 }`} />
                 
@@ -444,10 +444,10 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="flex items-center justify-center gap-3 text-blue-600"
+                      className={`flex items-center justify-center gap-3 ${colors.text}`}
                     >
                       <motion.div
-                        className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full"
+                        className={`w-6 h-6 border-2 ${colors.border} border-t-transparent rounded-full`}
                         animate={{ rotate: 360 }}
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       />
@@ -493,7 +493,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                     <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-4 border border-gray-200 shadow-sm">
                       <div className="flex items-start gap-3">
                         <motion.div 
-                          className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg"
+                          className={`w-10 h-10 ${colors.background} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg`}
                           animate={{ 
                             boxShadow: displayTranscript 
                               ? ["0 4px 20px rgba(59, 130, 246, 0.3)", "0 4px 20px rgba(99, 102, 241, 0.4)", "0 4px 20px rgba(59, 130, 246, 0.3)"]
@@ -517,7 +517,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                                 {[0, 1, 2].map((i) => (
                                   <motion.div
                                     key={i}
-                                    className="w-1 h-1 bg-blue-500 rounded-full"
+                                    className={`w-1 h-1 ${colors.accent} rounded-full`}
                                     animate={{ 
                                       scale: [1, 1.5, 1],
                                       opacity: [0.5, 1, 0.5]
@@ -537,7 +537,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                               {displayTranscript || transcript}
                               {displayTranscript && (
                                 <motion.span
-                                  className="inline-block w-0.5 h-6 bg-blue-500 ml-1 rounded-full"
+                                  className={`inline-block w-0.5 h-6 ${colors.accent} ml-1 rounded-full`}
                                   animate={{ opacity: [1, 0, 1] }}
                                   transition={{ duration: 1, repeat: Infinity }}
                                 />
@@ -608,7 +608,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                         mass: 0.8
                       }}
                       onClick={handleSend}
-                      className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white w-16 h-16 rounded-full flex items-center justify-center hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 shadow-xl relative overflow-hidden group"
+                      className={`${colors.background} text-white w-16 h-16 rounded-full flex items-center justify-center hover:opacity-90 transition-all duration-200 shadow-xl relative overflow-hidden group`}
                       whileTap={{ scale: 0.95 }}
                       whileHover={{ scale: 1.05 }}
                     >
@@ -656,7 +656,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
-                      className="absolute right-0 w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl"
+                      className={`absolute right-0 w-16 h-16 rounded-full ${colors.background} flex items-center justify-center shadow-xl`}
                     >
                       <motion.div
                         animate={{ rotate: 360 }}
@@ -667,7 +667,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                       
                       {/* Ripple effect */}
                       <motion.div
-                        className="absolute inset-0 border-2 border-blue-400 rounded-full"
+                        className={`absolute inset-0 border-2 ${colors.border} rounded-full`}
                         animate={{
                           scale: [1, 1.5, 1],
                           opacity: [0.8, 0, 0.8],
@@ -700,7 +700,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                     <span>録音停止</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <div className={`w-2 h-2 ${colors.accent} rounded-full`} />
                     <span>送信</span>
                   </div>
                 </div>
