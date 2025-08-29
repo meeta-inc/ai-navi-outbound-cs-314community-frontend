@@ -32,3 +32,4 @@ storybook-static
 
 # 테스트 커버리지 파일
 coverage/
+sample/

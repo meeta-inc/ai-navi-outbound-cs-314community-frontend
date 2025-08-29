@@ -9,6 +9,7 @@ import { ChatInput } from '../components/organisms/ChatInput';
 import { QuickReply } from '../components/organisms/QuickReply';
 import { FAQCategory } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
+import { VoiceInputModal } from '../components/organisms/VoiceInputModal/VoiceInputModal';
 import { MenuModal } from '../components/organisms/MenuModal';
 import { MenuService } from '../services/menuService';
 import { isIOS } from '../utils/device';
@@ -43,6 +44,9 @@ function MainPage() {
   // CTA 관련 상태
   const [latestCTAMessageId, setLatestCTAMessageId] = useState<string | null>(null);
   const [hideAllCTA, setHideAllCTA] = useState(false);
+  
+  // 음성 입력 모달 상태
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   
   // 메시지 ID 기반 컴포넌트 활성화 관리
   const {
@@ -311,6 +315,12 @@ function MainPage() {
   const handleMenuItemClick = (item: any) => {
     console.log('Menu item clicked:', item);
     
+    // 음성 입력 처리
+    if (item.action === 'voice-input') {
+      setIsVoiceModalOpen(true);
+      return;
+    }
+    
     // 외부 링크 처리
     if (item.action === 'external-link' && item.url) {
       window.open(item.url, '_blank', 'noopener,noreferrer');
@@ -338,6 +348,15 @@ function MainPage() {
       // 네비게이션 액션 처리 (추후 구현)
       console.log('Navigate to:', item.url);
     }
+  };
+  
+  // 음성 입력 완료 핸들러
+  const handleVoiceTranscript = (transcript: string) => {
+    // 음성 입력 텍스트를 채팅 메시지로 전송
+    setNewMessage(transcript);
+    setTimeout(() => {
+      handleSendClick();
+    }, 100);
   };
 
   if (isLoading) {
@@ -522,6 +541,13 @@ function MainPage() {
         </div>
       </div>
       </ChatLayout>
+      
+      {/* Voice Input Modal */}
+      <VoiceInputModal 
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        onTranscript={handleVoiceTranscript}
+      />
     </>
   );
 }

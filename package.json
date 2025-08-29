@@ -23,6 +23,7 @@
     "@aws-sdk/client-kms": "^3.848.0",
     "@aws-sdk/client-sts": "^3.848.0",
     "@aws-sdk/credential-providers": "^3.848.0",
+    "framer-motion": "^12.23.12",
     "jose": "^6.0.12",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.344.0",
