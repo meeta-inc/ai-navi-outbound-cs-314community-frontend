@@ -292,13 +292,13 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center">
           {/* Backdrop with blur effect */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm z-[9998]"
             onClick={onClose}
           />
 
@@ -313,7 +313,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
               damping: 30,
               mass: 0.8 
             }}
-            className="relative bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-md mx-4 z-10 overflow-hidden"
+            className="relative bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-md mx-4 z-[9999] overflow-hidden"
             style={{ 
               maxHeight: '85vh',
               paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))'
