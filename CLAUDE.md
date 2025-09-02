@@ -1,5 +1,22 @@
 # Claude Code 작업 가이드라인
 
+## 🏢 GitHub 계정 사용 규칙
+
+### 회사 리포지토리 작업 시
+- **소유자(Owner)**: `meeta-inc` (회사 계정)
+- **개인 계정 아님**: rimapa2025가 아닌 meeta-inc 사용
+- **이슈/PR 생성 시**: 항상 owner를 `meeta-inc`로 지정
+
+### 올바른 GitHub 명령 예시
+```bash
+# ✅ 올바른 예 - 회사 계정 사용
+gh issue create --repo meeta-inc/ai-navi-outbound-cs-314community-frontend
+gh pr create --repo meeta-inc/ai-navi-outbound-cs-314community-frontend
+
+# ❌ 잘못된 예 - 개인 계정 사용
+gh issue create --repo rimapa2025/ai-navi-outbound-cs-314community-frontend
+```
+
 ## 🔴 중요: PR 타겟 브랜치 규칙
 
 이 프로젝트에서 PR을 생성할 때는 **반드시** 다음 규칙을 따라주세요:
