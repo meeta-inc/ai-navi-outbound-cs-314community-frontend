@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LocaleProvider } from './contexts/LocaleContext';
 import { ClientConfigProvider } from './contexts/ClientConfigContext';
 import MainPage from './pages/MainPage';
+import OpenAITestPage from './pages/OpenAITestPage';
 import { CognitoTestPage, JWETestPage } from './dev';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
               <>
                 <Route path="/dev/jwe-test" element={<JWETestPage />} />
                 <Route path="/dev/cognito-test" element={<CognitoTestPage />} />
+                <Route path="/test-openai" element={<OpenAITestPage />} />
               </>
             )}
             <Route path="*" element={<Navigate to="/" replace />} />
