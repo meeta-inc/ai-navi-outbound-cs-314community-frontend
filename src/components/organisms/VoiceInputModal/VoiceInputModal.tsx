@@ -1,19 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Mic, Square, Send, Volume2, Check } from 'lucide-react';
+import { X, Mic, Square, Send, Volume2, Check, User, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { SpeechRecognitionService } from '../../../services/speechRecognition';
 import { Button } from '../../atoms/Button';
 import { getColorClasses } from '../../../shared/config/theme.config';
 import { getAccentColor } from '../../../shared/config/app.config';
+import { openAITTSService } from '../../../services/openai/ttsService';
+import { sendChatMessage } from '../../../services/api/chat';
+import type { LLMResponse } from '../../../types';
 
 interface VoiceInputModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTranscript: (transcript: string) => void;
+  onChatUpdate?: (userMessage: string, botResponse: string, llmResponse?: LLMResponse) => void;
+  userId?: string;
 }
 
-export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputModalProps) {
+interface Message {
+  id: string;
+  type: 'user' | 'bot';
+  content: string;
+  timestamp: Date;
+}
+
+export function VoiceInputModal({ 
+  isOpen, 
+  onClose, 
+  onTranscript, 
+  onChatUpdate,
+  userId = 'default' 
+}: VoiceInputModalProps) {
   const { t } = useLocale();
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -24,6 +42,17 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
+  
+  // 현재 대화 표시용 (1개 사용자 + 1개 AI)
+  const [currentConversation, setCurrentConversation] = useState<Message[]>([]);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  
+  // 침묵 감지용
+  const [silenceTimer, setSilenceTimer] = useState<NodeJS.Timeout | null>(null);
+  const autoSendEnabled = import.meta.env.VITE_VOICE_AUTO_SEND === 'true';
+  const silenceDuration = parseInt(import.meta.env.VITE_VOICE_SILENCE_DURATION || '1500');
+  const ttsAutoPlay = import.meta.env.VITE_TTS_AUTO_PLAY === 'true';
   
   const recognitionService = useRef<SpeechRecognitionService | null>(null);
   const animationRef = useRef<number>();
@@ -52,6 +81,32 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
         if (isFinal) {
           setTranscript(text);
           animateTyping(text);
+          
+          // 침묵 감지: 최종 텍스트가 있고 자동 전송이 활성화된 경우
+          if (autoSendEnabled && text.trim()) {
+            // 기존 타이머 클리어
+            if (silenceTimer) {
+              clearTimeout(silenceTimer);
+            }
+            
+            // 새 타이머 설정 (침묵 기간 후 자동 전송)
+            const timer = setTimeout(() => {
+              // 녹음 중지 및 전송
+              if (recognitionService.current) {
+                recognitionService.current.stop();
+                setIsRecording(false);
+                // handleSend 함수를 직접 호출할 수 없으므로 transcript 상태 업데이트로 트리거
+                setTimeout(() => {
+                  const sendButton = document.querySelector('[data-send-button]') as HTMLButtonElement;
+                  if (sendButton) {
+                    sendButton.click();
+                  }
+                }, 100);
+              }
+            }, silenceDuration);
+            
+            setSilenceTimer(timer);
+          }
         } else {
           setDisplayTranscript(text);
         }
@@ -61,11 +116,19 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
         setIsRecording(false);
         setIsProcessing(false);
         setRecordingDuration(0);
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          setSilenceTimer(null);
+        }
       },
       onEnd: () => {
         setIsRecording(false);
         setIsProcessing(false);
         setRecordingDuration(0);
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          setSilenceTimer(null);
+        }
       }
     });
 
@@ -94,6 +157,12 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
       }
+    }
+    
+    // 침묵 감지 타이머 초기화
+    if (silenceTimer) {
+      clearTimeout(silenceTimer);
+      setSilenceTimer(null);
     }
 
     return () => {
@@ -167,30 +236,87 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
     }
   };
 
+  // 음성 대화 처리 함수
+  const handleVoiceConversation = async (userInput: string) => {
+    try {
+      // 1. 현재 대화에 사용자 입력 추가
+      const userMessage: Message = {
+        id: `user-${Date.now()}`,
+        type: 'user',
+        content: userInput,
+        timestamp: new Date()
+      };
+      setCurrentConversation([userMessage]);
+      
+      // 2. 대기 상태 표시
+      setIsWaitingForResponse(true);
+      
+      // 3. Chat API 호출
+      const response = await sendChatMessage(userInput, userId);
+      
+      if (response.llmResponse) {
+        // 4. main 버블만 추출
+        const mainBubble = response.llmResponse.response.find(
+          bubble => bubble.type === 'main'
+        );
+        
+        if (mainBubble && mainBubble.text) {
+          // 5. AI 응답을 현재 대화에 추가
+          const botMessage: Message = {
+            id: `bot-${Date.now()}`,
+            type: 'bot',
+            content: mainBubble.text,
+            timestamp: new Date()
+          };
+          setCurrentConversation([userMessage, botMessage]);
+          
+          // 6. TTS 자동 재생 (환경 변수 확인)
+          if (ttsAutoPlay && openAITTSService.isConfigured()) {
+            setIsSpeaking(true);
+            try {
+              const audioBuffer = await openAITTSService.synthesizeSpeech(mainBubble.text);
+              await openAITTSService.playAudio(audioBuffer);
+            } catch (ttsError) {
+              console.error('TTS Error:', ttsError);
+            } finally {
+              setIsSpeaking(false);
+            }
+          }
+          
+          // 7. 채팅 화면에 전체 대화 전달 (전체 llmResponse 전달)
+          if (onChatUpdate) {
+            onChatUpdate(userInput, mainBubble.text, response.llmResponse);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Voice conversation error:', error);
+      setError('応答の取得に失敗しました');
+    } finally {
+      setIsWaitingForResponse(false);
+    }
+  };
+
   // Handle send
   const handleSend = async () => {
     if (transcript.trim()) {
       setIsSending(true);
       
       try {
-        // 송신 애니메이션 시작
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // LLM으로 메시지 전송
-        onTranscript(transcript.trim());
+        // 음성 대화 처리
+        await handleVoiceConversation(transcript.trim());
         
         // 성공 상태 표시
         setSendSuccess(true);
         
-        // 1.5초 후 모달 닫기
+        // 2초 후 다음 대화 준비
         setTimeout(() => {
-          onClose();
-          // 상태 초기화
+          // 상태 초기화 (모달은 열어둠)
           setTranscript('');
           setDisplayTranscript('');
           setSendSuccess(false);
           setIsSending(false);
-        }, 1500);
+        }, 2000);
         
       } catch (error) {
         setError('メッセージの送信に失敗しました');
@@ -321,7 +447,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 pb-4">
-              <h3 className="text-xl font-bold text-gray-900">音声入力</h3>
+              <h3 className="text-xl font-bold text-gray-900">AI音声相談</h3>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -352,6 +478,128 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
 
             {/* Main content area */}
             <div className="px-6 pb-6">
+              {/* Current conversation display */}
+              <AnimatePresence>
+                {currentConversation.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mb-4 space-y-3"
+                  >
+                    {currentConversation.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className={`flex gap-2 ${
+                          message.type === 'user' ? 'justify-end' : 'justify-start'
+                        }`}
+                      >
+                        {message.type === 'bot' && (
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <Bot className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                        <div
+                          className={`max-w-[80%] px-4 py-2 rounded-2xl ${
+                            message.type === 'user'
+                              ? `${colors.background} text-white`
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          <p className="text-sm font-medium">{message.content}</p>
+                        </div>
+                        {message.type === 'user' && (
+                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                            <User className="w-5 h-5 text-white" />
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                    
+                    {/* AI 응답 대기 중 표시 */}
+                    {isWaitingForResponse && !isSpeaking && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex gap-2 justify-start"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="bg-gray-100 px-4 py-3 rounded-2xl">
+                          <div className="flex gap-1">
+                            {[0, 1, 2].map((i) => (
+                              <motion.div
+                                key={i}
+                                className="w-2 h-2 bg-gray-400 rounded-full"
+                                animate={{ 
+                                  y: [0, -5, 0],
+                                  opacity: [0.5, 1, 0.5]
+                                }}
+                                transition={{ 
+                                  duration: 1.2, 
+                                  repeat: Infinity,
+                                  delay: i * 0.2 
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    
+                    {/* TTS 재생 중 표시 - 음성 파형 효과 추가 */}
+                    {isSpeaking && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex gap-2 justify-start"
+                      >
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                          <Volume2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="bg-gray-100 px-4 py-3 rounded-2xl">
+                          <div className="flex items-center gap-2">
+                            {/* 음성 파형 애니메이션 */}
+                            <div className="flex gap-1 items-center">
+                              {[0, 1, 2, 3, 4].map((i) => (
+                                <motion.div
+                                  key={i}
+                                  className={`w-1 ${colors.accent} rounded-full`}
+                                  animate={{
+                                    height: [4, 12, 8, 16, 4],
+                                    opacity: [0.6, 1, 0.8, 1, 0.6]
+                                  }}
+                                  transition={{
+                                    duration: 0.8,
+                                    repeat: Infinity,
+                                    delay: i * 0.1,
+                                    ease: "easeInOut"
+                                  }}
+                                  style={{ 
+                                    minHeight: '4px',
+                                    backgroundColor: colors.accent.includes('blue') ? '#3B82F6' : 
+                                                     colors.accent.includes('green') ? '#10B981' :
+                                                     colors.accent.includes('purple') ? '#8B5CF6' :
+                                                     colors.accent.includes('red') ? '#EF4444' : '#F59E0B'
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs font-medium text-gray-600">
+                              音声再生中...
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
               {/* Waveform visualization */}
               <div className="bg-gray-50 rounded-3xl p-6 mb-6 relative overflow-hidden">
                 {/* Background gradient effect */}
@@ -594,63 +842,18 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                   </motion.button>
                 </div>
 
-                {/* Send button */}
-                <AnimatePresence>
-                  {transcript && !isRecording && !isProcessing && !isSending && !sendSuccess && (
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                      animate={{ opacity: 1, scale: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 400, 
-                        damping: 25,
-                        mass: 0.8
-                      }}
-                      onClick={handleSend}
-                      className={`${colors.background} text-white w-16 h-16 rounded-full flex items-center justify-center hover:opacity-90 transition-all duration-200 shadow-xl relative overflow-hidden group`}
-                      whileTap={{ scale: 0.95 }}
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {/* Shimmer effect */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                        animate={{ x: ['-100%', '100%'] }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity, 
-                          ease: "easeInOut",
-                          repeatDelay: 1
-                        }}
-                      />
-                      
-                      <motion.div
-                        animate={{ 
-                          rotate: [0, -10, 10, 0],
-                          scale: [1, 1.1, 1]
-                        }}
-                        transition={{ 
-                          duration: 0.6, 
-                          repeat: Infinity,
-                          repeatDelay: 2
-                        }}
-                      >
-                        <Send className="w-6 h-6 relative z-10" />
-                      </motion.div>
-                      
-                      {/* Pulse effect on hover */}
-                      <motion.div
-                        className="absolute inset-0 bg-white/10 rounded-full"
-                        initial={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+                {/* Hidden send button for auto-send functionality */}
+                {transcript && !isRecording && (
+                  <button
+                    data-send-button
+                    onClick={handleSend}
+                    className="hidden"
+                    aria-hidden="true"
+                  />
+                )}
                 
-                {/* Sending animation */}
-                <AnimatePresence>
+                {/* Sending animation - 주석처리됨 (마이크 옆 전송 버튼 제거) */}
+                {/* <AnimatePresence>
                   {isSending && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -665,7 +868,6 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                         <Send className="w-6 h-6 text-white" />
                       </motion.div>
                       
-                      {/* Ripple effect */}
                       <motion.div
                         className={`absolute inset-0 border-2 ${colors.border} rounded-full`}
                         animate={{
@@ -680,7 +882,7 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                       />
                     </motion.div>
                   )}
-                </AnimatePresence>
+                </AnimatePresence> */}
               </div>
 
               {/* Instructions */}
@@ -698,10 +900,6 @@ export function VoiceInputModal({ isOpen, onClose, onTranscript }: VoiceInputMod
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full" />
                     <span>録音停止</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 ${colors.accent} rounded-full`} />
-                    <span>送信</span>
                   </div>
                 </div>
                 
