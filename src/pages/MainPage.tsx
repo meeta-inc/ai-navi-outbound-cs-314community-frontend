@@ -358,6 +358,29 @@ function MainPage() {
       handleSendClick();
     }, 100);
   };
+  
+  // 음성 대화 업데이트 핸들러
+  const handleVoiceChatUpdate = (userMessage: string, botResponse: string, llmResponse?: any) => {
+    // 사용자 메시지 추가
+    addUserMessage(userMessage, false);
+    
+    // AI 응답 추가
+    if (llmResponse) {
+      const messageId = addTypingBotMessage('', true);
+      completeTyping({
+        id: messageId,
+        content: botResponse,
+        llmResponse: llmResponse
+      });
+    } else {
+      // LLM 응답이 없는 경우 일반 텍스트로 추가
+      const messageId = addTypingBotMessage(botResponse, false);
+      completeTyping({
+        id: messageId,
+        content: botResponse
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -547,6 +570,8 @@ function MainPage() {
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         onTranscript={handleVoiceTranscript}
+        onChatUpdate={handleVoiceChatUpdate}
+        userId="Hyunse0001"
       />
     </>
   );
