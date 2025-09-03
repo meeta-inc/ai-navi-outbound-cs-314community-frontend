@@ -653,7 +653,7 @@ export function VoiceInputModal({
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
                       >
-                        送信完了！
+                        応答完了！
                       </motion.span>
                     </motion.div>
                   ) : isSending ? (
@@ -669,7 +669,11 @@ export function VoiceInputModal({
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <Send className="w-8 h-8 text-white" />
+                        {isSpeaking ? (
+                          <Volume2 className="w-8 h-8 text-white" />
+                        ) : (
+                          <Send className="w-8 h-8 text-white" />
+                        )}
                         <motion.div
                           className="absolute inset-0 bg-white/20"
                           animate={{ 
@@ -683,7 +687,7 @@ export function VoiceInputModal({
                         />
                       </motion.div>
                       <span className="text-lg font-semibold text-gray-700">
-                        送信中...
+                        {isSpeaking ? '音声出力中...' : '送信中...'}
                       </span>
                     </motion.div>
                   ) : isProcessing ? (
