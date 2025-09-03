@@ -1,5 +1,22 @@
 # Claude Code 작업 가이드라인
 
+## 🏢 GitHub 계정 사용 규칙
+
+### 회사 리포지토리 작업 시
+- **소유자(Owner)**: `meeta-inc` (회사 계정)
+- **개인 계정 아님**: rimapa2025가 아닌 meeta-inc 사용
+- **이슈/PR 생성 시**: 항상 owner를 `meeta-inc`로 지정
+
+### 올바른 GitHub 명령 예시
+```bash
+# ✅ 올바른 예 - 회사 계정 사용
+gh issue create --repo meeta-inc/ai-navi-outbound-cs-314community-frontend
+gh pr create --repo meeta-inc/ai-navi-outbound-cs-314community-frontend
+
+# ❌ 잘못된 예 - 개인 계정 사용
+gh issue create --repo rimapa2025/ai-navi-outbound-cs-314community-frontend
+```
+
 ## 🔴 중요: PR 타겟 브랜치 규칙
 
 이 프로젝트에서 PR을 생성할 때는 **반드시** 다음 규칙을 따라주세요:
@@ -69,6 +86,32 @@ VITE_CONTENT_CONFIG_API_URL=https://content-config-dev.meeta.jp/v1
 - docs: 문서 수정
 - test: 테스트 코드
 - chore: 빌드, 패키지 등
+
+## 🌏 언어 사용 규칙
+
+### Claude Code가 따라야 할 언어 규칙
+1. **사용자 답변 및 설명**: 한글로 작성
+2. **소스 코드 주석**: 한글로 작성
+3. **UI 텍스트 및 화면 표시 내용**: 
+   - 일본어 또는 영어 사용
+   - 특히 사용자가 보는 모든 인터페이스 텍스트는 일본어 우선
+4. **에러 메시지**: 일본어 또는 영어
+5. **변수명/함수명**: 영어
+
+### 예시
+```typescript
+// ✅ 올바른 예
+// 음성 입력 처리 함수
+const handleVoiceInput = () => {
+  setMessage('音声入力中...');  // UI는 일본어
+  console.error('音声認識に失敗しました');  // 에러 메시지는 일본어
+};
+
+// ❌ 잘못된 예  
+const handleVoiceInput = () => {
+  setMessage('음성 입력중...');  // UI에 한글 사용 X
+};
+```
 
 ---
 ⚠️ **이 파일은 Claude Code가 프로젝트 작업 시 참조하는 가이드라인입니다**
