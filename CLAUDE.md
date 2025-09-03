@@ -87,5 +87,31 @@ VITE_CONTENT_CONFIG_API_URL=https://content-config-dev.meeta.jp/v1
 - test: 테스트 코드
 - chore: 빌드, 패키지 등
 
+## 🌏 언어 사용 규칙
+
+### Claude Code가 따라야 할 언어 규칙
+1. **사용자 답변 및 설명**: 한글로 작성
+2. **소스 코드 주석**: 한글로 작성
+3. **UI 텍스트 및 화면 표시 내용**: 
+   - 일본어 또는 영어 사용
+   - 특히 사용자가 보는 모든 인터페이스 텍스트는 일본어 우선
+4. **에러 메시지**: 일본어 또는 영어
+5. **변수명/함수명**: 영어
+
+### 예시
+```typescript
+// ✅ 올바른 예
+// 음성 입력 처리 함수
+const handleVoiceInput = () => {
+  setMessage('音声入力中...');  // UI는 일본어
+  console.error('音声認識に失敗しました');  // 에러 메시지는 일본어
+};
+
+// ❌ 잘못된 예  
+const handleVoiceInput = () => {
+  setMessage('음성 입력중...');  // UI에 한글 사용 X
+};
+```
+
 ---
 ⚠️ **이 파일은 Claude Code가 프로젝트 작업 시 참조하는 가이드라인입니다**

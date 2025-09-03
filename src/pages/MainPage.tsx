@@ -22,6 +22,7 @@ import { getColorClasses } from '../shared/config/theme.config';
 import { GradeSelection } from '../components/organisms/GradeSelection';
 import { GradeQuickReply } from '../components/organisms/GradeQuickReply';
 import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/grade.constants';
+import type { Message } from '../types';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
@@ -58,6 +59,7 @@ function MainPage() {
 
   const {
     messages,
+    setMessages,
     newMessage,
     setNewMessage,
     isTyping,
@@ -364,21 +366,27 @@ function MainPage() {
     // 사용자 메시지 추가
     addUserMessage(userMessage, false);
     
-    // AI 응답 추가
+    // AI 응답 추가 - LLMResponse를 직접 messages에 추가
     if (llmResponse) {
-      const messageId = addTypingBotMessage('', true);
-      completeTyping({
-        id: messageId,
-        content: botResponse,
-        llmResponse: llmResponse
-      });
+      // LLMResponse가 있는 경우 직접 메시지로 추가
+      const botMessage: Message = {
+        id: Date.now().toString(),
+        type: 'bot',
+        content: '', // LLMResponseGroup이 렌더링하므로 content는 비움
+        timestamp: new Date(),
+        llmResponse: llmResponse // 전달받은 LLMResponse를 그대로 사용
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
+      
+      // 스크롤 처리
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } else {
       // LLM 응답이 없는 경우 일반 텍스트로 추가
       const messageId = addTypingBotMessage(botResponse, false);
-      completeTyping({
-        id: messageId,
-        content: botResponse
-      });
+      completeTyping();
     }
   };
 
