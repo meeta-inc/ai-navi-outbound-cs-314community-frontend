@@ -280,6 +280,7 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
 
   return {
     messages,
+    setMessages,  // setMessages 추가
     newMessage,
     setNewMessage,
     isTyping,
