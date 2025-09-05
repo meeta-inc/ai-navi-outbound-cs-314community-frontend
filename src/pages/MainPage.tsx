@@ -7,7 +7,7 @@ import { NavigationHeader } from '../components/organisms/NavigationHeader';
 import { ChatMessage } from '../components/organisms/ChatMessage';
 import { ChatInput } from '../components/organisms/ChatInput';
 import { QuickReply } from '../components/organisms/QuickReply';
-import { FAQCategory } from '../components/organisms/FAQCategory';
+import { FAQCategory, FAQCategoryItem } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
 import { VoiceInputModal } from '../components/organisms/VoiceInputModal/VoiceInputModal';
 import { MenuModal } from '../components/organisms/MenuModal';
@@ -23,6 +23,8 @@ import { GradeSelection } from '../components/organisms/GradeSelection';
 import { GradeQuickReply } from '../components/organisms/GradeQuickReply';
 import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/grade.constants';
 import type { Message } from '../types';
+import { getCategories, isCategoryApiEnabled } from '../services/api/category';
+import { CategoryItem } from '../types/api/category.types';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
@@ -36,6 +38,10 @@ function MainPage() {
   const [showFAQCategories, setShowFAQCategories] = useState(false);
   const [waitingForFAQCategories, setWaitingForFAQCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  
+  // API 카테고리 관련 상태
+  const [apiCategories, setApiCategories] = useState<FAQCategoryItem[] | null>(null);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   
   // 온보딩 관련 상태
   const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
@@ -121,6 +127,35 @@ function MainPage() {
       isInitialized.current = true;
     }
   }, [t, addWelcomeMessage, isLoading, schoolName]);
+
+  // 카테고리 API 호출
+  useEffect(() => {
+    if (isCategoryApiEnabled() && clientId) {
+      setCategoriesLoading(true);
+      getCategories(clientId, true)
+        .then(response => {
+          if (response && response.items) {
+            // API 응답을 FAQCategoryItem 형식으로 변환
+            const convertedCategories: FAQCategoryItem[] = response.items
+              .sort((a, b) => a.displayOrder - b.displayOrder)
+              .map(item => ({
+                id: item.categoryId,
+                textKey: '', // API 사용 시에는 사용하지 않음
+                valueKey: item.categoryId, // TopQuestions API에 전달할 categoryId
+                displayName: item.categoryName,
+                emojiIcon: item.icon
+              }));
+            setApiCategories(convertedCategories);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to load categories:', error);
+        })
+        .finally(() => {
+          setCategoriesLoading(false);
+        });
+    }
+  }, [clientId]);
 
   // 최신 LLM 응답 메시지 ID 업데이트
   useEffect(() => {
@@ -220,8 +255,8 @@ function MainPage() {
     }, 100);
   };
 
-  const handleFAQCategorySelect = (category: any) => {
-    const categoryTitle = t(category.textKey);
+  const handleFAQCategorySelect = (category: FAQCategoryItem) => {
+    const categoryTitle = category.displayName || t(category.textKey);
     const categorySelectedMessage = t('chat.faq.categorySelected', { category: categoryTitle });
     
     // 이전 컴포넌트들 비활성화
@@ -526,6 +561,7 @@ function MainPage() {
               {isComponentActive('faqCategories', message.id) && showFAQCategories && (
                 <div className="mt-4">
                   <FAQCategory 
+                    categories={apiCategories || undefined}
                     onCategorySelect={handleFAQCategorySelect}
                   />
                 </div>
@@ -534,8 +570,8 @@ function MainPage() {
               {selectedCategory && isComponentActive('topQuestions', message.id) && (
                 <div className="mt-4">
                   <TopQuestions
-                    categoryId={selectedCategory.id}
-                    categoryTitle={t(selectedCategory.textKey)}
+                    categoryId={selectedCategory.valueKey || selectedCategory.id}
+                    categoryTitle={selectedCategory.displayName || t(selectedCategory.textKey)}
                     grade={selectedGrade || 'high'}
                     onQuestionSelect={handleTopQuestionSelect}
                     onBackToCategories={handleBackToCategories}
