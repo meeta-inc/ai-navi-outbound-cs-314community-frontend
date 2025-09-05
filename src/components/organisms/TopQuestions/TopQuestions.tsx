@@ -35,7 +35,7 @@ const sortQuestionsByBest = (questions: Question[]): Question[] => {
 };
 
 interface TopQuestionsProps {
-  categoryId: CategoryType;
+  categoryId: CategoryType | string;
   categoryTitle: string;
   grade: GradeType;
   onQuestionSelect: (question: string) => void;
@@ -84,16 +84,22 @@ export function TopQuestions({
           }
         } else {
           // FAQ API가 비활성화된 경우 기존 로컬 데이터 사용
-          const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId];
-          
-          if (gradeQuestions && gradeQuestions.length > 0) {
-            // 베스트 질문 우선 정렬
-            const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+          // categoryId가 CategoryType인 경우만 로컬 데이터 사용
+          if (typeof categoryId === 'string' && !categoryId.startsWith('CAT')) {
+            const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId as CategoryType];
             
-            // 질문 텍스트만 추출
-            const questionTexts = sortedQuestions.map(q => q.text);
-            setQuestions(questionTexts);
+            if (gradeQuestions && gradeQuestions.length > 0) {
+              // 베스트 질문 우선 정렬
+              const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+              
+              // 질문 텍스트만 추출
+              const questionTexts = sortedQuestions.map(q => q.text);
+              setQuestions(questionTexts);
+            } else {
+              setQuestions([]);
+            }
           } else {
+            // API categoryId인 경우 로컬 데이터가 없음
             setQuestions([]);
           }
         }
@@ -103,12 +109,17 @@ export function TopQuestions({
         
         // 에러 발생 시 로컬 데이터로 폴백
         try {
-          const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId];
-          if (gradeQuestions && gradeQuestions.length > 0) {
-            const sortedQuestions = sortQuestionsByBest(gradeQuestions);
-            const questionTexts = sortedQuestions.map(q => q.text);
-            setQuestions(questionTexts);
+          if (typeof categoryId === 'string' && !categoryId.startsWith('CAT')) {
+            const gradeQuestions = GRADE_CATEGORY_QUESTIONS[grade][categoryId as CategoryType];
+            if (gradeQuestions && gradeQuestions.length > 0) {
+              const sortedQuestions = sortQuestionsByBest(gradeQuestions);
+              const questionTexts = sortedQuestions.map(q => q.text);
+              setQuestions(questionTexts);
+            } else {
+              setQuestions([]);
+            }
           } else {
+            // API categoryId인 경우 로컬 데이터가 없음
             setQuestions([]);
           }
         } catch (fallbackErr) {
