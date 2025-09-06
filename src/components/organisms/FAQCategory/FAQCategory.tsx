@@ -28,6 +28,10 @@ export interface FAQCategoryItem {
   iconConfig?: IconConfig;
   /** @deprecated 백워드 호환성을 위해 유지. iconConfig 사용을 권장합니다. */
   icon?: React.ReactNode;
+  /** API에서 가져온 카테고리 이름 (API 사용 시) */
+  displayName?: string;
+  /** API에서 가져온 이모지 아이콘 (API 사용 시) */
+  emojiIcon?: string;
 }
 
 interface FAQCategoryProps {
@@ -62,6 +66,13 @@ const createDefaultCategories = (): FAQCategoryItem[] => {
  * @returns 렌더링할 아이콘 JSX 엘리먼트
  */
 const renderCategoryIcon = (category: FAQCategoryItem): React.ReactNode => {
+  // API에서 가져온 이모지 아이콘 우선 표시
+  if (category.emojiIcon) {
+    return (
+      <span className="text-base">{category.emojiIcon}</span>
+    );
+  }
+  
   if (category.iconConfig) {
     return (
       <Icon 
@@ -156,7 +167,7 @@ const CategoryButton: React.FC<CategoryButtonProps> = ({
         {renderCategoryIcon(category)}
       </div>
       <span className={STYLES.TEXT_SPAN}>
-        {t(category.textKey)}
+        {category.displayName || t(category.textKey)}
       </span>
     </button>
   </div>

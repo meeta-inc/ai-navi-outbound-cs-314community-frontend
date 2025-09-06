@@ -62,13 +62,13 @@ export async function getQuickReplyQuestions(
 /**
  * Fetch top 5 questions for Top Questions component
  * @param grade - Grade level (preschool, elementary, middle, high)
- * @param categoryId - Category ID (curriculum, schedule, pricing)
+ * @param categoryId - Category ID (curriculum, schedule, pricing or API categoryId like CAT202508150001)
  * @param clientId - Client ID (defaults to RS000001)
  * @returns Promise with top questions
  */
 export async function getTopQuestions(
   grade: GradeType,
-  categoryId: CategoryType,
+  categoryId: CategoryType | string,
   clientId: string = 'RS000001'
 ): Promise<TopQuestionsApiResponse | null> {
   if (!USE_FAQ_API) {
@@ -76,11 +76,18 @@ export async function getTopQuestions(
   }
 
   try {
-    // Map category to API categoryId
-    const apiCategoryId = CATEGORY_ID_MAP[categoryId];
-    if (!apiCategoryId) {
-      console.error('Invalid category ID:', categoryId);
-      return null;
+    // API에서 받은 categoryId(CAT로 시작)인 경우 직접 사용, 아니면 매핑 사용
+    let apiCategoryId: string;
+    if (categoryId.startsWith('CAT')) {
+      // API에서 받은 categoryId 직접 사용
+      apiCategoryId = categoryId;
+    } else {
+      // 기존 매핑 사용
+      apiCategoryId = CATEGORY_ID_MAP[categoryId as CategoryType];
+      if (!apiCategoryId) {
+        console.error('Invalid category ID:', categoryId);
+        return null;
+      }
     }
 
     const params = new URLSearchParams({
