@@ -186,6 +186,25 @@ export class DemoVoiceService {
   }
   
   /**
+   * 오디오 컨텍스트 활성화 (모바일 대응)
+   * 사용자 상호작용 시점에 호출하여 오디오 재생 권한 획득
+   */
+  async activateAudioContext(): Promise<void> {
+    try {
+      // 무음 데이터 URI (1초의 무음)
+      const silentAudioData = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAAA=';
+      const audio = new Audio(silentAudioData);
+      audio.volume = 0.01;
+      
+      // 무음 재생으로 오디오 컨텍스트 활성화
+      await audio.play();
+      console.log('[Demo Mode] Audio context activated');
+    } catch (error) {
+      console.warn('[Demo Mode] Failed to activate audio context:', error);
+    }
+  }
+
+  /**
    * Audio 요소를 사용한 직접 재생 (CORS 우회)
    */
   async playAudioDirect(voiceFile: string): Promise<void> {
