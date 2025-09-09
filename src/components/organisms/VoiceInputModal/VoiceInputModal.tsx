@@ -227,6 +227,11 @@ export function VoiceInputModal({
 
   // Handle recording start
   const startRecording = async () => {
+    // 데모 모드에서 모바일 오디오 컨텍스트 활성화
+    if (isDemoMode) {
+      await demoVoiceService.activateAudioContext();
+    }
+    
     if (!recognitionService.current) {
       setError('音声認識サービスが利用できません');
       return;
