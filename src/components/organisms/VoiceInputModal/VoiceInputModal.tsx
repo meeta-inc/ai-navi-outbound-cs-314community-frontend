@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Mic, Square, Send, Volume2, Check, User, Bot } from 'lucide-react';
+import { X, Mic, Square, Send, Volume2, Check, User, Bot, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { SpeechRecognitionService } from '../../../services/speechRecognition';
@@ -8,6 +8,7 @@ import { getColorClasses } from '../../../shared/config/theme.config';
 import { getAccentColor } from '../../../shared/config/app.config';
 import { openAITTSService } from '../../../services/openai/ttsService';
 import { sendChatMessage } from '../../../services/api/chat';
+import { DemoVoiceService, demoVoiceService } from '../../../services/demo/demoVoiceService';
 import type { LLMResponse } from '../../../types';
 
 interface VoiceInputModalProps {
@@ -54,6 +55,9 @@ export function VoiceInputModal({
   const silenceDuration = parseInt(import.meta.env.VITE_VOICE_SILENCE_DURATION || '1500');
   const ttsAutoPlay = import.meta.env.VITE_TTS_AUTO_PLAY === 'true';
   
+  // 데모 모드 체크
+  const isDemoMode = DemoVoiceService.isDemoMode();
+  
   const recognitionService = useRef<SpeechRecognitionService | null>(null);
   const animationRef = useRef<number>();
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
@@ -61,6 +65,16 @@ export function VoiceInputModal({
   
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
+
+  // Initialize demo mode
+  useEffect(() => {
+    if (isDemoMode && isOpen) {
+      // 데모 모드일 때 시나리오 프리로드
+      demoVoiceService.loadScenarios().catch(error => {
+        console.error('[Demo Mode] Failed to load scenarios:', error);
+      });
+    }
+  }, [isDemoMode, isOpen]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -251,41 +265,79 @@ export function VoiceInputModal({
       // 2. 대기 상태 표시
       setIsWaitingForResponse(true);
       
-      // 3. Chat API 호출
-      const response = await sendChatMessage(userInput, userId);
+      let responseText = '';
+      let audioBuffer: ArrayBuffer | undefined;
       
-      if (response.llmResponse) {
-        // 4. main 버블만 추출
-        const mainBubble = response.llmResponse.response.find(
-          bubble => bubble.type === 'main'
-        );
+      // 3. 데모 모드 또는 실제 API 호출 분기
+      if (isDemoMode) {
+        // 데모 모드: 시나리오 기반 응답
+        console.log('[Demo Mode] Processing user input:', userInput);
+        const demoResponse = await demoVoiceService.processUserInput(userInput);
+        responseText = demoResponse.text;
+        audioBuffer = demoResponse.audioBuffer;
         
-        if (mainBubble && mainBubble.text) {
-          // 5. AI 응답을 현재 대화에 추가
-          const botMessage: Message = {
-            id: `bot-${Date.now()}`,
-            type: 'bot',
-            content: mainBubble.text,
-            timestamp: new Date()
+        // 데모 응답을 LLM 형식으로 변환 (채팅 화면 호환성)
+        if (onChatUpdate) {
+          const mockLLMResponse: LLMResponse = {
+            response: [
+              {
+                type: 'main',
+                text: responseText
+              }
+            ],
+            status: 200
           };
-          setCurrentConversation([userMessage, botMessage]);
+          onChatUpdate(userInput, responseText, mockLLMResponse);
+        }
+      } else {
+        // 실제 모드: Chat API 호출
+        const response = await sendChatMessage(userInput, userId);
+        
+        if (response.llmResponse) {
+          // main 버블만 추출
+          const mainBubble = response.llmResponse.response.find(
+            bubble => bubble.type === 'main'
+          );
           
-          // 6. TTS 자동 재생 (환경 변수 확인)
-          if (ttsAutoPlay && openAITTSService.isConfigured()) {
-            setIsSpeaking(true);
-            try {
-              const audioBuffer = await openAITTSService.synthesizeSpeech(mainBubble.text);
-              await openAITTSService.playAudio(audioBuffer);
-            } catch (ttsError) {
-              console.error('TTS Error:', ttsError);
-            } finally {
-              setIsSpeaking(false);
+          if (mainBubble && mainBubble.text) {
+            responseText = mainBubble.text;
+            
+            // TTS를 위한 음성 생성
+            if (ttsAutoPlay && openAITTSService.isConfigured()) {
+              try {
+                audioBuffer = await openAITTSService.synthesizeSpeech(responseText);
+              } catch (ttsError) {
+                console.error('TTS Error:', ttsError);
+              }
+            }
+            
+            // 채팅 화면에 전체 대화 전달
+            if (onChatUpdate) {
+              onChatUpdate(userInput, responseText, response.llmResponse);
             }
           }
-          
-          // 7. 채팅 화면에 전체 대화 전달 (전체 llmResponse 전달)
-          if (onChatUpdate) {
-            onChatUpdate(userInput, mainBubble.text, response.llmResponse);
+        }
+      }
+      
+      // 4. AI 응답을 현재 대화에 추가
+      if (responseText) {
+        const botMessage: Message = {
+          id: `bot-${Date.now()}`,
+          type: 'bot',
+          content: responseText,
+          timestamp: new Date()
+        };
+        setCurrentConversation([userMessage, botMessage]);
+        
+        // 5. 음성 재생 (데모 또는 TTS)
+        if (audioBuffer && ttsAutoPlay) {
+          setIsSpeaking(true);
+          try {
+            await openAITTSService.playAudio(audioBuffer);
+          } catch (playError) {
+            console.error('Audio playback error:', playError);
+          } finally {
+            setIsSpeaking(false);
           }
         }
       }
@@ -447,7 +499,19 @@ export function VoiceInputModal({
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 pb-4">
-              <h3 className="text-xl font-bold text-gray-900">AI音声相談</h3>
+              <div className="flex items-center gap-3">
+                <h3 className="text-xl font-bold text-gray-900">AI音声相談</h3>
+                {isDemoMode && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full shadow-sm"
+                  >
+                    <Zap className="w-3.5 h-3.5 text-white" />
+                    <span className="text-xs font-semibold text-white">DEMO</span>
+                  </motion.div>
+                )}
+              </div>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -908,7 +972,9 @@ export function VoiceInputModal({
                 </div>
                 
                 <p className="text-xs text-gray-400 leading-relaxed max-w-xs mx-auto px-4">
-                  音声認識の精度向上のため、静かな環境でご利用ください
+                  {isDemoMode 
+                    ? 'デモモード：事前定義された応答を使用しています' 
+                    : '音声認識の精度向上のため、静かな環境でご利用ください'}
                 </p>
               </motion.div>
             </div>
