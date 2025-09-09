@@ -178,17 +178,45 @@ export class DemoVoiceService {
   /**
    * 음성을 ArrayBuffer로 가져오기 (TTS 서비스와의 호환성)
    */
-  async getAudioBuffer(voiceFile: string): Promise<ArrayBuffer> {
-    try {
-      const response = await fetch(voiceFile);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch audio: ${response.statusText}`);
-      }
-      return await response.arrayBuffer();
-    } catch (error) {
-      console.error('[Demo Mode] Failed to get audio buffer:', error);
-      throw error;
+  async getAudioBuffer(voiceFile: string): Promise<ArrayBuffer | undefined> {
+    // 데모 모드에서는 CORS 문제로 인해 직접 재생 방식 사용
+    // ArrayBuffer 대신 undefined 반환
+    console.log('[Demo Mode] Will use direct audio playback for:', voiceFile);
+    return undefined;
+  }
+  
+  /**
+   * Audio 요소를 사용한 직접 재생 (CORS 우회)
+   */
+  async playAudioDirect(voiceFile: string): Promise<void> {
+    if (!voiceFile) {
+      console.log('[Demo Mode] No voice file to play');
+      return;
     }
+
+    return new Promise((resolve) => {
+      console.log('[Demo Mode] Playing audio directly from S3:', voiceFile);
+      
+      const audio = new Audio(voiceFile);
+      // crossOrigin 설정 제거 (CORS 우회를 위해)
+      
+      audio.onended = () => {
+        console.log('[Demo Mode] Audio playback completed');
+        resolve();
+      };
+      
+      audio.onerror = (error) => {
+        console.error('[Demo Mode] Audio playback error:', error);
+        // 에러가 나도 앱이 멈추지 않도록 resolve 처리
+        resolve();
+      };
+      
+      audio.play().catch(error => {
+        console.error('[Demo Mode] Failed to play audio:', error);
+        // 자동 재생 정책 등으로 실패해도 계속 진행
+        resolve();
+      });
+    });
   }
 
   /**
@@ -197,6 +225,7 @@ export class DemoVoiceService {
   async processUserInput(userInput: string): Promise<{
     text: string;
     audioBuffer?: ArrayBuffer;
+    voiceFile?: string;
     duration: number;
   }> {
     // 시나리오 로드 확인
@@ -207,20 +236,11 @@ export class DemoVoiceService {
     // 매칭 시나리오 찾기
     const scenario = this.findMatchingScenario(userInput);
     
-    // 음성 파일이 있는 경우 버퍼 가져오기
-    let audioBuffer: ArrayBuffer | undefined;
-    if (scenario.response.voiceFile) {
-      try {
-        audioBuffer = await this.getAudioBuffer(scenario.response.voiceFile);
-      } catch (error) {
-        console.warn('[Demo Mode] Could not load audio buffer:', error);
-      }
-    }
-
-    // 응답 반환
+    // 데모 모드에서는 직접 재생을 위해 voiceFile URL 반환
     return {
       text: scenario.response.text,
-      audioBuffer,
+      audioBuffer: undefined, // CORS 문제로 ArrayBuffer 사용 안함
+      voiceFile: scenario.response.voiceFile, // 직접 재생용 URL
       duration: scenario.response.duration
     };
   }

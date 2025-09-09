@@ -11,6 +11,13 @@ import { sendChatMessage } from '../../../services/api/chat';
 import { DemoVoiceService, demoVoiceService } from '../../../services/demo/demoVoiceService';
 import type { LLMResponse } from '../../../types';
 
+// 데모 모드용 window 확장
+declare global {
+  interface Window {
+    __demoVoiceFile?: string;
+  }
+}
+
 interface VoiceInputModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -272,9 +279,18 @@ export function VoiceInputModal({
       if (isDemoMode) {
         // 데모 모드: 시나리오 기반 응답
         console.log('[Demo Mode] Processing user input:', userInput);
+        
+        // 데모 모드에서 1초 지연 추가 (로딩 시뮬레이션)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const demoResponse = await demoVoiceService.processUserInput(userInput);
         responseText = demoResponse.text;
-        audioBuffer = demoResponse.audioBuffer;
+        
+        // 데모 모드에서는 직접 재생용 voiceFile 사용
+        if (demoResponse.voiceFile && ttsAutoPlay) {
+          // 나중에 직접 재생할 voiceFile 저장
+          window.__demoVoiceFile = demoResponse.voiceFile;
+        }
         
         // 데모 응답을 LLM 형식으로 변환 (채팅 화면 호환성)
         if (onChatUpdate) {
@@ -330,7 +346,19 @@ export function VoiceInputModal({
         setCurrentConversation([userMessage, botMessage]);
         
         // 5. 음성 재생 (데모 또는 TTS)
-        if (audioBuffer && ttsAutoPlay) {
+        if (isDemoMode && window.__demoVoiceFile && ttsAutoPlay) {
+          // 데모 모드: 직접 재생
+          setIsSpeaking(true);
+          try {
+            await demoVoiceService.playAudioDirect(window.__demoVoiceFile);
+            delete window.__demoVoiceFile; // 재생 후 정리
+          } catch (playError) {
+            console.error('Demo audio playback error:', playError);
+          } finally {
+            setIsSpeaking(false);
+          }
+        } else if (audioBuffer && ttsAutoPlay) {
+          // 실제 모드: TTS ArrayBuffer 재생
           setIsSpeaking(true);
           try {
             await openAITTSService.playAudio(audioBuffer);

@@ -28,7 +28,7 @@
         "学習内容"
       ],
       "response": {
-        "text": "3.14 communityでは、主要5教科（英語・数学・国語・理科・社会）を中心に指導しています。特に数学と英語に力を入れており、基礎から応用まで段階的に学習できるカリキュラムを用意しています。",
+        "text": "3.14 communityでは、中学生向けに5教科 国語 数学 英語 理科 社会を中心とした幅広い教科指導を提供しています。受講科目は定額制で、必要な教科を必要なだけ受講することができます。",
         "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_002_subjects.mp3",
         "duration": 12
       }
@@ -43,7 +43,7 @@
         "最寄り駅"
       ],
       "response": {
-        "text": "3.14 communityは都内に複数の教室があります。最寄りの教室については、お住まいの地域をお聞かせいただければ、最適な教室をご案内いたします。各教室とも駅から徒歩5分以内の便利な立地です。",
+        "text": "クレファス札幌本校は、地下鉄南北線大通駅や札幌市電西4丁目駅、西8丁目駅から徒歩圏内の中央区南1条西6丁目（旭川信金ビル4F）に位置しており、札幌市内の主要な交通機関からアクセスが大変便利です。",
         "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_003_location.mp3",
         "duration": 10
       }
@@ -58,7 +58,7 @@
         "体験授業"
       ],
       "response": {
-        "text": "はい、無料体験授業を実施しています。実際の授業の雰囲気を体験していただけるよう、2週間の無料体験期間を設けています。まずはお気軽にお申し込みください。",
+        "text": "はい！3.14コミュニティでは、体験授業や教室見学を随時受け付けております。実際の雰囲気や授業スタイルを体感してから入塾をご検討ください",
         "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_004_trial.mp3",
         "duration": 8
       }
@@ -73,7 +73,7 @@
         "授業時間"
       ],
       "response": {
-        "text": "授業は平日の16:00から21:00まで、土曜日は10:00から18:00まで開講しています。部活動との両立もできるよう、複数の時間帯をご用意しています。",
+        "text": "札幌本校と琴似校の2つの教室で開講しております。具体的な曜日や時間については、各教室によって異なりますので、詳細な情報が必要な場合はお問い合わせいただく必要がございます。",
         "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_005_schedule.mp3",
         "duration": 9
       }
@@ -83,7 +83,7 @@
       "triggers": [],
       "response": {
         "text": "ご質問ありがとうございます。3.14 communityについて詳しくご説明いたします。どのような点についてお知りになりたいでしょうか？授業料、カリキュラム、教室の場所など、お気軽にお尋ねください。",
-        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_default.mp3",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_005_schedule.mp3",
         "duration": 10
       }
     }
