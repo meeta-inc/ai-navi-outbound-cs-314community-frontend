@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "demo_001_fee",
+      "triggers": [
+        "授業料",
+        "いくら",
+        "料金",
+        "費用",
+        "月謝",
+        "値段",
+        "価格"
+      ],
+      "response": {
+        "text": "3.14 communityの授業料は、中1・2年生の場合、1科目25,260円から始まり、科目数に応じて段階的に上がっていきます。中3は2科目30,920円からスタートし、最大5科目で37,350円となっています。入会金・諸経費は別途必要です。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_001_fee.mp3",
+        "duration": 15
+      }
+    },
+    {
+      "id": "demo_002_subjects",
+      "triggers": [
+        "科目",
+        "教科",
+        "何を教え",
+        "勉強",
+        "学習内容"
+      ],
+      "response": {
+        "text": "3.14 communityでは、中学生向けに5教科 国語 数学 英語 理科 社会を中心とした幅広い教科指導を提供しています。受講科目は定額制で、必要な教科を必要なだけ受講することができます。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_002_subjects.mp3",
+        "duration": 12
+      }
+    },
+    {
+      "id": "demo_003_location",
+      "triggers": [
+        "場所",
+        "どこ",
+        "アクセス",
+        "住所",
+        "最寄り駅"
+      ],
+      "response": {
+        "text": "クレファス札幌本校は、地下鉄南北線大通駅や札幌市電西4丁目駅、西8丁目駅から徒歩圏内の中央区南1条西6丁目（旭川信金ビル4F）に位置しており、札幌市内の主要な交通機関からアクセスが大変便利です。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_003_location.mp3",
+        "duration": 10
+      }
+    },
+    {
+      "id": "demo_004_trial",
+      "triggers": [
+        "体験",
+        "無料",
+        "お試し",
+        "見学",
+        "体験授業"
+      ],
+      "response": {
+        "text": "はい！3.14コミュニティでは、体験授業や教室見学を随時受け付けております。実際の雰囲気や授業スタイルを体感してから入塾をご検討ください",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_004_trial.mp3",
+        "duration": 8
+      }
+    },
+    {
+      "id": "demo_005_schedule",
+      "triggers": [
+        "時間",
+        "スケジュール",
+        "何時",
+        "曜日",
+        "授業時間"
+      ],
+      "response": {
+        "text": "札幌本校と琴似校の2つの教室で開講しております。具体的な曜日や時間については、各教室によって異なりますので、詳細な情報が必要な場合はお問い合わせいただく必要がございます。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_005_schedule.mp3",
+        "duration": 9
+      }
+    },
+    {
+      "id": "demo_default",
+      "triggers": [],
+      "response": {
+        "text": "ご質問ありがとうございます。3.14 communityについて詳しくご説明いたします。どのような点についてお知りになりたいでしょうか？授業料、カリキュラム、教室の場所など、お気軽にお尋ねください。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_005_schedule.mp3",
+        "duration": 10
+      }
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-01-08",
+    "totalScenarios": 6
+  }
+}

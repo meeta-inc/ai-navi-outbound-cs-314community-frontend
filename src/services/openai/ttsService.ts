@@ -44,16 +44,36 @@ export class OpenAITTSService {
   }
 
   async playAudio(audioBuffer: ArrayBuffer): Promise<void> {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const audioBufferDecoded = await audioContext.decodeAudioData(audioBuffer);
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBufferDecoded;
-    source.connect(audioContext.destination);
+    // 빈 버퍼 체크
+    if (!audioBuffer || audioBuffer.byteLength === 0) {
+      console.warn('[TTS] Empty audio buffer, skipping playback');
+      return;
+    }
     
-    return new Promise((resolve) => {
-      source.onended = () => resolve();
-      source.start(0);
-    });
+    try {
+      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      
+      // iOS에서 자동 재생을 위한 처리
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      
+      const audioBufferDecoded = await audioContext.decodeAudioData(audioBuffer.slice(0));
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBufferDecoded;
+      source.connect(audioContext.destination);
+      
+      return new Promise((resolve) => {
+        source.onended = () => {
+          audioContext.close();
+          resolve();
+        };
+        source.start(0);
+      });
+    } catch (error) {
+      console.error('[TTS] Failed to play audio:', error);
+      throw error;
+    }
   }
 
   isConfigured(): boolean {

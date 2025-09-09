@@ -25,7 +25,8 @@ dist-ssr
 
 # 빌드 디렉토리
 build
-public
+# public 폴더는 데모 시나리오를 위해 추적
+# public
 *storybook.log
 storybook-static
 .env
@@ -33,3 +34,4 @@ storybook-static
 # 테스트 커버리지 파일
 coverage/
 sample/
+.serena/
