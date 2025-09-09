@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "scenarios": [
+    {
+      "id": "demo_001_fee",
+      "triggers": [
+        "授業料",
+        "いくら",
+        "料金",
+        "費用",
+        "月謝",
+        "値段",
+        "価格"
+      ],
+      "response": {
+        "text": "3.14 communityの授業料は、中1・2年生の場合、1科目25,260円から始まり、科目数に応じて段階的に上がっていきます。中3は2科目30,920円からスタートし、最大5科目で37,350円となっています。入会金・諸経費は別途必要です。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_001_fee.mp3",
+        "duration": 15
+      }
+    },
+    {
+      "id": "demo_002_subjects",
+      "triggers": [
+        "科目",
+        "教科",
+        "何を教え",
+        "勉強",
+        "学習内容"
+      ],
+      "response": {
+        "text": "3.14 communityでは、主要5教科（英語・数学・国語・理科・社会）を中心に指導しています。特に数学と英語に力を入れており、基礎から応用まで段階的に学習できるカリキュラムを用意しています。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_002_subjects.mp3",
+        "duration": 12
+      }
+    },
+    {
+      "id": "demo_003_location",
+      "triggers": [
+        "場所",
+        "どこ",
+        "アクセス",
+        "住所",
+        "最寄り駅"
+      ],
+      "response": {
+        "text": "3.14 communityは都内に複数の教室があります。最寄りの教室については、お住まいの地域をお聞かせいただければ、最適な教室をご案内いたします。各教室とも駅から徒歩5分以内の便利な立地です。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_003_location.mp3",
+        "duration": 10
+      }
+    },
+    {
+      "id": "demo_004_trial",
+      "triggers": [
+        "体験",
+        "無料",
+        "お試し",
+        "見学",
+        "体験授業"
+      ],
+      "response": {
+        "text": "はい、無料体験授業を実施しています。実際の授業の雰囲気を体験していただけるよう、2週間の無料体験期間を設けています。まずはお気軽にお申し込みください。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_004_trial.mp3",
+        "duration": 8
+      }
+    },
+    {
+      "id": "demo_005_schedule",
+      "triggers": [
+        "時間",
+        "スケジュール",
+        "何時",
+        "曜日",
+        "授業時間"
+      ],
+      "response": {
+        "text": "授業は平日の16:00から21:00まで、土曜日は10:00から18:00まで開講しています。部活動との両立もできるよう、複数の時間帯をご用意しています。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_005_schedule.mp3",
+        "duration": 9
+      }
+    },
+    {
+      "id": "demo_default",
+      "triggers": [],
+      "response": {
+        "text": "ご質問ありがとうございます。3.14 communityについて詳しくご説明いたします。どのような点についてお知りになりたいでしょうか？授業料、カリキュラム、教室の場所など、お気軽にお尋ねください。",
+        "voiceFile": "https://meeta-ai-navi.s3.ap-northeast-1.amazonaws.com/demo/voice/voice_demo_default.mp3",
+        "duration": 10
+      }
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-01-08",
+    "totalScenarios": 6
+  }
+}
