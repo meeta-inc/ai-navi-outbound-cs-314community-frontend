@@ -166,8 +166,11 @@ export class SpeechRecognitionService {
     if (this.isListening) {
       try {
         this.recognition.stop();
+        // 즉시 상태 변경
+        this.isListening = false;
       } catch (error) {
         console.error('Error stopping recognition:', error);
+        this.isListening = false; // 에러 발생 시에도 상태 초기화
       }
     }
   }
@@ -181,8 +184,11 @@ export class SpeechRecognitionService {
     if (this.isListening) {
       try {
         this.recognition.abort();
+        // 즉시 상태 변경
+        this.isListening = false;
       } catch (error) {
         console.error('Error aborting recognition:', error);
+        this.isListening = false; // 에러 발생 시에도 상태 초기화
       }
     }
   }

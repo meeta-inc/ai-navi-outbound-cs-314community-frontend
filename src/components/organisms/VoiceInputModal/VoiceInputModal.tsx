@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Mic, Square, Send, Volume2, Check, User, Bot, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocale } from '../../../contexts/LocaleContext';
@@ -193,6 +193,30 @@ export function VoiceInputModal({
     };
   }, [isRecording]);
 
+  // 음성 재생 중일 때 자동으로 녹음 중단
+  useEffect(() => {
+    if (isSpeaking) {
+      console.log('[VoiceInput] Speaking started - checking microphone state');
+      
+      // UI 상태 체크
+      if (isRecording) {
+        console.log('[VoiceInput] Stopping recording because speaking started');
+        stopRecording();
+      }
+      
+      // recognitionService 백그라운드 실행 강제 중단
+      if (recognitionService.current?.getIsListening()) {
+        console.log('[VoiceInput] Force stopping recognition service during speech');
+        recognitionService.current.abort();
+        setTimeout(() => {
+          if (recognitionService.current?.getIsListening()) {
+            recognitionService.current.stop();
+          }
+        }, 100);
+      }
+    }
+  }, [isSpeaking, isRecording]);
+
   // Typing animation
   const animateTyping = (text: string) => {
     setDisplayTranscript('');
@@ -227,6 +251,12 @@ export function VoiceInputModal({
 
   // Handle recording start
   const startRecording = async () => {
+    // 음성 재생 중일 때는 녹음을 시작하지 않음
+    if (isSpeaking) {
+      console.log('[VoiceInput] Cannot start recording while speaking');
+      return;
+    }
+    
     // 데모 모드에서 모바일 오디오 컨텍스트 활성화
     if (isDemoMode) {
       await demoVoiceService.activateAudioContext();
@@ -250,9 +280,18 @@ export function VoiceInputModal({
   };
 
   // Handle recording stop
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (recognitionService.current) {
-      recognitionService.current.stop();
+      // 더 강력한 중단을 위해 abort() 사용
+      recognitionService.current.abort();
+      
+      // 잠시 후 stop()도 호출하여 확실히 중단
+      setTimeout(() => {
+        if (recognitionService.current) {
+          recognitionService.current.stop();
+        }
+      }, 100);
+      
       setIsRecording(false);
       setIsProcessing(true);
       
@@ -260,7 +299,7 @@ export function VoiceInputModal({
         setIsProcessing(false);
       }, 1000);
     }
-  };
+  }, []);
 
   // 음성 대화 처리 함수
   const handleVoiceConversation = async (userInput: string) => {
@@ -355,7 +394,29 @@ export function VoiceInputModal({
           // 데모 모드: 직접 재생
           setIsSpeaking(true);
           try {
-            await demoVoiceService.playAudioDirect(window.__demoVoiceFile);
+            await demoVoiceService.playAudioDirect(window.__demoVoiceFile, {
+              onStart: () => {
+                // 음성 재생 시작 시 마이크 강제 비활성화
+                console.log('[VoiceInput] Audio playback started, stopping microphone');
+                if (isRecording) {
+                  stopRecording();
+                }
+                // recognitionService가 백그라운드에서 실행중인지 추가 체크
+                if (recognitionService.current?.getIsListening()) {
+                  console.log('[VoiceInput] Force aborting recognition service');
+                  recognitionService.current.abort();
+                  setTimeout(() => {
+                    if (recognitionService.current?.getIsListening()) {
+                      recognitionService.current.stop();
+                    }
+                  }, 100);
+                }
+              },
+              onEnd: () => {
+                // 음성 재생 종료 후 특별한 처리 없음 (사용자가 직접 마이크 버튼을 누르도록)
+                console.log('[VoiceInput] Audio playback ended');
+              }
+            });
             delete window.__demoVoiceFile; // 재생 후 정리
           } catch (playError) {
             console.error('Demo audio playback error:', playError);
@@ -403,7 +464,8 @@ export function VoiceInputModal({
           setIsSending(false);
         }, 2000);
         
-      } catch (error) {
+      } catch (sendError) {
+        console.error('Send message error:', sendError);
         setError('メッセージの送信に失敗しました');
         setIsSending(false);
       }
@@ -908,7 +970,7 @@ export function VoiceInputModal({
                   
                   <motion.button
                     onClick={isRecording ? stopRecording : startRecording}
-                    disabled={isProcessing || isSending || !SpeechRecognitionService.isSupported()}
+                    disabled={isProcessing || isSending || isWaitingForResponse || isSpeaking || !SpeechRecognitionService.isSupported()}
                     className={`relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl ${
                       isRecording
                         ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-300'

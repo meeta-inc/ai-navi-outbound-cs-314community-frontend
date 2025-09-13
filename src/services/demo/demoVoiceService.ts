@@ -212,7 +212,10 @@ export class DemoVoiceService {
   /**
    * Audio 요소를 사용한 직접 재생 (CORS 우회)
    */
-  async playAudioDirect(voiceFile: string): Promise<void> {
+  async playAudioDirect(voiceFile: string, options?: {
+    onStart?: () => void;
+    onEnd?: () => void;
+  }): Promise<void> {
     if (!voiceFile) {
       console.log('[Demo Mode] No voice file to play');
       return;
@@ -227,12 +230,24 @@ export class DemoVoiceService {
       console.log('[Demo Mode] Playing audio with persistent element:', voiceFile);
       
       const onEnded = () => {
+        if (audio === this.persistentAudio) {
+          audio.pause();
+          audio.src = '';
+          audio.load();
+        }
+        options?.onEnd?.();
         cleanup();
         resolve();
       };
       
       const onError = (error: Event | string) => {
         console.error('[Demo Mode] Audio playback error:', error);
+        if (audio === this.persistentAudio) {
+            audio.pause();
+            audio.src = '';
+            audio.load();
+        }
+        options?.onEnd?.();
         cleanup();
         resolve();
       };
@@ -240,10 +255,19 @@ export class DemoVoiceService {
       const cleanup = () => {
         audio.removeEventListener('ended', onEnded);
         audio.removeEventListener('error', onError);
+        audio.removeEventListener('play', onPlay);
       }
+
+      // 오디오 재생 시작 이벤트 핸들러
+      const onPlay = () => {
+        console.log('[Demo Mode] Audio playback started');
+        options?.onStart?.();
+        audio.removeEventListener('play', onPlay);
+      };
 
       audio.addEventListener('ended', onEnded);
       audio.addEventListener('error', onError);
+      audio.addEventListener('play', onPlay);
       
       audio.src = voiceFile;
       const playPromise = audio.play();
@@ -252,23 +276,24 @@ export class DemoVoiceService {
         playPromise.catch(error => {
           console.error('[Demo Mode] Failed to play audio automatically:', error);
 
-          // Fallback for iOS: if it's a NotAllowedError, wait for the next user interaction.
           if (error.name === 'NotAllowedError') {
             const playOnInteraction = () => {
               audio.play().catch(err => {
                 console.error('[Demo Mode] Failed to play audio on interaction:', err);
+                // If it fails even on interaction, resolve to unblock.
+                onError(err); 
               });
-              // The { once: true } option will automatically remove the listener.
             };
 
             console.log('[Demo Mode] Waiting for user interaction to play audio...');
             document.addEventListener('touchstart', playOnInteraction, { once: true });
             document.addEventListener('click', playOnInteraction, { once: true });
+            
+            // DO NOT resolve here. Wait for the interaction and for onEnded to fire.
+          } else {
+            // For other errors, resolve to unblock the app.
+            onError(error);
           }
-          
-          // In any case of playback start error, resolve the promise to not block the app flow.
-          cleanup();
-          resolve();
         });
       }
     });
