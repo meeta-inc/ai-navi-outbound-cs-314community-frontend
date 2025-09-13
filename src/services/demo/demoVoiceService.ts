@@ -26,6 +26,7 @@ export class DemoVoiceService {
   private scenarios: DemoScenario[] = [];
   private audioCache: Map<string, HTMLAudioElement> = new Map();
   private isLoaded = false;
+  private persistentAudio: HTMLAudioElement | null = null;
 
   /**
    * 데모 모드 활성화 여부 확인
@@ -190,17 +191,21 @@ export class DemoVoiceService {
    * 사용자 상호작용 시점에 호출하여 오디오 재생 권한 획득
    */
   async activateAudioContext(): Promise<void> {
+    if (this.persistentAudio) {
+      return;
+    }
     try {
-      // 무음 데이터 URI (1초의 무음)
-      const silentAudioData = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAAA=';
-      const audio = new Audio(silentAudioData);
-      audio.volume = 0.01;
+      console.log('[Demo Mode] Activating audio context...');
+      this.persistentAudio = new Audio();
+      this.persistentAudio.volume = 0;
+      this.persistentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAAA=';
       
-      // 무음 재생으로 오디오 컨텍스트 활성화
-      await audio.play();
-      console.log('[Demo Mode] Audio context activated');
+      await this.persistentAudio.play();
+      this.persistentAudio.volume = 1;
+      console.log('[Demo Mode] Audio context activated with persistent element.');
     } catch (error) {
       console.warn('[Demo Mode] Failed to activate audio context:', error);
+      this.persistentAudio = null;
     }
   }
 
@@ -213,28 +218,59 @@ export class DemoVoiceService {
       return;
     }
 
+    const audio = this.persistentAudio || new Audio();
+    if (!this.persistentAudio) {
+        console.warn('[Demo Mode] Persistent audio element not available. Creating new one. This might fail on iOS.');
+    }
+
     return new Promise((resolve) => {
-      console.log('[Demo Mode] Playing audio directly from S3:', voiceFile);
+      console.log('[Demo Mode] Playing audio with persistent element:', voiceFile);
       
-      const audio = new Audio(voiceFile);
-      // crossOrigin 설정 제거 (CORS 우회를 위해)
-      
-      audio.onended = () => {
-        console.log('[Demo Mode] Audio playback completed');
+      const onEnded = () => {
+        cleanup();
         resolve();
       };
       
-      audio.onerror = (error) => {
+      const onError = (error: Event | string) => {
         console.error('[Demo Mode] Audio playback error:', error);
-        // 에러가 나도 앱이 멈추지 않도록 resolve 처리
+        cleanup();
         resolve();
       };
+
+      const cleanup = () => {
+        audio.removeEventListener('ended', onEnded);
+        audio.removeEventListener('error', onError);
+      }
+
+      audio.addEventListener('ended', onEnded);
+      audio.addEventListener('error', onError);
       
-      audio.play().catch(error => {
-        console.error('[Demo Mode] Failed to play audio:', error);
-        // 자동 재생 정책 등으로 실패해도 계속 진행
-        resolve();
-      });
+      audio.src = voiceFile;
+      const playPromise = audio.play();
+
+      if (playPromise) {
+        playPromise.catch(error => {
+          console.error('[Demo Mode] Failed to play audio automatically:', error);
+
+          // Fallback for iOS: if it's a NotAllowedError, wait for the next user interaction.
+          if (error.name === 'NotAllowedError') {
+            const playOnInteraction = () => {
+              audio.play().catch(err => {
+                console.error('[Demo Mode] Failed to play audio on interaction:', err);
+              });
+              // The { once: true } option will automatically remove the listener.
+            };
+
+            console.log('[Demo Mode] Waiting for user interaction to play audio...');
+            document.addEventListener('touchstart', playOnInteraction, { once: true });
+            document.addEventListener('click', playOnInteraction, { once: true });
+          }
+          
+          // In any case of playback start error, resolve the promise to not block the app flow.
+          cleanup();
+          resolve();
+        });
+      }
     });
   }
 
