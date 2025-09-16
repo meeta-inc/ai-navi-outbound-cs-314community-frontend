@@ -92,9 +92,16 @@ export class SpeechRecognitionService {
 
     this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       console.error('Speech recognition error:', event.error);
-      
+
+      // abort 에러는 의도적인 중단이므로 에러 콜백을 호출하지 않음
+      if (event.error === 'aborted') {
+        console.log('Speech recognition aborted (intentional)');
+        this.isListening = false;
+        return;
+      }
+
       let errorMessage = 'Speech recognition error';
-      
+
       switch (event.error) {
         case 'not-allowed':
           errorMessage = 'マイクのアクセスが許可されていません';
@@ -166,8 +173,11 @@ export class SpeechRecognitionService {
     if (this.isListening) {
       try {
         this.recognition.stop();
+        // 즉시 상태 변경
+        this.isListening = false;
       } catch (error) {
         console.error('Error stopping recognition:', error);
+        this.isListening = false; // 에러 발생 시에도 상태 초기화
       }
     }
   }
@@ -181,8 +191,11 @@ export class SpeechRecognitionService {
     if (this.isListening) {
       try {
         this.recognition.abort();
+        // 즉시 상태 변경
+        this.isListening = false;
       } catch (error) {
         console.error('Error aborting recognition:', error);
+        this.isListening = false; // 에러 발생 시에도 상태 초기화
       }
     }
   }
