@@ -66,13 +66,14 @@ const createDefaultCategories = (): FAQCategoryItem[] => {
  * @returns 렌더링할 아이콘 JSX 엘리먼트
  */
 const renderCategoryIcon = (category: FAQCategoryItem): React.ReactNode => {
-  // API에서 가져온 이모지 아이콘 우선 표시
-  if (category.emojiIcon) {
+  // 1. API에서 가져온 이모지 아이콘 우선 표시 (타입 안전성 확보)
+  if (category.emojiIcon && typeof category.emojiIcon === 'string') {
     return (
       <span className="text-base">{category.emojiIcon}</span>
     );
   }
   
+  // 2. iconConfig 처리
   if (category.iconConfig) {
     return (
       <Icon 
@@ -82,12 +83,37 @@ const renderCategoryIcon = (category: FAQCategoryItem): React.ReactNode => {
     );
   }
   
-  // 백워드 호환성 지원
+  // 3. 백워드 호환성 지원 - 레거시 icon 필드 처리
   if (category.icon) {
-    return category.icon;
+    // 객체인 경우 (API 응답의 {type, value, color} 형태)
+    if (typeof category.icon === 'object' && 'type' in category.icon && 'value' in category.icon) {
+      const iconObj = category.icon as {type: string, value: string, color?: string | null};
+      
+      if (iconObj.type === 'emoji' && typeof iconObj.value === 'string') {
+        return <span className="text-base">{iconObj.value}</span>;
+      }
+      
+      if (iconObj.type === 'lucide' && typeof iconObj.value === 'string') {
+        return (
+          <Icon 
+            config={{
+              type: 'lucide',
+              value: iconObj.value
+            }} 
+            className={STYLES.ICON}
+          />
+        );
+      }
+      
+      // 알 수 없는 객체 타입의 경우 경고하고 기본 아이콘 사용
+      console.warn('Unknown icon object format:', iconObj);
+    } else {
+      // 기존 React.ReactNode 처리
+      return category.icon;
+    }
   }
   
-  // 기본 아이콘
+  // 4. 기본 아이콘
   return <MessageCircleMore className={STYLES.ICON} />;
 };
 
