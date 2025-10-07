@@ -25,6 +25,8 @@ import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/g
 import type { Message } from '../types';
 import { getCategories, isCategoryApiEnabled } from '../services/api/category';
 import { CategoryItem } from '../types/api/category.types';
+import { getAttributes, isAttributesApiEnabled } from '../services/api/attributes';
+import { AttributeItem } from '../types/api/attributes.types';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
@@ -42,6 +44,10 @@ function MainPage() {
   // API 카테고리 관련 상태
   const [apiCategories, setApiCategories] = useState<FAQCategoryItem[] | null>(null);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
+  
+  // API Attributes 관련 상태
+  const [apiGrades, setApiGrades] = useState<AttributeItem[] | null>(null);
+  const [gradesLoading, setGradesLoading] = useState(false);
   
   // 온보딩 관련 상태
   const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
@@ -135,13 +141,12 @@ function MainPage() {
       getCategories(clientId, true)
         .then(response => {
           if (response && response.items) {
-            // API 응답을 FAQCategoryItem 형식으로 변환
             const convertedCategories: FAQCategoryItem[] = response.items
               .sort((a, b) => a.displayOrder - b.displayOrder)
               .map(item => ({
                 id: item.categoryId,
-                textKey: '', // API 사용 시에는 사용하지 않음
-                valueKey: item.categoryId, // TopQuestions API에 전달할 categoryId
+                textKey: '',
+                valueKey: item.categoryId,
                 displayName: item.categoryName,
                 emojiIcon: item.icon
               }));
@@ -153,6 +158,24 @@ function MainPage() {
         })
         .finally(() => {
           setCategoriesLoading(false);
+        });
+    }
+  }, [clientId]);
+
+  useEffect(() => {
+    if (isAttributesApiEnabled() && clientId) {
+      setGradesLoading(true);
+      getAttributes(clientId, 'grade', true)
+        .then(response => {
+          if (response && response.items) {
+            setApiGrades(response.items);
+          }
+        })
+        .catch(error => {
+          console.error('Failed to load grade attributes:', error);
+        })
+        .finally(() => {
+          setGradesLoading(false);
         });
     }
   }, [clientId]);
@@ -509,6 +532,8 @@ function MainPage() {
                   <GradeSelection 
                     onGradeSelect={handleGradeSelect} 
                     clientId={clientId}
+                    apiGrades={apiGrades}
+                    isLoading={gradesLoading}
                   />
                 </div>
               )}
@@ -520,6 +545,8 @@ function MainPage() {
                   <GradeSelection 
                     onGradeSelect={handleGradeSelect}
                     clientId={clientId}
+                    apiGrades={apiGrades}
+                    isLoading={gradesLoading}
                   />
                 </div>
               )}
