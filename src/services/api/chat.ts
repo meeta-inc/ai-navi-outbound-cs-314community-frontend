@@ -62,6 +62,9 @@ export const sendChatMessage = async (
     const finalClientId = clientId || import.meta.env.VITE_CLIENT_ID || 'RS000001';
     const finalAppId = appId || import.meta.env.VITE_APP_ID || '0001';
     
+    // 환경변수에서 APP_ENV 값 가져오기 (기본값: dev)
+    const env = import.meta.env.VITE_APP_ENV || 'dev';
+    
     const response = await fetchApi('/students/chat', {
       method: 'POST',
       headers,
@@ -71,6 +74,7 @@ export const sendChatMessage = async (
         gradeId: gradeId || 'high', // 기본값 high
         userId,
         message,
+        env, // APP_ENV 값 추가
       }),
     });
 
