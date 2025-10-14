@@ -148,7 +148,8 @@ function MainPage() {
                 textKey: '',
                 valueKey: item.categoryId,
                 displayName: item.categoryName,
-                emojiIcon: item.icon
+                // API 응답의 icon 객체를 그대로 전달
+                icon: item.icon
               }));
             setApiCategories(convertedCategories);
           }
