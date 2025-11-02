@@ -162,6 +162,31 @@ describe('ChatBubble 컴포넌트', () => {
         const image = screen.getByRole('img', { name: '교재 표지' });
         expect(image).toHaveAttribute('src', 'https://example.com/textbook-thumb.jpg');
       });
+
+      it('file 타입 첨부파일이 있을 때 이미지를 표시해야 한다', () => {
+        const subBubble: BubbleResponse = {
+          type: 'sub',
+          text: '파일 첨부입니다.',
+          attachment: {
+            type: 'file',
+            url: 'https://example.com/document.png',
+            title: 'document.png'
+          }
+        };
+
+        render(
+          <ChatBubble
+            content={subBubble.text}
+            isBot={true}
+            accentColor="orange"
+            bubbleType={subBubble.type}
+            attachment={subBubble.attachment}
+          />
+        );
+
+        const image = screen.getByRole('img', { name: 'document.png' });
+        expect(image).toHaveAttribute('src', 'https://example.com/document.png');
+      });
     });
 
     describe('CTA 버블', () => {

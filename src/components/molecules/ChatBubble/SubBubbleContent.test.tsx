@@ -162,6 +162,25 @@ describe('SubBubbleContent', () => {
       expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
     });
 
+    it('file 타입 attachment는 텍스트만 표시한다 (AttachmentPreview는 ChatBubble에서 분리 렌더링)', () => {
+      const fileAttachment = {
+        type: 'file' as const,
+        url: 'https://example.com/document.png',
+        title: 'document.png'
+      };
+
+      render(
+        <SubBubbleContent 
+          content="파일을 확인하세요" 
+          attachment={fileAttachment}
+          isTypingComplete={true}
+        />
+      );
+      
+      expect(screen.getByText('파일을 확인하세요')).toBeInTheDocument();
+      expect(screen.queryByTestId('attachment-preview')).not.toBeInTheDocument();
+    });
+
     it('타이핑이 완료되지 않으면 image/video attachment 미리보기를 표시하지 않는다', () => {
       const imageAttachment = {
         type: 'image' as const,
