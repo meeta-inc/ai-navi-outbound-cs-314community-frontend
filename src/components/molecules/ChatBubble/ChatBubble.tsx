@@ -41,8 +41,8 @@ export function ChatBubble({
     : content;
 
   if (isBot) {
-    // Image/Video 첨부파일이 있는 경우 분리 렌더링
-    if (bubbleType === 'sub' && attachment && (attachment.type === 'image' || attachment.type === 'video')) {
+    // link 타입이 아닌 첨부파일이 있는 경우 분리 렌더링
+    if (bubbleType === 'sub' && attachment && attachment.type !== 'link') {
       return (
         <div className="box-border content-stretch flex flex-col gap-[6px] items-start justify-start pb-0 pl-5 pr-0 pt-[3px] relative shrink-0">
           {/* 텍스트 버블 */}

@@ -65,8 +65,8 @@ export function SubBubbleContent({ content, className, isTypingComplete = true, 
           {convertUrlsToLinks(processedContent)}
         </div>
       );
-    } else if (attachment.type === 'image' || attachment.type === 'video') {
-      // image/video 타입: 텍스트만 표시 (AttachmentPreview는 ChatBubble에서 분리 렌더링)
+    } else {
+      // link가 아닌 모든 타입: 텍스트만 표시 (AttachmentPreview는 ChatBubble에서 분리 렌더링)
       return (
         <div className={`whitespace-pre-wrap ${className || ''}`}>
           {convertUrlsToLinks(processedContent)}
