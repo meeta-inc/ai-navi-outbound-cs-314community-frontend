@@ -11,7 +11,7 @@ export function AttachmentPreview({ attachment, className = '' }: AttachmentPrev
   const [showLightbox, setShowLightbox] = useState(false);
 
   const handleClick = () => {
-    if (attachment.type === 'image') {
+    if (attachment.type === 'image' || attachment.type === 'file') {
       setShowLightbox(true);
     } else {
       // 비디오나 다른 타입의 경우 (추후 구현)
@@ -43,16 +43,11 @@ export function AttachmentPreview({ attachment, className = '' }: AttachmentPrev
             alt={`${attachment.title || '添付ファイル'}プレビュー`}
             className="w-full h-full object-cover"
           />
-          {attachment.title && (
-            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs py-1 px-2">
-              {attachment.title}
-            </div>
-          )}
         </div>
       </div>
       
       {/* 이미지 라이트박스 */}
-      {attachment.type === 'image' && (
+      {(attachment.type === 'image' || attachment.type === 'file') && (
         <ImageLightbox
           imageUrl={attachment.url}
           isOpen={showLightbox}
