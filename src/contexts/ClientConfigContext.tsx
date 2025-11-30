@@ -23,63 +23,81 @@ const ClientConfigContext = createContext<ClientConfigContextType | undefined>(u
 
 export function ClientConfigProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const defaultMapping = getClientMapping(DEFAULT_CLIENT_ID);
-  const [config, setConfig] = useState<ClientConfig>({
-    clientId: DEFAULT_CLIENT_ID,
-    appId: DEFAULT_APP_ID,
-    clientName: defaultMapping.clientName,
-    schoolName: defaultMapping.schoolName
-  });
+  
+  // 초기 로드 시 URL 파라미터를 즉시 확인하여 초기값 설정
+  const getInitialConfig = () => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryClientId = searchParams.get('clientId');
+    const queryAppId = searchParams.get('appId');
+    
+    const initialClientId = queryClientId || 
+                           sessionStorage.getItem('clientId') || 
+                           DEFAULT_CLIENT_ID;
+    const initialAppId = queryAppId || 
+                        sessionStorage.getItem('appId') || 
+                        DEFAULT_APP_ID;
+    
+    const mapping = getClientMapping(initialClientId);
+    
+    return {
+      clientId: initialClientId,
+      appId: initialAppId,
+      clientName: mapping.clientName,
+      schoolName: mapping.schoolName
+    };
+  };
+  
+  const [config, setConfig] = useState<ClientConfig>(getInitialConfig());
 
-  // 초기 로드 시 쿼리 파라미터 및 sessionStorage 확인
+  // URL 변경 감지 및 sessionStorage 업데이트
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const queryClientId = searchParams.get('clientId');
     const queryAppId = searchParams.get('appId');
 
-    // 우선순위: 쿼리 파라미터 > sessionStorage > 기본값
-    const finalClientId = 
-      queryClientId || 
-      sessionStorage.getItem('clientId') || 
-      DEFAULT_CLIENT_ID;
-    
-    const finalAppId = 
-      queryAppId || 
-      sessionStorage.getItem('appId') || 
-      DEFAULT_APP_ID;
-
-    // 쿼리 파라미터가 있으면 sessionStorage에 저장
-    if (queryClientId) {
-      sessionStorage.setItem('clientId', queryClientId);
-      console.log(`ClientId saved to sessionStorage: ${queryClientId}`);
+    // 쿼리 파라미터가 있고 현재 설정과 다른 경우에만 업데이트
+    if ((queryClientId && queryClientId !== config.clientId) || 
+        (queryAppId && queryAppId !== config.appId)) {
+      
+      const newClientId = queryClientId || config.clientId;
+      const newAppId = queryAppId || config.appId;
+      
+      // sessionStorage 업데이트
+      if (queryClientId) {
+        sessionStorage.setItem('clientId', queryClientId);
+        console.log(`ClientId saved to sessionStorage: ${queryClientId}`);
+      }
+      if (queryAppId) {
+        sessionStorage.setItem('appId', queryAppId);
+        console.log(`AppId saved to sessionStorage: ${queryAppId}`);
+      }
+      
+      // 매핑 정보 가져오기
+      const mapping = getClientMapping(newClientId);
+      
+      // 설정 업데이트
+      setConfig({
+        clientId: newClientId,
+        appId: newAppId,
+        clientName: mapping.clientName,
+        schoolName: mapping.schoolName
+      });
+      
+      console.log('ClientConfig updated from URL:', {
+        clientId: newClientId,
+        appId: newAppId,
+        clientName: mapping.clientName,
+        schoolName: mapping.schoolName
+      });
+    } else if (queryClientId || queryAppId) {
+      // 쿼리 파라미터가 있지만 이미 설정과 같은 경우, sessionStorage만 업데이트
+      if (queryClientId) {
+        sessionStorage.setItem('clientId', queryClientId);
+      }
+      if (queryAppId) {
+        sessionStorage.setItem('appId', queryAppId);
+      }
     }
-    if (queryAppId) {
-      sessionStorage.setItem('appId', queryAppId);
-      console.log(`AppId saved to sessionStorage: ${queryAppId}`);
-    }
-
-    // clientId에 따른 매핑 정보 가져오기
-    const mapping = getClientMapping(finalClientId);
-
-    // 설정 업데이트
-    setConfig({
-      clientId: finalClientId,
-      appId: finalAppId,
-      clientName: mapping.clientName,
-      schoolName: mapping.schoolName
-    });
-
-    console.log('ClientConfig initialized:', {
-      clientId: finalClientId,
-      appId: finalAppId,
-      clientName: mapping.clientName,
-      schoolName: mapping.schoolName,
-      source: queryClientId || queryAppId 
-        ? 'query params' 
-        : sessionStorage.getItem('clientId') || sessionStorage.getItem('appId')
-          ? 'sessionStorage'
-          : 'default values'
-    });
   }, [location.search]);
 
   // 설정 업데이트 함수

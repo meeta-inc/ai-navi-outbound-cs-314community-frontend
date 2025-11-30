@@ -23,6 +23,7 @@ interface QuickReplyProps {
   options?: QuickReplyOption[];
   showBackButton?: boolean;
   grade?: GradeType;
+  clientId?: string;
 }
 
 export function QuickReply({ 
@@ -33,7 +34,8 @@ export function QuickReply({
   userId,
   options,
   showBackButton = false,
-  grade
+  grade,
+  clientId = 'RS000001'
 }: QuickReplyProps) {
   const { t } = useLocale();
   const accentColor = getAccentColor();
@@ -55,7 +57,7 @@ export function QuickReply({
           // FAQ API가 활성화된 경우 새로운 API 사용
           // grade가 있고 FAQ API가 활성화된 경우에만 API 호출
           if (grade && isFaqApiEnabled()) {
-            const apiResponse = await getQuickReplyQuestionsAPI(grade);
+            const apiResponse = await getQuickReplyQuestionsAPI(grade, clientId);
             
             if (apiResponse && apiResponse.items) {
               // API 응답을 QuickReplyOption 형식으로 변환
