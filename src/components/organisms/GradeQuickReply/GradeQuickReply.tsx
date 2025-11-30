@@ -10,6 +10,7 @@ interface GradeQuickReplyProps {
   onShowFAQCategories?: () => void;
   onBackClick?: () => void;
   className?: string;
+  clientId?: string;
 }
 
 export const GradeQuickReply: React.FC<GradeQuickReplyProps> = ({
@@ -17,7 +18,8 @@ export const GradeQuickReply: React.FC<GradeQuickReplyProps> = ({
   onReplyClick,
   onShowFAQCategories,
   onBackClick,
-  className = ''
+  className = '',
+  clientId = 'RS000001'
 }) => {
   const { t } = useLocale();
 
@@ -53,6 +55,7 @@ export const GradeQuickReply: React.FC<GradeQuickReplyProps> = ({
         options={options}
         showBackButton={true}
         grade={grade}
+        clientId={clientId}
       />
     </div>
   );
