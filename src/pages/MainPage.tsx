@@ -560,6 +560,7 @@ function MainPage() {
                     onShowFAQCategories={handleShowFAQCategories}
                     show={true}
                     userId="Hyunse0001"
+                    clientId={clientId}
                   />
                 </div>
               )}
@@ -582,6 +583,7 @@ function MainPage() {
                     onReplyClick={handleQuickReplyClick}
                     onShowFAQCategories={handleShowFAQCategories}
                     onBackClick={handleBackToGradeSelection}
+                    clientId={clientId}
                   />
                 </div>
               )}
@@ -605,6 +607,7 @@ function MainPage() {
                     onBackToCategories={handleBackToCategories}
                     userId="Hyunse0001"
                     onDataLoaded={handleTopQuestionsDataLoaded}
+                    clientId={clientId}
                   />
                 </div>
               )}

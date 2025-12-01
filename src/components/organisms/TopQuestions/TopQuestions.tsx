@@ -43,6 +43,7 @@ interface TopQuestionsProps {
   userId: string;
   onDataLoaded?: () => void;
   className?: string;
+  clientId?: string;
 }
 
 export function TopQuestions({ 
@@ -53,7 +54,8 @@ export function TopQuestions({
   onBackToCategories,
   userId,
   onDataLoaded,
-  className = ""
+  className = "",
+  clientId = 'RS000001'
 }: TopQuestionsProps) {
   const { t } = useLocale();
   const accentColor = getAccentColor();
@@ -72,7 +74,7 @@ export function TopQuestions({
       try {
         // FAQ API가 활성화된 경우 새로운 API 사용
         if (isFaqApiEnabled()) {
-          const apiResponse = await getTopQuestionsAPI(grade, categoryId);
+          const apiResponse = await getTopQuestionsAPI(grade, categoryId, clientId);
           
           if (apiResponse && apiResponse.items) {
             // API 응답에서 질문 텍스트만 추출
