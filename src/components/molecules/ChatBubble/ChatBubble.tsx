@@ -5,6 +5,7 @@ import { BubbleResponse, AttachmentData } from '../../../types';
 import { isIOS } from '../../../utils/device';
 import { SubBubbleContent } from './SubBubbleContent';
 import { AttachmentPreview } from './AttachmentPreview';
+import { FormattedText } from './FormattedText';
 
 interface ChatBubbleProps {
   content: string | React.ReactNode;
@@ -111,15 +112,19 @@ export function ChatBubble({
               />
             ) : (
               bubbleType === 'sub' && typeof displayContent === 'string' ? (
-                <SubBubbleContent 
-                  content={displayContent} 
+                <SubBubbleContent
+                  content={displayContent}
                   isTypingComplete={localTypingComplete}
                   attachment={attachment}
                 />
               ) : (
-                <div className="whitespace-pre-wrap">
-                  {typeof displayContent === 'string' ? displayContent : displayContent}
-                </div>
+                typeof displayContent === 'string' ? (
+                  <FormattedText content={displayContent} />
+                ) : (
+                  <div className="whitespace-pre-wrap">
+                    {displayContent}
+                  </div>
+                )
               )
             )}
           </div>
@@ -137,9 +142,13 @@ export function ChatBubble({
             <div
               className="relative text-[#303030] text-left meeta-text-mid-regular"
             >
-              <div className="whitespace-pre-wrap">
-                {typeof content === 'string' ? content : content}
-              </div>
+              {typeof content === 'string' ? (
+                <FormattedText content={content} />
+              ) : (
+                <div className="whitespace-pre-wrap">
+                  {content}
+                </div>
+              )}
             </div>
           </div>
         </div>

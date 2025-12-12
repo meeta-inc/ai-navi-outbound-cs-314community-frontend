@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { parseTextContent } from '../../../utils/textFormatUtils';
 
 interface TypewriterTextProps {
   text: string;
@@ -15,20 +16,20 @@ export function TypewriterText({ text, speed = 50, onComplete }: TypewriterTextP
       const timer = setTimeout(() => {
         setDisplayText(prev => {
           const newText = prev + text[currentIndex];
-          
+
           // 새 글자가 추가될 때마다 스크롤
           const messageContainer = document.querySelector('.overflow-y-auto');
           if (messageContainer) {
             const scrollHeight = messageContainer.scrollHeight;
             const height = messageContainer.clientHeight;
             const maxScrollTop = scrollHeight - height;
-            
+
             messageContainer.scrollTo({
               top: maxScrollTop,
               behavior: 'smooth'
             });
           }
-          
+
           return newText;
         });
         setCurrentIndex(currentIndex + 1);
@@ -46,5 +47,5 @@ export function TypewriterText({ text, speed = 50, onComplete }: TypewriterTextP
     setCurrentIndex(0);
   }, [text]);
 
-  return <span className="whitespace-pre-wrap">{displayText}</span>;
+  return <span className="whitespace-pre-wrap">{parseTextContent(displayText)}</span>;
 }
