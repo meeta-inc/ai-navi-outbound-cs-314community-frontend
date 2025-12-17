@@ -1,4 +1,5 @@
 import { MenuConfig } from '../shared/config/menuConfig';
+import { isFAQEnabled } from '../utils/appFeatures';
 
 // AI 음성 상담 기능 활성화 여부 확인
 const isVoiceConsultationEnabled = (): boolean => {
@@ -174,8 +175,25 @@ const clientMenuConfigs: Record<string, MenuConfig> = {
 
 export class MenuService {
   // 고객사별 메뉴 설정 가져오기
-  static getMenuConfig(clientId: string): MenuConfig {
-    return clientMenuConfigs[clientId] || clientMenuConfigs['default'];
+  static getMenuConfig(clientId: string, appId?: string): MenuConfig {
+    const config = clientMenuConfigs[clientId] || clientMenuConfigs['default'];
+    
+    // appId가 제공된 경우 FAQ 기능 활성화 여부에 따라 메뉴 조정
+    if (appId) {
+      const modifiedConfig = { ...config };
+      modifiedConfig.items = config.items.map(item => {
+        if (item.id === 'ai-faq') {
+          return {
+            ...item,
+            disabled: !isFAQEnabled(appId)
+          };
+        }
+        return item;
+      });
+      return modifiedConfig;
+    }
+    
+    return config;
   }
 
   // 메뉴 설정 업데이트 (관리자용)

@@ -62,8 +62,8 @@ export const defaultMenuConfig: MenuConfig = {
 };
 
 // 고객사별 메뉴 설정을 가져오는 함수 
-export const getMenuConfig = async (clientId: string): Promise<MenuConfig> => {
+export const getMenuConfig = async (clientId: string, appId?: string): Promise<MenuConfig> => {
   // 동적 import를 사용하여 순환 의존성 방지
   const { MenuService } = await import('../../services/menuService');
-  return MenuService.getMenuConfig(clientId);
+  return MenuService.getMenuConfig(clientId, appId);
 };

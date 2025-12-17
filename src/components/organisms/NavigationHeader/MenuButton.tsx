@@ -10,10 +10,11 @@ import { useNavigate } from 'react-router-dom';
 
 interface MenuButtonProps {
   clientId?: string;
+  appId?: string;
   accentColor?: AccentColor;
 }
 
-export function MenuButton({ clientId = 'default', accentColor = 'orange' }: MenuButtonProps) {
+export function MenuButton({ clientId = 'default', appId, accentColor = 'orange' }: MenuButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menuConfig, setMenuConfig] = useState<MenuConfig | null>(null);
   const isKeyboardOpen = useKeyboardState();
@@ -22,9 +23,9 @@ export function MenuButton({ clientId = 'default', accentColor = 'orange' }: Men
   
   // 고객사별 메뉴 설정 가져오기
   useEffect(() => {
-    const config = MenuService.getMenuConfig(clientId);
+    const config = MenuService.getMenuConfig(clientId, appId);
     setMenuConfig(config);
-  }, [clientId]);
+  }, [clientId, appId]);
 
   const handleMenuClick = () => {
     // 키보드가 열려있으면 키보드가 닫힐 때까지 대기

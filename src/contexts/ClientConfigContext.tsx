@@ -5,6 +5,7 @@ import { getClientMapping } from '../config/clientMappings';
 interface ClientConfig {
   clientId: string;
   appId: string;
+  userId: string;
   clientName: string;
   schoolName: string;
 }
@@ -18,6 +19,7 @@ interface ClientConfigContextType {
 // 하드코딩된 기본값
 const DEFAULT_CLIENT_ID = 'RS000001';
 const DEFAULT_APP_ID = '0001';
+const DEFAULT_USER_ID = 'OutBoundUserWithoutId';
 
 const ClientConfigContext = createContext<ClientConfigContextType | undefined>(undefined);
 
@@ -29,6 +31,7 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
     const searchParams = new URLSearchParams(location.search);
     const queryClientId = searchParams.get('clientId');
     const queryAppId = searchParams.get('appId');
+    const queryUserId = searchParams.get('userId');
     
     const initialClientId = queryClientId || 
                            sessionStorage.getItem('clientId') || 
@@ -36,12 +39,16 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
     const initialAppId = queryAppId || 
                         sessionStorage.getItem('appId') || 
                         DEFAULT_APP_ID;
+    const initialUserId = queryUserId || 
+                         sessionStorage.getItem('userId') || 
+                         DEFAULT_USER_ID;
     
     const mapping = getClientMapping(initialClientId);
     
     return {
       clientId: initialClientId,
       appId: initialAppId,
+      userId: initialUserId,
       clientName: mapping.clientName,
       schoolName: mapping.schoolName
     };
@@ -54,13 +61,16 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
     const searchParams = new URLSearchParams(location.search);
     const queryClientId = searchParams.get('clientId');
     const queryAppId = searchParams.get('appId');
+    const queryUserId = searchParams.get('userId');
 
     // 쿼리 파라미터가 있고 현재 설정과 다른 경우에만 업데이트
     if ((queryClientId && queryClientId !== config.clientId) || 
-        (queryAppId && queryAppId !== config.appId)) {
+        (queryAppId && queryAppId !== config.appId) ||
+        (queryUserId && queryUserId !== config.userId)) {
       
       const newClientId = queryClientId || config.clientId;
       const newAppId = queryAppId || config.appId;
+      const newUserId = queryUserId || config.userId;
       
       // sessionStorage 업데이트
       if (queryClientId) {
@@ -71,6 +81,10 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
         sessionStorage.setItem('appId', queryAppId);
         console.log(`AppId saved to sessionStorage: ${queryAppId}`);
       }
+      if (queryUserId) {
+        sessionStorage.setItem('userId', queryUserId);
+        console.log(`UserId saved to sessionStorage: ${queryUserId}`);
+      }
       
       // 매핑 정보 가져오기
       const mapping = getClientMapping(newClientId);
@@ -79,6 +93,7 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
       setConfig({
         clientId: newClientId,
         appId: newAppId,
+        userId: newUserId,
         clientName: mapping.clientName,
         schoolName: mapping.schoolName
       });
@@ -86,10 +101,11 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
       console.log('ClientConfig updated from URL:', {
         clientId: newClientId,
         appId: newAppId,
+        userId: newUserId,
         clientName: mapping.clientName,
         schoolName: mapping.schoolName
       });
-    } else if (queryClientId || queryAppId) {
+    } else if (queryClientId || queryAppId || queryUserId) {
       // 쿼리 파라미터가 있지만 이미 설정과 같은 경우, sessionStorage만 업데이트
       if (queryClientId) {
         sessionStorage.setItem('clientId', queryClientId);
@@ -97,8 +113,11 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
       if (queryAppId) {
         sessionStorage.setItem('appId', queryAppId);
       }
+      if (queryUserId) {
+        sessionStorage.setItem('userId', queryUserId);
+      }
     }
-  }, [location.search]);
+  }, [location.search, config.clientId, config.appId, config.userId]);
 
   // 설정 업데이트 함수
   const updateConfig = (newConfig: Partial<ClientConfig>) => {
@@ -122,6 +141,9 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
       if (newConfig.appId) {
         sessionStorage.setItem('appId', newConfig.appId);
       }
+      if (newConfig.userId) {
+        sessionStorage.setItem('userId', newConfig.userId);
+      }
       
       console.log('ClientConfig updated:', updated);
       return updated;
@@ -132,10 +154,12 @@ export function ClientConfigProvider({ children }: { children: ReactNode }) {
   const clearConfig = () => {
     sessionStorage.removeItem('clientId');
     sessionStorage.removeItem('appId');
+    sessionStorage.removeItem('userId');
     const defaultMapping = getClientMapping(DEFAULT_CLIENT_ID);
     setConfig({
       clientId: DEFAULT_CLIENT_ID,
       appId: DEFAULT_APP_ID,
+      userId: DEFAULT_USER_ID,
       clientName: defaultMapping.clientName,
       schoolName: defaultMapping.schoolName
     });
