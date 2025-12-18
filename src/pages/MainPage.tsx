@@ -27,14 +27,16 @@ import { getCategories, isCategoryApiEnabled } from '../services/api/category';
 import { CategoryItem } from '../types/api/category.types';
 import { getAttributes, isAttributesApiEnabled } from '../services/api/attributes';
 import { AttributeItem } from '../types/api/attributes.types';
+import { isFAQEnabled } from '../utils/appFeatures';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
-  const { clientId, appId, clientName, schoolName } = useClientConfig(); // Context에서 설정값 가져오기
+  const { clientId, appId, userId, clientName, schoolName } = useClientConfig(); // Context에서 설정값 가져오기
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
   const showNavigationHeader = getShowNavigationHeader();
   const showGradeSelection = getShowGradeSelection();
+  const faqEnabled = isFAQEnabled(appId); // FAQ 활성화 여부 확인
   const isInitialized = useRef(false);
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
   const [showFAQCategories, setShowFAQCategories] = useState(false);
@@ -84,7 +86,7 @@ function MainPage() {
     addTypingBotMessage,
     addUserMessage
   } = useChat({
-    userId: 'Hyunse0001', // 실제 사용자 ID
+    userId, // Context에서 받은 동적 userId
     gradeId: selectedGrade || 'high', // 선택된 학년 또는 기본값
     clientId, // 쿼리 파라미터에서 받은 clientId
     appId, // 쿼리 파라미터에서 받은 appId
@@ -134,9 +136,9 @@ function MainPage() {
     }
   }, [t, addWelcomeMessage, isLoading, schoolName]);
 
-  // 카테고리 API 호출
+  // 카테고리 API 호출 (FAQ가 활성화된 경우에만)
   useEffect(() => {
-    if (isCategoryApiEnabled() && clientId) {
+    if (faqEnabled && isCategoryApiEnabled() && clientId) {
       setCategoriesLoading(true);
       getCategories(clientId, true)
         .then(response => {
@@ -161,7 +163,7 @@ function MainPage() {
           setCategoriesLoading(false);
         });
     }
-  }, [clientId]);
+  }, [faqEnabled, clientId]);
 
   useEffect(() => {
     if (isAttributesApiEnabled() && clientId) {
@@ -388,8 +390,8 @@ function MainPage() {
       return;
     }
     
-    // FAQ 메뉴 클릭 시 처리
-    if (item.id === 'ai-faq') {
+    // FAQ 메뉴 클릭 시 처리 (FAQ가 활성화된 경우에만)
+    if (item.id === 'ai-faq' && faqEnabled && !item.disabled) {
       // 이전 FAQ 카테고리 비활성화
       deactivateComponent('faqCategories');
       
@@ -403,6 +405,11 @@ function MainPage() {
         const messageId = addTypingBotMessage(whatWouldYouLikeToKnow);
         activateComponent('faqCategories', messageId);
       }, 100);
+    }
+    // FAQ가 비활성화된 경우 메뉴 클릭 무시
+    else if (item.id === 'ai-faq' && (!faqEnabled || item.disabled)) {
+      console.log('FAQ menu is disabled for this app');
+      return;
     }
     // 다른 메뉴 아이템들 처리
     else if (item.action === 'navigate' && item.url) {
@@ -489,6 +496,7 @@ function MainPage() {
             onSend={handleSendClick}
             disabled={isTyping || (showGradeSelection && !selectedGrade)}
             clientId={clientId}
+            appId={appId}
             placeholder={
               showGradeSelection && !selectedGrade 
                 ? 'まずは学年を選択してください'
@@ -559,8 +567,9 @@ function MainPage() {
                     onReplyClick={handleQuickReplyClick}
                     onShowFAQCategories={handleShowFAQCategories}
                     show={true}
-                    userId="Hyunse0001"
+                    userId={userId}
                     clientId={clientId}
+                    appId={appId}
                   />
                 </div>
               )}
@@ -584,6 +593,7 @@ function MainPage() {
                     onShowFAQCategories={handleShowFAQCategories}
                     onBackClick={handleBackToGradeSelection}
                     clientId={clientId}
+                    appId={appId}
                   />
                 </div>
               )}

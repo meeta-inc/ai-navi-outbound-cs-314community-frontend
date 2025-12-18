@@ -18,6 +18,7 @@ interface ChatInputProps {
   disabled?: boolean;
   placeholder?: string;
   clientId?: string;
+  appId?: string;
   onMenuItemClick?: (item: MenuItem) => void;
 }
 
@@ -28,6 +29,7 @@ export function ChatInput({
   disabled = false,
   placeholder,
   clientId = 'default',
+  appId,
   onMenuItemClick
 }: ChatInputProps) {
   const { t } = useLocale();
@@ -41,9 +43,9 @@ export function ChatInput({
 
   // 고객사별 메뉴 설정 가져오기
   useEffect(() => {
-    const config = MenuService.getMenuConfig(clientId);
+    const config = MenuService.getMenuConfig(clientId, appId);
     setMenuConfig(config);
-  }, [clientId]);
+  }, [clientId, appId]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

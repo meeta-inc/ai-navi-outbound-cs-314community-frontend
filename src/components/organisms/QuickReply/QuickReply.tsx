@@ -7,6 +7,7 @@ import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from
 import { getQuickReplyQuestions as getQuickReplyQuestionsAPI, isFaqApiEnabled } from '../../../services/api/faq';
 import { Button } from '../../atoms/Button';
 import type { GradeType } from '../../../shared/constants/grade.constants';
+import { isFAQEnabled } from '../../../utils/appFeatures';
 
 export interface QuickReplyOption {
   id: string;
@@ -24,6 +25,7 @@ interface QuickReplyProps {
   showBackButton?: boolean;
   grade?: GradeType;
   clientId?: string;
+  appId?: string;
 }
 
 export function QuickReply({ 
@@ -35,11 +37,13 @@ export function QuickReply({
   options,
   showBackButton = false,
   grade,
-  clientId = 'RS000001'
+  clientId = 'RS000001',
+  appId
 }: QuickReplyProps) {
   const { t } = useLocale();
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
+  const faqEnabled = appId ? isFAQEnabled(appId) : true; // FAQ 활성화 여부 확인
   const [apiData, setApiData] = useState<{header: string, questions: QuickReplyOption[]}>({
     header: '',
     questions: []
@@ -116,12 +120,19 @@ export function QuickReply({
     }
   }, [show, userId, options, t, grade]);
 
-  if (!show) return null;
+  // APP001의 경우 QuickReply 자체를 렌더링하지 않음
+  if (!show || appId === 'APP001') return null;
 
   const handleOptionClick = async (option: QuickReplyOption) => {
-    // "그외" 버튼의 경우 FAQ 카테고리 표시
-    if (option.id === 'other' && onShowFAQCategories) {
+    // "그외" 버튼의 경우 FAQ 카테고리 표시 (FAQ가 활성화된 경우에만)
+    if (option.id === 'other' && faqEnabled && onShowFAQCategories) {
       onShowFAQCategories();
+      return;
+    }
+    
+    // FAQ가 비활성화된 경우 "그외" 버튼 클릭 무시
+    if (option.id === 'other' && !faqEnabled) {
+      console.log('FAQ is disabled for this app');
       return;
     }
     
@@ -132,7 +143,13 @@ export function QuickReply({
   };
 
   // 사용할 옵션 결정 (props로 전달된 것 또는 API에서 가져온 것)
-  const finalOptions = options || apiData.questions;
+  let finalOptions = options || apiData.questions;
+  
+  // FAQ가 비활성화된 경우 'other' 옵션 제거
+  if (!faqEnabled) {
+    finalOptions = finalOptions.filter(option => option.id !== 'other');
+  }
+  
   const headerText = options ? t('chat.quickReplies.header') : apiData.header;
 
   return (
