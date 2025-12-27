@@ -13,7 +13,8 @@
   },
   "onboarding": {
     "gradeSelectionHeader": "お子様の学年を教えてください",
-    "gradeSelectionMessage": "まずは、お子様の学年を教えてください🙋"
+    "gradeSelectionMessage": "まずは、お子様の学年を教えてください🙋",
+    "gradeSelectionMessageForInbound": "まずは、あなたの学年を教えてください🙋"
   },
   "student": {
     "menu": {

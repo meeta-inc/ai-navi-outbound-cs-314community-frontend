@@ -27,7 +27,7 @@ import { getCategories, isCategoryApiEnabled } from '../services/api/category';
 import { CategoryItem } from '../types/api/category.types';
 import { getAttributes, isAttributesApiEnabled } from '../services/api/attributes';
 import { AttributeItem } from '../types/api/attributes.types';
-import { isFAQEnabled } from '../utils/appFeatures';
+import { isFAQEnabled, isInboundApp } from '../utils/appFeatures';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
@@ -208,10 +208,13 @@ function MainPage() {
   // 온보딩 메시지가 표시된 후 GradeSelection 표시
   useEffect(() => {
     if (showOnboardingMessage) {
-      // 온보딩 메시지를 ChatMessage로 추가
-      const onboardingMessage = t('onboarding.gradeSelectionMessage');
+      // 내부생 앱의 경우 다른 메시지 사용
+      const messageKey = isInboundApp(appId)
+        ? 'onboarding.gradeSelectionMessageForInbound'
+        : 'onboarding.gradeSelectionMessage';
+      const onboardingMessage = t(messageKey);
       addTypingBotMessage(onboardingMessage);
-      
+
       setTimeout(() => {
         setShowGradeSelectionComponent(true);
         setTimeout(() => {
@@ -219,7 +222,7 @@ function MainPage() {
         }, 100);
       }, 1000);
     }
-  }, [showOnboardingMessage, addTypingBotMessage, t]);
+  }, [showOnboardingMessage, addTypingBotMessage, t, appId]);
 
   // 학년 선택 핸들러
   const handleGradeSelect = (grade: GradeType) => {

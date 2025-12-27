@@ -7,7 +7,7 @@ import { getQuickReplyQuestions, updateQuestionStats, type QuickReplyData } from
 import { getQuickReplyQuestions as getQuickReplyQuestionsAPI, isFaqApiEnabled } from '../../../services/api/faq';
 import { Button } from '../../atoms/Button';
 import type { GradeType } from '../../../shared/constants/grade.constants';
-import { isFAQEnabled } from '../../../utils/appFeatures';
+import { isFAQEnabled, isInboundApp } from '../../../utils/appFeatures';
 
 export interface QuickReplyOption {
   id: string;
@@ -120,8 +120,8 @@ export function QuickReply({
     }
   }, [show, userId, options, t, grade]);
 
-  // APP001의 경우 QuickReply 자체를 렌더링하지 않음
-  if (!show || appId === 'APP001') return null;
+  // 내부생 앱의 경우 QuickReply 자체를 렌더링하지 않음
+  if (!show || isInboundApp(appId || '')) return null;
 
   const handleOptionClick = async (option: QuickReplyOption) => {
     // "그외" 버튼의 경우 FAQ 카테고리 표시 (FAQ가 활성화된 경우에만)

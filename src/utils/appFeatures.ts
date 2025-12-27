@@ -3,13 +3,22 @@
  */
 
 /**
+ * 내부생(Inbound) 앱 여부를 확인하는 함수
+ * @param appId - 애플리케이션 ID
+ * @returns 내부생 앱이면 true, 아니면 false
+ */
+export const isInboundApp = (appId: string): boolean => {
+  return appId === 'APP001';
+};
+
+/**
  * FAQ 기능 활성화 여부를 확인하는 함수
  * @param appId - 애플리케이션 ID
  * @returns FAQ 기능이 활성화되어 있으면 true, 비활성화되어 있으면 false
  */
 export const isFAQEnabled = (appId: string): boolean => {
-  // APP001의 경우 FAQ 기능 비활성화
-  return appId !== 'APP001';
+  // 내부생 앱의 경우 FAQ 기능 비활성화
+  return !isInboundApp(appId);
 };
 
 /**

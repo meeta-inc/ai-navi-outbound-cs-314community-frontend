@@ -13,7 +13,8 @@
   },
   "onboarding": {
     "gradeSelectionHeader": "Please tell us your child's grade level",
-    "gradeSelectionMessage": "First, please tell us your child's grade level🙋"
+    "gradeSelectionMessage": "First, please tell us your child's grade level🙋",
+    "gradeSelectionMessageForInbound": "First, please tell us your grade level🙋"
   },
   "student": {
     "menu": {

@@ -3,7 +3,7 @@ import { useLocale } from '../../../contexts/LocaleContext';
 import { QuickReply, type QuickReplyOption } from '../QuickReply';
 import { GRADE_QUESTION_KEYS, type GradeType } from '../../../shared/constants/grade.constants';
 import { isFaqApiEnabled } from '../../../services/api/faq';
-import { isFAQEnabled } from '../../../utils/appFeatures';
+import { isFAQEnabled, isInboundApp } from '../../../utils/appFeatures';
 
 interface GradeQuickReplyProps {
   grade: GradeType;
@@ -51,8 +51,8 @@ export const GradeQuickReply: React.FC<GradeQuickReplyProps> = ({
     ] : baseOptions;
   }
 
-  // APP001의 경우 GradeQuickReply 자체를 렌더링하지 않음
-  if (appId === 'APP001') {
+  // 내부생 앱의 경우 GradeQuickReply 자체를 렌더링하지 않음
+  if (isInboundApp(appId || '')) {
     return null;
   }
 
