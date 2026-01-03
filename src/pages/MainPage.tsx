@@ -528,9 +528,9 @@ function MainPage() {
                   hideAvatar={message.type === 'bot' && !isFirstBotMessage}
                   llmResponse={message.llmResponse}
                   clientId={clientId}
-                  // 최신 LLM 응답에서만 CTA 버튼 표시
+                  // 최신 LLM 응답에서만 CTA 버튼 표시 (내부생 앱에서는 표시하지 않음)
                   {...(message.llmResponse ? {
-                    showCTAAfterComplete: message.id === latestCTAMessageId && !hideAllCTA,
+                    showCTAAfterComplete: message.id === latestCTAMessageId && !hideAllCTA && !isInboundApp(appId),
                     onMainCTAClick: handleMainCTAClick,
                     onSubCTAClick: handleSubCTAClick,
                     onCTADisplayed: handleCTADisplayed
