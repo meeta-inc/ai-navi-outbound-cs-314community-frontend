@@ -15,6 +15,7 @@ import { MenuService } from '../services/menuService';
 import { isIOS } from '../utils/device';
 import { TypingIndicator } from '../components/molecules/TypingIndicator';
 import { IOSViewportDebug } from '../components/molecules/IOSViewportDebug';
+import { AttachedFile } from '../components/molecules/InputField';
 import { useChat } from '../hooks/useChat';
 import { useActiveComponents } from '../hooks/useActiveComponents';
 import { getAccentColor, getShowNavigationHeader, getShowGradeSelection } from '../shared/config/app.config';
@@ -62,7 +63,10 @@ function MainPage() {
   
   // 음성 입력 모달 상태
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
-  
+
+  // 파일 첨부 상태
+  const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
+
   // 메시지 ID 기반 컴포넌트 활성화 관리
   const {
     activeComponents,
@@ -341,6 +345,17 @@ function MainPage() {
 
   const handleSendClick = async () => {
     await handleSendMessage();
+    if (attachedFile) {
+      setAttachedFile(null);
+    }
+  };
+
+  const handleFileAttach = (file: AttachedFile) => {
+    setAttachedFile(file);
+  };
+
+  const handleFileRemove = () => {
+    setAttachedFile(null);
   };
 
   // CTA 버튼 클릭 핸들러
@@ -501,11 +516,14 @@ function MainPage() {
             clientId={clientId}
             appId={appId}
             placeholder={
-              showGradeSelection && !selectedGrade 
+              showGradeSelection && !selectedGrade
                 ? 'まずは学年を選択してください'
                 : undefined
             }
             onMenuItemClick={handleMenuItemClick}
+            attachedFile={attachedFile}
+            onFileAttach={handleFileAttach}
+            onFileRemove={handleFileRemove}
           />
         }
       >
