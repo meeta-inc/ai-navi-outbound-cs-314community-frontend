@@ -10,6 +10,7 @@ import { QuickReply } from '../components/organisms/QuickReply';
 import { FAQCategory, FAQCategoryItem } from '../components/organisms/FAQCategory';
 import { TopQuestions } from '../components/organisms/TopQuestions';
 import { VoiceInputModal } from '../components/organisms/VoiceInputModal/VoiceInputModal';
+import { OnboardingModal } from '../components/organisms/OnboardingModal';
 import { MenuModal } from '../components/organisms/MenuModal';
 import { MenuService } from '../services/menuService';
 import { isIOS } from '../utils/device';
@@ -63,6 +64,9 @@ function MainPage() {
   
   // 음성 입력 모달 상태
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+
+  // 온보딩 모달 상태
+  const [isOnboardingModalOpen, setIsOnboardingModalOpen] = useState(false);
 
   // 파일 첨부 상태
   const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
@@ -129,6 +133,21 @@ function MainPage() {
       
     }
   });
+
+  useEffect(() => {
+    // 테스트용: localStorage 초기화
+    localStorage.removeItem('onboarding_completed');
+    localStorage.removeItem('onboarding_data');
+
+    const onboardingCompleted = localStorage.getItem('onboarding_completed');
+    console.log('온보딩 체크:', onboardingCompleted);
+    if (!onboardingCompleted) {
+      console.log('온보딩 모달 표시');
+      setTimeout(() => {
+        setIsOnboardingModalOpen(true);
+      }, 800);
+    }
+  }, []);
 
   useEffect(() => {
     // 번역이 로드되고 초기화가 아직 되지 않았을 때만 welcome 메시지 추가
@@ -672,12 +691,22 @@ function MainPage() {
       </ChatLayout>
       
       {/* Voice Input Modal */}
-      <VoiceInputModal 
+      <VoiceInputModal
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         onTranscript={handleVoiceTranscript}
         onChatUpdate={handleVoiceChatUpdate}
         userId="Hyunse0001"
+      />
+
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={isOnboardingModalOpen}
+        onClose={() => setIsOnboardingModalOpen(false)}
+        onComplete={() => {
+          setIsOnboardingModalOpen(false);
+        }}
+        accentColor={accentColor}
       />
     </>
   );
