@@ -5,6 +5,8 @@ export interface Message {
   timestamp: Date;
   error?: boolean;
   llmResponse?: LLMResponse;
+  imageUrl?: string;      // 첨부된 이미지 URL (previewUrl 또는 로컬 이미지)
+  s3Uri?: string;         // S3 URI (서버로 전송용)
 }
 
 // LLM 응답 구조 타입 정의

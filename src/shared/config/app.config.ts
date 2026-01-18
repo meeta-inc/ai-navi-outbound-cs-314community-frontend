@@ -22,6 +22,17 @@ export const getChatApiUrl = () => {
   return chatApiUrl;
 };
 
+export const getFileUploadApiUrl = () => {
+  const fileUploadApiUrl = import.meta.env.VITE_STUDENT_FRONT_API_URL;
+
+  if (!fileUploadApiUrl) {
+    console.warn('File Upload API URL is not defined, falling back to main API');
+    return getApiUrl();
+  }
+
+  return fileUploadApiUrl;
+};
+
 export const getAccentColor = (): AccentColor => {
   const accentColor = import.meta.env.VITE_ACCENT_COLOR;
   

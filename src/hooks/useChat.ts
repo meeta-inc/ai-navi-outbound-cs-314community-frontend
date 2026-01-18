@@ -93,9 +93,9 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
     }
   }, [currentlyTyping]);
 
-  const sendMessage = async (messageContent?: string): Promise<ProcessedChatResponse> => {
+  const sendMessage = async (messageContent?: string, s3Uri?: string): Promise<ProcessedChatResponse> => {
     try {
-      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId, clientId, appId);
+      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId, clientId, appId, s3Uri);
       return {
         message: response.response,
         toolName: response.tool?.name,
@@ -111,7 +111,7 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
     }
   };
 
-  const handleSendMessage = async (messageContent?: string) => {
+  const handleSendMessage = async (messageContent?: string, imageUrl?: string, s3Uri?: string, onMessageSent?: () => void) => {
     const content = messageContent || newMessage;
     if (!content.trim() || isTyping) return;
 
@@ -119,16 +119,24 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
       id: Date.now().toString(),
       type: 'user',
       content: content.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
+      ...(imageUrl && { imageUrl }),
+      ...(s3Uri && { s3Uri })
     };
 
     setMessages(prev => [...prev, userMessage]);
     setNewMessage('');
+
+    // 메시지가 전송된 직후 콜백 호출 (attachedFile 삭제 등)
+    if (onMessageSent) {
+      onMessageSent();
+    }
+
     setIsTyping(true);
 
     try {
-      const response = await sendMessage(content);
-      
+      const response = await sendMessage(content, s3Uri);
+
       setCurrentlyTyping({
         message: response.message,
         toolName: response.toolName,
