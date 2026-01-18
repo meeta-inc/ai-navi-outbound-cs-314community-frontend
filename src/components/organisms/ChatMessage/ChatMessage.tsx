@@ -1,9 +1,11 @@
+import React from 'react';
 import type { Message, LLMResponse } from '../../../types';
 import { getAccentColor, getShowTimestamp } from '../../../shared/config/app.config';
 import { useLocale } from '../../../contexts/LocaleContext';
 import { UserAvatar } from '../../molecules/UserAvatar';
 import { ChatBubble } from '../../molecules/ChatBubble';
 import { LLMResponseGroup } from '../LLMResponseGroup';
+import { ImagePreviewModal } from '../../molecules/ImagePreviewModal';
 
 interface ChatMessageProps {
   message: Message;
@@ -21,10 +23,10 @@ interface ChatMessageProps {
   clientId?: string; // clientId 추가
 }
 
-export function ChatMessage({ 
-  message, 
-  isTyping = false, 
-  onTypingComplete, 
+export function ChatMessage({
+  message,
+  isTyping = false,
+  onTypingComplete,
   hideAvatar = false,
   llmResponse,
   enableLLMTyping = true,
@@ -38,6 +40,7 @@ export function ChatMessage({
   const accentColor = getAccentColor();
   const showTimestamp = getShowTimestamp();
   const isBot = message.type === 'bot';
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   if (isBot) {
     return (
@@ -73,6 +76,29 @@ export function ChatMessage({
   // 사용자 메시지
   return (
     <div className="box-border content-stretch flex flex-col gap-[3px] items-end justify-start p-0 relative size-full">
+      {/* 첨부된 이미지가 있으면 표시 */}
+      {message.imageUrl && (
+        <>
+          <div
+            className="max-w-[200px] rounded-lg overflow-hidden mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <img
+              src={message.imageUrl}
+              alt="添付画像"
+              className="w-full h-auto object-contain"
+              style={{ maxHeight: '300px' }}
+            />
+          </div>
+
+          {/* 이미지 프리뷰 모달 */}
+          <ImagePreviewModal
+            isOpen={isModalOpen}
+            imageUrl={message.imageUrl}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </>
+      )}
       <ChatBubble
         content={message.content}
         isBot={false}

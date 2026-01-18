@@ -30,11 +30,12 @@ export interface ExtendedChatResponse extends ChatResponse {
 }
 
 export const sendChatMessage = async (
-  message: string, 
-  userId: string, 
+  message: string,
+  userId: string,
   gradeId?: string,
   clientId?: string,
-  appId?: string
+  appId?: string,
+  s3Uri?: string
 ): Promise<ExtendedChatResponse> => {
   try {
     // JWE 토큰 생성 (client_id, app_id 암호화) - 파라미터로 받은 clientId, appId 사용
@@ -75,6 +76,7 @@ export const sendChatMessage = async (
         userId,
         message,
         env, // APP_ENV 값 추가
+        ...(s3Uri && { fileUrl: s3Uri }), // s3Uri가 있으면 fileUrl로 포함
       }),
     });
 
