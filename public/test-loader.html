@@ -52,15 +52,18 @@
             color: #555;
         }
 
-        .form-group input[type="text"] {
+        .form-group input[type="text"],
+        .form-group select {
             padding: 8px 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 13px;
             transition: border-color 0.2s;
+            background: #fff;
         }
 
-        .form-group input[type="text"]:focus {
+        .form-group input[type="text"]:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #4a90d9;
             box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
@@ -205,11 +208,68 @@
             background: #e0e0e0;
             color: #666;
         }
+
+        .env-banner {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .env-banner.dev {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+
+        .env-banner.staging {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffcc80;
+        }
+
+        .env-banner.prod {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .prod-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .prod-overlay-message {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 420px;
+        }
+
+        .prod-overlay-message h2 {
+            color: #c62828;
+            margin-bottom: 12px;
+        }
+
+        .prod-overlay-message p {
+            color: #666;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="controls">
+            <div id="envBanner" class="env-banner dev"></div>
+
             <h3>
                 Chatbot Test Harness
                 <span id="statusBadge" class="status-badge idle">Idle</span>
@@ -222,7 +282,11 @@
 
             <div class="form-group">
                 <label>Client ID</label>
-                <input type="text" id="clientId" value="RS000001" />
+                <select id="clientId">
+                    <option value="RS000001">連成会 (RS000001)</option>
+                    <option value="MM000002">名門会 (MM000002)</option>
+                    <option value="AS000003">あすなろ (AS000003)</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -273,6 +337,35 @@
     </div>
 
     <script>
+        // --- 환경 감지 ---
+        var ALLOWED_HOSTS = [
+            'localhost',
+            '127.0.0.1',
+            'ainavi-dev.meeta.jp',
+            'ainavi-uat1.meeta.jp'
+        ];
+
+        var currentHost = window.location.hostname;
+        var isAllowed = ALLOWED_HOSTS.indexOf(currentHost) !== -1;
+
+        // 환경 배너 표시
+        var envBanner = document.getElementById('envBanner');
+        envBanner.className = 'env-banner ' + (isAllowed ? 'dev' : 'prod');
+        envBanner.textContent = 'Host: ' + currentHost + (isAllowed ? ' (Allowed)' : ' (Blocked)');
+
+        // 허용되지 않은 환경에서는 오버레이로 차단
+        if (!isAllowed) {
+            var overlay = document.createElement('div');
+            overlay.className = 'prod-overlay';
+            overlay.innerHTML =
+                '<div class="prod-overlay-message">' +
+                    '<h2>Access Denied</h2>' +
+                    '<p>このテストページは許可されていない環境です。<br/>' +
+                    '許可されたホスト: ' + ALLOWED_HOSTS.join(', ') + '</p>' +
+                '</div>';
+            document.body.appendChild(overlay);
+        }
+
         const frame = document.getElementById('chatFrame');
         const logsEl = document.getElementById('logs');
         const statusBadge = document.getElementById('statusBadge');
@@ -328,6 +421,11 @@
 
         // --- Load Chatbot ---
         function loadChatbot() {
+            if (!isAllowed) {
+                log('Error: Blocked on this host', 'error');
+                return;
+            }
+
             isReady = false;
             setStatus('waiting');
 
