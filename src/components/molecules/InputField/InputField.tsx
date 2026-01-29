@@ -11,6 +11,7 @@ export interface AttachedFile {
   loading?: boolean;
   fileId?: string;
   s3Key?: string;
+  s3Uri?: string;
   previewUrl?: string;
 }
 

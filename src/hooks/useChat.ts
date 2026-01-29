@@ -5,6 +5,7 @@ import { getColorClasses } from '../shared/config/theme.config';
 import { getAccentColor } from "../shared/config/app.config";
 import { isIOS } from '../utils/device';
 import type { Message, LLMResponse } from '../types';
+import type { FileInfo } from '../types/api/fileUpload.types';
 
 interface UseChatOptions {
   userId: string;
@@ -93,9 +94,9 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
     }
   }, [currentlyTyping]);
 
-  const sendMessage = async (messageContent?: string, s3Uri?: string): Promise<ProcessedChatResponse> => {
+  const sendMessage = async (messageContent?: string, fileInfo?: FileInfo): Promise<ProcessedChatResponse> => {
     try {
-      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId, clientId, appId, s3Uri);
+      const response = await sendChatMessage(messageContent || newMessage, userId, gradeId, clientId, appId, fileInfo);
       return {
         message: response.response,
         toolName: response.tool?.name,
@@ -111,7 +112,7 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
     }
   };
 
-  const handleSendMessage = async (messageContent?: string, imageUrl?: string, s3Uri?: string, onMessageSent?: () => void) => {
+  const handleSendMessage = async (messageContent?: string, imageUrl?: string, fileInfo?: FileInfo, onMessageSent?: () => void) => {
     const content = messageContent || newMessage;
     if (!content.trim() || isTyping) return;
 
@@ -121,7 +122,7 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
       content: content.trim(),
       timestamp: new Date(),
       ...(imageUrl && { imageUrl }),
-      ...(s3Uri && { s3Uri })
+      ...(fileInfo && { s3Uri: fileInfo.s3Uri })
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -135,7 +136,7 @@ export function useChat({ userId, gradeId, clientId, appId, onError, onTypingCom
     setIsTyping(true);
 
     try {
-      const response = await sendMessage(content, s3Uri);
+      const response = await sendMessage(content, fileInfo);
 
       setCurrentlyTyping({
         message: response.message,
