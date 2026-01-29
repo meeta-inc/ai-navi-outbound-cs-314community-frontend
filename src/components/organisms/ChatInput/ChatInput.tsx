@@ -12,6 +12,7 @@ import { isIOS } from '../../../utils/device';
 import type { MenuConfig, MenuItem } from '../../../shared/config/menuConfig';
 import { generatePDFThumbnail } from '../../../utils/pdfThumbnail';
 import { uploadFile, isUploadableFile, isFileSizeValid } from '../../../services/api/fileUpload';
+import { isMultimodalImageInputEnable } from '../../../utils/appFeatures';
 
 interface ChatInputProps {
   value: string;
@@ -25,6 +26,7 @@ interface ChatInputProps {
   attachedFile?: AttachedFile | null;
   onFileAttach?: (file: AttachedFile) => void;
   onFileRemove?: () => void;
+  isEnableLearningNavi?: boolean;
 }
 
 export function ChatInput({
@@ -38,7 +40,8 @@ export function ChatInput({
   onMenuItemClick,
   attachedFile,
   onFileAttach,
-  onFileRemove
+  onFileRemove,
+  isEnableLearningNavi
 }: ChatInputProps) {
   const { t } = useLocale();
   const accentColor = getAccentColor();
@@ -263,8 +266,8 @@ export function ChatInput({
         }`} />
       </Button>
 
-      {/* Attach File Button - AS000003 클라이언트 전용 */}
-      {clientId === 'AS000003' && (
+      {/* Attach File Button - 멀티모달 이미지 입력 활성화 시 표시 */}
+      {isMultimodalImageInputEnable(isEnableLearningNavi) && (
         <>
           <Button
             onClick={handleAttachClick}

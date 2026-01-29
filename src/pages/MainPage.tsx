@@ -34,7 +34,7 @@ import { OnboardingModal } from '../components/organisms/OnboardingModal';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
-  const { clientId, appId, userId, clientName, schoolName, greeting, isEmbeddedEnvironment, isInitialDataReceived, isRequestedLearningOnboarding } = useClientConfig(); // Context에서 설정값 가져오기
+  const { clientId, appId, userId, clientName, schoolName, greeting, isEmbeddedEnvironment, isInitialDataReceived, isRequestedLearningOnboarding, isEnableLearningNavi } = useClientConfig(); // Context에서 설정값 가져오기
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
   const showNavigationHeader = getShowNavigationHeader();
@@ -740,6 +740,7 @@ function MainPage() {
             attachedFile={attachedFile}
             onFileAttach={handleFileAttach}
             onFileRemove={handleFileRemove}
+            isEnableLearningNavi={isEnableLearningNavi}
           />
         }
       >
