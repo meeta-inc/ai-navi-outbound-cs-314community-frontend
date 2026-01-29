@@ -263,8 +263,8 @@ export function ChatInput({
         }`} />
       </Button>
 
-      {/* Attach File Button - AS00003 클라이언트 전용 */}
-      {clientId === 'AS00003' && (
+      {/* Attach File Button - AS000003 클라이언트 전용 */}
+      {clientId === 'AS000003' && (
         <>
           <Button
             onClick={handleAttachClick}

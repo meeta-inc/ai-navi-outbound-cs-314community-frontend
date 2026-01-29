@@ -30,16 +30,18 @@ import { CategoryItem } from '../types/api/category.types';
 import { getAttributes, isAttributesApiEnabled } from '../services/api/attributes';
 import { AttributeItem } from '../types/api/attributes.types';
 import { isFAQEnabled, isInboundApp } from '../utils/appFeatures';
+import { OnboardingModal } from '../components/organisms/OnboardingModal';
 
 function MainPage() {
   const { t, isLoading } = useLocale();
-  const { clientId, appId, userId, clientName, schoolName } = useClientConfig(); // Context에서 설정값 가져오기
+  const { clientId, appId, userId, clientName, schoolName, greeting, isEmbeddedEnvironment, isInitialDataReceived, isRequestedLearningOnboarding } = useClientConfig(); // Context에서 설정값 가져오기
   const accentColor = getAccentColor();
   const colors = getColorClasses(accentColor);
   const showNavigationHeader = getShowNavigationHeader();
   const showGradeSelection = getShowGradeSelection();
   const faqEnabled = isFAQEnabled(appId); // FAQ 활성화 여부 확인
   const isInitialized = useRef(false);
+  const isGreetingProcessed = useRef(false); // greeting 처리 여부 추적
   const [showFigmaQuickReply, setShowFigmaQuickReply] = useState(false);
   const [showFAQCategories, setShowFAQCategories] = useState(false);
   const [waitingForFAQCategories, setWaitingForFAQCategories] = useState(false);
@@ -64,6 +66,10 @@ function MainPage() {
   
   // 음성 입력 모달 상태
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+
+  // 학습 정보 온보딩 모달 상태
+  const [isLearningOnboardingModalOpen, setIsLearningOnboardingModalOpen] = useState(false);
+  const isLearningOnboardingCompleted = useRef(false); // 온보딩 완료 여부 추적
 
   // 파일 첨부 상태
   const [attachedFile, setAttachedFile] = useState<AttachedFile | null>(null);
@@ -99,9 +105,11 @@ function MainPage() {
       console.error('Chat error:', error);
     },
     onTypingComplete: () => {
-      // 첫 번째 메시지 타이핑 완료 후 처리
+      // 메시지 타이핑 완료 후 처리
       setTimeout(() => {
-        if (messages.length <= 1) {
+        // greeting이 없고 첫 번째 메시지인 경우에만 온보딩/QuickReply 처리
+        // (greeting이 있으면 별도의 useEffect에서 처리)
+        if (!greeting && messages.length <= 1) {
           if (showGradeSelection) {
             // 학년 선택이 활성화된 경우: 온보딩 메시지 표시
             setShowOnboardingMessage(true);
@@ -115,7 +123,7 @@ function MainPage() {
           }, 100);
         }
       }, 500);
-      
+
       // FAQ 카테고리 대기 중이면 표시
       if (waitingForFAQCategories) {
         setTimeout(() => {
@@ -127,19 +135,102 @@ function MainPage() {
           }, 100);
         }, 500);
       }
-      
+
     }
   });
 
   useEffect(() => {
     // 번역이 로드되고 초기화가 아직 되지 않았을 때만 welcome 메시지 추가
     if (!isLoading && !isInitialized.current) {
-      // 동적 school_name 사용
-      const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
-      addWelcomeMessage(welcomeMessage);
-      isInitialized.current = true;
+      // 임베디드 환경(WebView/iframe)에서는 INITIAL_DATA를 기다림
+      if (isEmbeddedEnvironment && !isInitialDataReceived) {
+        console.log('Waiting for INITIAL_DATA in embedded environment...');
+        return; // INITIAL_DATA를 받을 때까지 대기
+      }
+
+      // isRequestedLearningOnboarding이 true면 온보딩 모달 표시 (greeting 표시하지 않음)
+      if (isRequestedLearningOnboarding && !isLearningOnboardingCompleted.current) {
+        console.log('Learning onboarding requested, showing modal...');
+        setIsLearningOnboardingModalOpen(true);
+        isInitialized.current = true;
+        return; // 모달이 닫힐 때까지 greeting 표시하지 않음
+      }
+
+      // greeting.main이 있으면 greeting.main을 표시, 없으면 chat.greeting을 표시
+      if (greeting?.main) {
+        // greeting.main 표시
+        addWelcomeMessage(greeting.main);
+        isInitialized.current = true;
+        isGreetingProcessed.current = true; // greeting 처리 완료 표시
+
+        // greeting.sub가 있으면 추가 표시
+        if (greeting.sub) {
+          setTimeout(() => {
+            addTypingBotMessage(greeting.sub);
+            // greeting.sub 타이핑 완료 후 QuickReply 표시
+            setTimeout(() => {
+              setShowFigmaQuickReply(true);
+              setTimeout(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }, 1500);
+          }, 1500);
+        } else {
+          // greeting.sub가 없으면 greeting.main 타이핑 완료 후 QuickReply 표시
+          setTimeout(() => {
+            setShowFigmaQuickReply(true);
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }, 1500);
+        }
+      } else {
+        // greeting이 없으면 chat.greeting 표시
+        const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
+        addWelcomeMessage(welcomeMessage);
+        isInitialized.current = true;
+      }
     }
-  }, [t, addWelcomeMessage, isLoading, schoolName]);
+  }, [t, addWelcomeMessage, addTypingBotMessage, isLoading, schoolName, isEmbeddedEnvironment, isInitialDataReceived, greeting, messagesEndRef, isRequestedLearningOnboarding]);
+
+  // greeting 정보가 업데이트되었을 때 처리
+  useEffect(() => {
+    // 이미 초기화되었고, greeting이 있고, 아직 greeting 처리가 안 된 경우
+    // 단, 학습 온보딩 모달이 열려 있으면 greeting 표시하지 않음
+    if (isInitialized.current && greeting?.main && !isGreetingProcessed.current && !isLearningOnboardingModalOpen) {
+      isGreetingProcessed.current = true;
+
+      // 기존에 표시된 QuickReply와 온보딩 숨기기
+      setShowFigmaQuickReply(false);
+      setShowOnboardingMessage(false);
+      setShowGradeSelectionComponent(false);
+
+      // greeting.main을 chat.greeting 뒤에 추가
+      addTypingBotMessage(greeting.main);
+
+      // greeting.sub가 있으면 나중에 표시하고 QuickReply는 그 후에
+      if (greeting.sub) {
+        setTimeout(() => {
+          addTypingBotMessage(greeting.sub);
+          // greeting.sub 타이핑 완료 후 QuickReply 표시
+          setTimeout(() => {
+            setShowFigmaQuickReply(true);
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }, 1500);
+        }, 1500);
+      } else {
+        // greeting.sub가 없으면 greeting.main 타이핑 완료 후 QuickReply 표시
+        setTimeout(() => {
+          setShowFigmaQuickReply(true);
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }, 1500);
+      }
+    }
+  }, [greeting, addTypingBotMessage, messagesEndRef, isLearningOnboardingModalOpen]);
 
   // 카테고리 API 호출 (FAQ가 활성화된 경우에만)
   useEffect(() => {
@@ -459,6 +550,108 @@ function MainPage() {
     }
   };
   
+  // 학습 정보 온보딩 모달 완료 핸들러
+  const handleLearningOnboardingComplete = () => {
+    console.log('Learning onboarding completed');
+    isLearningOnboardingCompleted.current = true;
+    setIsLearningOnboardingModalOpen(false);
+
+    // 온보딩 완료 후 greeting 표시
+    if (greeting?.main) {
+      // greeting.main이 있으면 greeting만 표시
+      addWelcomeMessage(greeting.main);
+      isGreetingProcessed.current = true;
+
+      if (greeting.sub) {
+        setTimeout(() => {
+          addTypingBotMessage(greeting.sub);
+          setTimeout(() => {
+            setShowFigmaQuickReply(true);
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }, 1500);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          setShowFigmaQuickReply(true);
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }, 1500);
+      }
+    } else {
+      // greeting이 없으면 chat.greeting 표시 후 기존 온보딩/QuickReply 로직
+      const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
+      addWelcomeMessage(welcomeMessage);
+      isGreetingProcessed.current = true;
+
+      // chat.greeting 표시 후 온보딩 또는 QuickReply 처리
+      setTimeout(() => {
+        if (showGradeSelection) {
+          // 학년 선택이 활성화된 경우: 온보딩 메시지 표시
+          setShowOnboardingMessage(true);
+        } else {
+          // 학년 선택이 비활성화된 경우: 기본 QuickReply 표시
+          setShowFigmaQuickReply(true);
+        }
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 500);
+    }
+  };
+
+  // 학습 정보 온보딩 모달 닫기 핸들러
+  const handleLearningOnboardingClose = () => {
+    console.log('Learning onboarding closed');
+    setIsLearningOnboardingModalOpen(false);
+    isLearningOnboardingCompleted.current = true; // 닫기도 완료로 처리
+
+    // 모달을 닫아도 greeting은 표시
+    if (greeting?.main && !isGreetingProcessed.current) {
+      // greeting.main이 있으면 greeting만 표시
+      addWelcomeMessage(greeting.main);
+      isGreetingProcessed.current = true;
+
+      if (greeting.sub) {
+        setTimeout(() => {
+          addTypingBotMessage(greeting.sub);
+          setTimeout(() => {
+            setShowFigmaQuickReply(true);
+            setTimeout(() => {
+              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }, 1500);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          setShowFigmaQuickReply(true);
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }, 1500);
+      }
+    } else if (!isGreetingProcessed.current) {
+      // greeting이 없으면 chat.greeting 표시 후 기존 온보딩/QuickReply 로직
+      const welcomeMessage = t('chat.greeting').replace('{school_name}', schoolName);
+      addWelcomeMessage(welcomeMessage);
+      isGreetingProcessed.current = true;
+
+      // chat.greeting 표시 후 온보딩 또는 QuickReply 처리
+      setTimeout(() => {
+        if (showGradeSelection) {
+          setShowOnboardingMessage(true);
+        } else {
+          setShowFigmaQuickReply(true);
+        }
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 500);
+    }
+  };
+
   // 음성 입력 완료 핸들러
   const handleVoiceTranscript = (transcript: string) => {
     // 음성 입력 텍스트를 채팅 메시지로 전송
@@ -535,11 +728,11 @@ function MainPage() {
             value={newMessage}
             onChange={setNewMessage}
             onSend={handleSendClick}
-            disabled={isTyping || (showGradeSelection && !selectedGrade)}
+            disabled={isTyping || (showGradeSelection && !selectedGrade && !greeting)}
             clientId={clientId}
             appId={appId}
             placeholder={
-              showGradeSelection && !selectedGrade
+              showGradeSelection && !selectedGrade && !greeting
                 ? 'まずは学年を選択してください'
                 : undefined
             }
@@ -578,12 +771,12 @@ function MainPage() {
                   } : {})}
                 />
               
-              {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) */}
-              {index === 1 && message.type === 'bot' && showGradeSelectionComponent && showGradeSelection && 
-               !messages.some(msg => msg.content === 'もどる') && (
+              {/* 온보딩 메시지 다음에 GradeSelection 표시 (최초) - greeting이 있으면 표시하지 않음 */}
+              {index === 1 && message.type === 'bot' && showGradeSelectionComponent && showGradeSelection &&
+               !greeting && !messages.some(msg => msg.content === 'もどる') && (
                 <div className="mt-4">
-                  <GradeSelection 
-                    onGradeSelect={handleGradeSelect} 
+                  <GradeSelection
+                    onGradeSelect={handleGradeSelect}
                     clientId={clientId}
                     apiGrades={apiGrades}
                     isLoading={gradesLoading}
@@ -604,10 +797,20 @@ function MainPage() {
                 </div>
               )}
               
-              {/* 온보딩이 비활성화된 경우 기본 QuickReply 표시 */}
-              {index === 0 && message.type === 'bot' && showFigmaQuickReply && !showGradeSelection && (
+              {/* 온보딩이 비활성화된 경우 또는 greeting이 있는 경우 기본 QuickReply 표시 */}
+              {/* chat.greeting(index=0) → greeting.main(index=1) → greeting.sub(index=2) 순서 */}
+              {/* QuickReply는 마지막 greeting 메시지 다음에 표시 */}
+              {(() => {
+                const quickReplyIndex = greeting
+                  ? (greeting.sub ? 2 : 1)  // greeting 있음: sub 있으면 index=2, 없으면 index=1
+                  : 0;                       // greeting 없음: index=0
+                return index === quickReplyIndex &&
+                  message.type === 'bot' &&
+                  showFigmaQuickReply &&
+                  (!showGradeSelection || greeting);
+              })() && (
                 <div className="mt-4">
-                  <QuickReply 
+                  <QuickReply
                     onReplyClick={handleQuickReplyClick}
                     onShowFAQCategories={handleShowFAQCategories}
                     show={true}
@@ -695,12 +898,21 @@ function MainPage() {
       </ChatLayout>
       
       {/* Voice Input Modal */}
-      <VoiceInputModal 
+      <VoiceInputModal
         isOpen={isVoiceModalOpen}
         onClose={() => setIsVoiceModalOpen(false)}
         onTranscript={handleVoiceTranscript}
         onChatUpdate={handleVoiceChatUpdate}
         userId="Hyunse0001"
+      />
+
+      {/* Learning Onboarding Modal */}
+      <OnboardingModal
+        isOpen={isLearningOnboardingModalOpen}
+        onClose={handleLearningOnboardingClose}
+        onComplete={handleLearningOnboardingComplete}
+        accentColor={accentColor}
+        userId={userId}
       />
     </>
   );
