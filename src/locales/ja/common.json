@@ -14,7 +14,9 @@
   "onboarding": {
     "gradeSelectionHeader": "お子様の学年を教えてください",
     "gradeSelectionMessage": "まずは、お子様の学年を教えてください🙋",
-    "gradeSelectionMessageForInbound": "まずは、あなたの学年を教えてください🙋"
+    "gradeSelectionMessageForInbound": "まずは、あなたの学年を教えてください🙋",
+    "subjectSelectionHeader": "教科を選んでください",
+    "subjectSelectionMessage": "次に、学習したい教科を選んでください📚"
   },
   "student": {
     "menu": {

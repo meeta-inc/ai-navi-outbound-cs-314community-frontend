@@ -69,6 +69,13 @@
             box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
         }
 
+        .form-group input:disabled,
+        .form-group select:disabled {
+            background: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: center;
@@ -80,6 +87,28 @@
             font-size: 13px;
             cursor: pointer;
             user-select: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            padding: 4px 0;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 2px;
         }
 
         .btn {
@@ -275,14 +304,35 @@
                 <span id="statusBadge" class="status-badge idle">Idle</span>
             </h3>
 
+            <!-- 환경 선택 -->
+            <div class="form-group">
+                <label>Environment</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="envSelect" value="http://localhost:5173" checked onchange="onEnvChange(this.value)" /> Local</label>
+                    <label><input type="radio" name="envSelect" value="https://ainavi-dev.meeta.jp" onchange="onEnvChange(this.value)" /> Dev</label>
+                    <label><input type="radio" name="envSelect" value="https://ainavi-uat1.meeta.jp" onchange="onEnvChange(this.value)" /> UAT1</label>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Target URL</label>
                 <input type="text" id="targetUrl" value="http://localhost:5173" />
             </div>
 
+            <hr />
+
+            <!-- 사용자 유형 선택 -->
+            <div class="form-group">
+                <label>User Type</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="userType" value="internal" checked onchange="onUserTypeChange(this.value)" /> Internal (内部生)</label>
+                    <label><input type="radio" name="userType" value="external" onchange="onUserTypeChange(this.value)" /> External (外部生)</label>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>Client ID</label>
-                <select id="clientId">
+                <select id="clientId" onchange="onClientIdChange(this.value)">
                     <option value="RS000001">連成会 (RS000001)</option>
                     <option value="MM000002">名門会 (MM000002)</option>
                     <option value="AS000003">あすなろ (AS000003)</option>
@@ -291,12 +341,20 @@
 
             <div class="form-group">
                 <label>App ID</label>
-                <input type="text" id="appId" value="0001" />
+                <input type="text" id="appId" value="APP001" disabled />
+            </div>
+
+            <!-- 학생 선택 풀다운 -->
+            <div class="form-group">
+                <label>Student Selection</label>
+                <select id="studentSelect" onchange="onStudentSelect(this.value)">
+                    <option value="">-- 生徒を選択 --</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label>User ID</label>
-                <input type="text" id="userId" value="TEST_USER_01" />
+                <input type="text" id="userId" value="" />
             </div>
 
             <div class="form-group">
@@ -337,6 +395,28 @@
     </div>
 
     <script>
+        // --- 학생 데이터 ---
+        var STUDENT_DATA = [
+            {"id":"06906e8a-b4f9-42e1-849e-da4eb5c02e7a","client_id":"RS000001","name":"テスト健太","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-07-01","login_id":"test0006","grade_id":"middle"},
+            {"id":"36b884ba-6f1a-4f0d-99e7-a50fdb5b574f","client_id":"RS000001","name":"テスト次郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-10-20","login_id":"test0003","grade_id":"middle"},
+            {"id":"3db5e612-525d-4ea2-92e8-e9fb384a4799","client_id":"AS000003","name":"鈴木一郎","class_id":"47c99773-131b-4f68-b93d-ef792b5d0181","teacher_id":"883bdd42-a6f9-4f15-8e36-75c1bc884565","enrollment_date":"2024-04-03","login_id":"ASTEST0003","grade_id":"middle"},
+            {"id":"4310ad51-5d9a-44ed-8e76-46bf96766c39","client_id":"RS000001","name":"テスト美咲","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-08-05","login_id":"test0005","grade_id":"elementary"},
+            {"id":"4c024193-5fa1-4781-9da9-838cf391c03d","client_id":"RS000001","name":"テスト五子","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"d734aaa8-c0a1-70d5-9164-c94f5e39349f","enrollment_date":"2025-01-04","login_id":"MP0005","grade_id":"high"},
+            {"id":"4f53087d-33f7-45c3-82a4-18e156263cc8","client_id":"AS000003","name":"佐藤花子","class_id":"72d3dbba-9174-48b2-8213-b5f28c0988f8","teacher_id":"7dcef024-6645-485e-9f4f-ab754deecc01","enrollment_date":"2024-04-02","login_id":"ASTEST0002","grade_id":"middle"},
+            {"id":"51f13a90-f54c-454f-bd3f-7c17294924af","client_id":"RS000001","name":"テスト愛","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"e704da48-b0d1-70de-73c2-b510009b7f6b","enrollment_date":"2025-10-01","login_id":"test0009","grade_id":"elementary"},
+            {"id":"5f4f17a8-49cb-42b4-8934-facd5ddae43d","client_id":"RS000001","name":"テスト三郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-09-10","login_id":"test0004","grade_id":"high"},
+            {"id":"7497f98d-1608-484c-be20-92d6b2dd5c9c","client_id":"RS000001","name":"テスト四郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"d734aaa8-c0a1-70d5-9164-c94f5e39349f","enrollment_date":"2025-01-05","login_id":"MP0004","grade_id":"high"},
+            {"id":"7d244af6-b2b0-4a5c-bb31-423e35c53953","client_id":"RS000001","name":"テスト翔","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"e704da48-b0d1-70de-73c2-b510009b7f6b","enrollment_date":"2025-09-15","login_id":"test0010","grade_id":"middle"},
+            {"id":"80b3238c-4dd9-42dd-8b8e-0124c9b99cb7","client_id":"RS000001","name":"テスト大輔","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"e704da48-b0d1-70de-73c2-b510009b7f6b","enrollment_date":"2025-11-05","login_id":"test0008","grade_id":"high"},
+            {"id":"986238b5-c1e5-4dff-b32b-039bece713b4","client_id":"RS000001","name":"テスト花子","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-11-15","login_id":"test0002","grade_id":"middle"},
+            {"id":"a80b3154-a0cf-4576-a881-e3995800db1e","client_id":"RS000001","name":"テスト一郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"d734aaa8-c0a1-70d5-9164-c94f5e39349f","enrollment_date":"2025-01-08","login_id":"MP0001","grade_id":"elementary"},
+            {"id":"b4842832-8655-42b9-85a9-4ff2201294a3","client_id":"RS000001","name":"テスト太郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"57c46aa8-80f1-7035-c445-ed03b005a8b8","enrollment_date":"2025-12-01","login_id":"test0001","grade_id":"middle"},
+            {"id":"b75832b1-8667-4b69-a0d6-4620ed317304","client_id":"RS000001","name":"テスト二郎","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"d734aaa8-c0a1-70d5-9164-c94f5e39349f","enrollment_date":"2025-01-07","login_id":"MP0002","grade_id":"middle"},
+            {"id":"bde481d6-0612-47b7-8ac7-6c3a99c3e079","client_id":"AS000003","name":"田中太郎","class_id":"220c06b4-7e22-463b-bc15-198095332296","teacher_id":"7360b537-2a0d-4e2d-b619-9c473e9af43c","enrollment_date":"2024-04-01","login_id":"ASTEST0001","grade_id":"middle"},
+            {"id":"f1d944d6-628d-4659-b27d-a995e8ab4096","client_id":"RS000001","name":"テスト三子","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"d734aaa8-c0a1-70d5-9164-c94f5e39349f","enrollment_date":"2025-01-06","login_id":"MP0003","grade_id":"middle"},
+            {"id":"f2948cac-925a-48c5-abc0-40d1be40ddaf","client_id":"RS000001","name":"テスト陽子","class_id":"94ebd5a7-477e-418d-b9f7-40396cfb9ea0","teacher_id":"e704da48-b0d1-70de-73c2-b510009b7f6b","enrollment_date":"2025-12-10","login_id":"test0007","grade_id":"middle"}
+        ];
+
         // --- 환경 감지 ---
         var ALLOWED_HOSTS = [
             'localhost',
@@ -371,6 +451,88 @@
         const statusBadge = document.getElementById('statusBadge');
 
         let isReady = false;
+
+        // --- 환경 선택 시 Target URL 업데이트 ---
+        function onEnvChange(url) {
+            document.getElementById('targetUrl').value = url;
+        }
+
+        // --- 사용자 유형 변경 ---
+        function onUserTypeChange(type) {
+            var isInternal = (type === 'internal');
+            var appIdInput = document.getElementById('appId');
+            var userIdInput = document.getElementById('userId');
+            var clientIdSelect = document.getElementById('clientId');
+            var studentSelect = document.getElementById('studentSelect');
+            var greetingMain = document.getElementById('greetingMain');
+            var greetingSub = document.getElementById('greetingSub');
+            var isEnableLearningNavi = document.getElementById('isEnableLearningNavi');
+            var isRequestedLearningOnboarding = document.getElementById('isRequestedLearningOnboarding');
+
+            if (isInternal) {
+                // 내부생: App ID 고정, 학생 선택 활성화
+                appIdInput.value = 'APP001';
+                appIdInput.disabled = true;
+                clientIdSelect.disabled = false;
+                studentSelect.disabled = false;
+                userIdInput.disabled = false;
+                greetingMain.disabled = false;
+                greetingSub.disabled = false;
+                isEnableLearningNavi.disabled = false;
+                isRequestedLearningOnboarding.disabled = false;
+                updateStudentList(clientIdSelect.value);
+            } else {
+                // 외부생: 클라이언트 아이디 이하 항목 비활성화 및 초기화
+                appIdInput.value = '';
+                appIdInput.disabled = true;
+                userIdInput.value = '';
+                userIdInput.disabled = true;
+                clientIdSelect.disabled = false;
+                studentSelect.disabled = true;
+                studentSelect.innerHTML = '<option value="">-- 生徒を選択 --</option>';
+                greetingMain.value = '';
+                greetingMain.disabled = true;
+                greetingSub.value = '';
+                greetingSub.disabled = true;
+                isEnableLearningNavi.checked = false;
+                isEnableLearningNavi.disabled = true;
+                isRequestedLearningOnboarding.checked = false;
+                isRequestedLearningOnboarding.disabled = true;
+            }
+        }
+
+        // --- 클라이언트 ID 변경 시 학생 목록 업데이트 ---
+        function onClientIdChange(clientId) {
+            updateStudentList(clientId);
+            // 학생 선택 초기화 시 User ID도 초기화
+            document.getElementById('userId').value = '';
+        }
+
+        // --- 학생 목록 업데이트 ---
+        function updateStudentList(clientId) {
+            var studentSelect = document.getElementById('studentSelect');
+            var filtered = STUDENT_DATA.filter(function(s) {
+                return s.client_id === clientId;
+            });
+
+            studentSelect.innerHTML = '<option value="">-- 生徒を選択 --</option>';
+            filtered.forEach(function(student) {
+                var opt = document.createElement('option');
+                opt.value = student.id;
+                opt.textContent = student.login_id + ' ' + student.name;
+                studentSelect.appendChild(opt);
+            });
+        }
+
+        // --- 학생 선택 시 User ID 자동 주입 ---
+        function onStudentSelect(studentId) {
+            if (studentId) {
+                document.getElementById('userId').value = studentId;
+            }
+        }
+
+        // --- 초기화: 내부생 기본 상태로 학생 목록 로드 ---
+        updateStudentList(document.getElementById('clientId').value);
 
         // --- Log Utility ---
         function log(msg, type) {

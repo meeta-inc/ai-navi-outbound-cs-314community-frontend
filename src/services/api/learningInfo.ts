@@ -4,6 +4,8 @@ import type {
   RegisterLearningInfoResponse,
   RegisterLearningInfoErrorResponse,
   GradeId,
+  Subject,
+  GetSubjectsListResponse,
 } from '../../types/api/learningInfo.types';
 
 /**
@@ -73,6 +75,64 @@ export const registerLearningInfo = async (
     }
 
     throw new Error('学習情報の登録に失敗しました。もう一度お試しください。');
+  }
+};
+
+/**
+ * Student Front API를 통해 과목 목록을 조회합니다.
+ *
+ * @param clientId - 클라이언트 ID (예: RS000001)
+ * @returns 과목 목록 (Subject[]) 또는 null
+ */
+export const getSubjects = async (
+  clientId: string,
+  studentId: string,
+  gradeId?: string
+): Promise<Subject[] | null> => {
+  const baseUrl = getStudentFrontApiUrl();
+  const params = new URLSearchParams({ clientId, studentId });
+  if (gradeId) {
+    params.set('gradeId', gradeId);
+  }
+  const url = `${baseUrl}/subjects?${params}`;
+
+  console.log('getSubjects - API URL:', url);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.error('getSubjects - API error:', response.status, response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('getSubjects - Response:', data);
+    console.log('getSubjects - Response type:', typeof data, Array.isArray(data));
+
+    // 배열 형태의 응답 처리 (예: [{subjectId, subjectName, ...}])
+    if (Array.isArray(data)) {
+      return data;
+    }
+    // { items: [...] } 형태의 응답 처리
+    if (data && data.items) {
+      return data.items;
+    }
+    // { subjects: [...] } 형태의 응답 처리
+    if (data && data.subjects) {
+      return data.subjects;
+    }
+    console.warn('getSubjects - Unexpected response format:', Object.keys(data));
+    return null;
+  } catch (error) {
+    console.error('教科リスト取得中にエラーが発生しました:', error);
+    return null;
   }
 };
 

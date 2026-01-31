@@ -14,7 +14,9 @@
   "onboarding": {
     "gradeSelectionHeader": "Please tell us your child's grade level",
     "gradeSelectionMessage": "First, please tell us your child's grade level🙋",
-    "gradeSelectionMessageForInbound": "First, please tell us your grade level🙋"
+    "gradeSelectionMessageForInbound": "First, please tell us your grade level🙋",
+    "subjectSelectionHeader": "Please select a subject",
+    "subjectSelectionMessage": "Next, please select the subject you'd like to study📚"
   },
   "student": {
     "menu": {

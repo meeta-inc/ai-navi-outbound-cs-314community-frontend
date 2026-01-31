@@ -14,7 +14,9 @@
   "onboarding": {
     "gradeSelectionHeader": "자녀의 학년을 알려주세요",
     "gradeSelectionMessage": "먼저, 자녀의 학년을 알려주세요🙋",
-    "gradeSelectionMessageForInbound": "먼저, 본인의 학년을 알려주세요🙋"
+    "gradeSelectionMessageForInbound": "먼저, 본인의 학년을 알려주세요🙋",
+    "subjectSelectionHeader": "과목을 선택해주세요",
+    "subjectSelectionMessage": "다음으로, 학습하고 싶은 과목을 선택해주세요📚"
   },
   "student": {
     "menu": {

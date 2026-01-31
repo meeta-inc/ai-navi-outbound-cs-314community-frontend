@@ -39,6 +39,27 @@ export interface RegisterLearningInfoResponse {
 }
 
 /**
+ * 과목 정보 인터페이스
+ */
+export interface Subject {
+  // 과목 ID (예: 'math', 'english', 'science')
+  subjectId: string;
+  // 과목 표시명 (예: '算数', '英語')
+  subjectName: string;
+  // 과목 아이콘 (이모지, 옵션)
+  subjectIcon?: string;
+  // 정렬 우선순위
+  priority: number;
+}
+
+/**
+ * 과목 목록 API 응답
+ */
+export interface GetSubjectsListResponse {
+  items: Subject[];
+}
+
+/**
  * API 에러 객체
  */
 export interface LearningInfoApiError {

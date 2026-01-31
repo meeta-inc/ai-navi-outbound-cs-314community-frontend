@@ -2,11 +2,12 @@ import { useState, useCallback } from 'react';
 
 // 활성 컴포넌트 상태 인터페이스
 export interface ActiveComponentState {
-  faqCategories: string | null;  // FAQ 카테고리를 표시할 메시지 ID
-  topQuestions: string | null;   // Top 질문을 표시할 메시지 ID
-  gradeSelection: string | null; // 학년 선택을 표시할 메시지 ID
-  quickReply: string | null;     // 퀵 리플라이를 표시할 메시지 ID
-  cta: string | null;           // CTA 버튼을 표시할 메시지 ID
+  faqCategories: string | null;     // FAQ 카테고리를 표시할 메시지 ID
+  topQuestions: string | null;      // Top 질문을 표시할 메시지 ID
+  gradeSelection: string | null;    // 학년 선택을 표시할 메시지 ID
+  subjectSelection: string | null;  // 과목 선택을 표시할 메시지 ID
+  quickReply: string | null;        // 퀵 리플라이를 표시할 메시지 ID
+  cta: string | null;              // CTA 버튼을 표시할 메시지 ID
 }
 
 /**
@@ -18,6 +19,7 @@ export const useActiveComponents = () => {
     faqCategories: null,
     topQuestions: null,
     gradeSelection: null,
+    subjectSelection: null,
     quickReply: null,
     cta: null
   });
@@ -65,6 +67,7 @@ export const useActiveComponents = () => {
       faqCategories: null,
       topQuestions: null,
       gradeSelection: null,
+      subjectSelection: null,
       quickReply: null,
       cta: null
     });
