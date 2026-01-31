@@ -33,6 +33,17 @@ export const getFileUploadApiUrl = () => {
   return fileUploadApiUrl;
 };
 
+export const getStudentFrontApiUrl = () => {
+  const studentFrontApiUrl = import.meta.env.VITE_STUDENT_FRONT_API_URL;
+
+  if (!studentFrontApiUrl) {
+    console.warn('Student Front API URL is not defined, falling back to main API');
+    return getApiUrl();
+  }
+
+  return studentFrontApiUrl;
+};
+
 export const getAccentColor = (): AccentColor => {
   const accentColor = import.meta.env.VITE_ACCENT_COLOR;
   
