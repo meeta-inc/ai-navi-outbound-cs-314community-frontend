@@ -22,13 +22,14 @@ import { useActiveComponents } from '../hooks/useActiveComponents';
 import { getAccentColor, getShowNavigationHeader, getShowGradeSelection } from '../shared/config/app.config';
 import { getColorClasses } from '../shared/config/theme.config';
 import { GradeSelection } from '../components/organisms/GradeSelection';
+import { SubjectSelection } from '../components/organisms/SubjectSelection';
 import { GradeQuickReply } from '../components/organisms/GradeQuickReply';
 import { GRADE_LABELS, GRADE_NAMES, type GradeType } from '../shared/constants/grade.constants';
 import type { Message } from '../types';
 import { getCategories, isCategoryApiEnabled } from '../services/api/category';
 import { CategoryItem } from '../types/api/category.types';
-import { getAttributes, isAttributesApiEnabled } from '../services/api/attributes';
-import { AttributeItem } from '../types/api/attributes.types';
+import { getSubjects } from '../services/api/learningInfo';
+import type { Subject } from '../types/api/learningInfo.types';
 import { isFAQEnabled, isInboundApp } from '../utils/appFeatures';
 import { OnboardingModal } from '../components/organisms/OnboardingModal';
 
@@ -51,14 +52,19 @@ function MainPage() {
   const [apiCategories, setApiCategories] = useState<FAQCategoryItem[] | null>(null);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   
-  // API Attributes 관련 상태
-  const [apiGrades, setApiGrades] = useState<AttributeItem[] | null>(null);
-  const [gradesLoading, setGradesLoading] = useState(false);
+  // 학년 선택 관련 (API 호출 불필요, 상수 기반 fallback 사용)
   
   // 온보딩 관련 상태
   const [showGradeSelectionComponent, setShowGradeSelectionComponent] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<GradeType | null>(null);
   const [showOnboardingMessage, setShowOnboardingMessage] = useState(false);
+
+  // 과목 선택 관련 상태
+  const [apiSubjects, setApiSubjects] = useState<Subject[] | null>(null);
+  const [subjectsLoading, setSubjectsLoading] = useState(false);
+  const [showSubjectSelectionComponent, setShowSubjectSelectionComponent] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [showSubjectOnboardingMessage, setShowSubjectOnboardingMessage] = useState(false);
   
   // CTA 관련 상태
   const [latestCTAMessageId, setLatestCTAMessageId] = useState<string | null>(null);
@@ -110,7 +116,10 @@ function MainPage() {
         // greeting이 없고 첫 번째 메시지인 경우에만 온보딩/QuickReply 처리
         // (greeting이 있으면 별도의 useEffect에서 처리)
         if (!greeting && messages.length <= 1) {
-          if (showGradeSelection) {
+          if (isEnableLearningNavi) {
+            // 학습 내비 활성화: 바로 과목 선택 온보딩 표시
+            setShowSubjectOnboardingMessage(true);
+          } else if (showGradeSelection) {
             // 학년 선택이 활성화된 경우: 온보딩 메시지 표시
             setShowOnboardingMessage(true);
           } else {
@@ -167,18 +176,26 @@ function MainPage() {
         if (greeting.sub) {
           setTimeout(() => {
             addTypingBotMessage(greeting.sub);
-            // greeting.sub 타이핑 완료 후 QuickReply 표시
+            // greeting.sub 타이핑 완료 후 처리
             setTimeout(() => {
-              setShowFigmaQuickReply(true);
+              if (isEnableLearningNavi) {
+                setShowSubjectOnboardingMessage(true);
+              } else {
+                setShowFigmaQuickReply(true);
+              }
               setTimeout(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
               }, 100);
             }, 1500);
           }, 1500);
         } else {
-          // greeting.sub가 없으면 greeting.main 타이핑 완료 후 QuickReply 표시
+          // greeting.sub가 없으면 greeting.main 타이핑 완료 후 처리
           setTimeout(() => {
-            setShowFigmaQuickReply(true);
+            if (isEnableLearningNavi) {
+              setShowSubjectOnboardingMessage(true);
+            } else {
+              setShowFigmaQuickReply(true);
+            }
             setTimeout(() => {
               messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -208,22 +225,30 @@ function MainPage() {
       // greeting.main을 chat.greeting 뒤에 추가
       addTypingBotMessage(greeting.main);
 
-      // greeting.sub가 있으면 나중에 표시하고 QuickReply는 그 후에
+      // greeting.sub가 있으면 나중에 표시
       if (greeting.sub) {
         setTimeout(() => {
           addTypingBotMessage(greeting.sub);
-          // greeting.sub 타이핑 완료 후 QuickReply 표시
+          // greeting.sub 타이핑 완료 후 처리
           setTimeout(() => {
-            setShowFigmaQuickReply(true);
+            if (isEnableLearningNavi) {
+              setShowSubjectOnboardingMessage(true);
+            } else {
+              setShowFigmaQuickReply(true);
+            }
             setTimeout(() => {
               messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
           }, 1500);
         }, 1500);
       } else {
-        // greeting.sub가 없으면 greeting.main 타이핑 완료 후 QuickReply 표시
+        // greeting.sub가 없으면 greeting.main 타이핑 완료 후 처리
         setTimeout(() => {
-          setShowFigmaQuickReply(true);
+          if (isEnableLearningNavi) {
+            setShowSubjectOnboardingMessage(true);
+          } else {
+            setShowFigmaQuickReply(true);
+          }
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
@@ -261,23 +286,28 @@ function MainPage() {
     }
   }, [faqEnabled, clientId]);
 
+  // 과목 API 호출 (학습 내비 활성화 시)
   useEffect(() => {
-    if (isAttributesApiEnabled() && clientId) {
-      setGradesLoading(true);
-      getAttributes(clientId, 'grade', true)
-        .then(response => {
-          if (response && response.items) {
-            setApiGrades(response.items);
+    console.log('Subjects useEffect - isEnableLearningNavi:', isEnableLearningNavi, 'clientId:', clientId, 'userId:', userId);
+    if (isEnableLearningNavi && clientId && userId) {
+      setSubjectsLoading(true);
+      getSubjects(clientId, userId)
+        .then(items => {
+          console.log('Subjects API result:', items);
+          if (items) {
+            setApiSubjects(items);
+          } else {
+            console.warn('Subjects API returned null');
           }
         })
         .catch(error => {
-          console.error('Failed to load grade attributes:', error);
+          console.error('Failed to load subjects:', error);
         })
         .finally(() => {
-          setGradesLoading(false);
+          setSubjectsLoading(false);
         });
     }
-  }, [clientId]);
+  }, [isEnableLearningNavi, clientId, userId]);
 
   // 최신 LLM 응답 메시지 ID 업데이트
   useEffect(() => {
@@ -324,16 +354,71 @@ function MainPage() {
   const handleGradeSelect = (grade: GradeType) => {
     setSelectedGrade(grade);
     setShowGradeSelectionComponent(false);
-    
+
     // 선택한 학년을 사용자 메시지로 표시
     addUserMessage(GRADE_LABELS[grade], false);
-    
-    // 학년 확인 봇 메시지 추가
+
+    // 학습 내비 활성화 시: 학년 선택 후 과목 선택으로 이동
+    if (isEnableLearningNavi) {
+      setTimeout(() => {
+        const confirmationMessage = `${GRADE_NAMES[grade]}ですね！`;
+        addTypingBotMessage(confirmationMessage);
+
+        // 과목 선택 온보딩 메시지 표시
+        setTimeout(() => {
+          setShowSubjectOnboardingMessage(true);
+        }, 1000);
+      }, 500);
+      return;
+    }
+
+    // 기존 로직: 학년 확인 봇 메시지 추가 후 QuickReply 표시
     setTimeout(() => {
       const confirmationMessage = `${GRADE_NAMES[grade]}ですね！どのようなことを知りたいですか？`;
       addTypingBotMessage(confirmationMessage);
-      
+
       // 학년별 퀵 리플라이 표시
+      setTimeout(() => {
+        setShowFigmaQuickReply(true);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 1000);
+    }, 500);
+  };
+
+  // 과목 선택 온보딩 메시지 표시 후 SubjectSelection 표시
+  useEffect(() => {
+    if (showSubjectOnboardingMessage) {
+      const subjectMessage = t('onboarding.subjectSelectionMessage');
+      addTypingBotMessage(subjectMessage);
+
+      setTimeout(() => {
+        setShowSubjectSelectionComponent(true);
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }, 1000);
+    }
+  }, [showSubjectOnboardingMessage, addTypingBotMessage, t]);
+
+  // 과목 선택 핸들러
+  const handleSubjectSelect = (subjectId: string) => {
+    setSelectedSubject(subjectId);
+    setShowSubjectSelectionComponent(false);
+
+    // 선택한 과목명을 사용자 메시지로 표시
+    const selectedItem = apiSubjects?.find(s => s.subjectId === subjectId);
+    const subjectLabel = selectedItem
+      ? `${selectedItem.subjectIcon || ''}${selectedItem.subjectName}`
+      : subjectId;
+    addUserMessage(subjectLabel, false);
+
+    // 과목 확인 봇 메시지 추가 후 QuickReply 표시
+    setTimeout(() => {
+      const confirmationMessage = `${selectedItem?.subjectName || subjectId}ですね！どのようなことを知りたいですか？`;
+      addTypingBotMessage(confirmationMessage);
+
       setTimeout(() => {
         setShowFigmaQuickReply(true);
         setTimeout(() => {
@@ -566,7 +651,11 @@ function MainPage() {
         setTimeout(() => {
           addTypingBotMessage(greeting.sub);
           setTimeout(() => {
-            setShowFigmaQuickReply(true);
+            if (isEnableLearningNavi) {
+              setShowSubjectOnboardingMessage(true);
+            } else {
+              setShowFigmaQuickReply(true);
+            }
             setTimeout(() => {
               messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -574,7 +663,11 @@ function MainPage() {
         }, 1500);
       } else {
         setTimeout(() => {
-          setShowFigmaQuickReply(true);
+          if (isEnableLearningNavi) {
+            setShowSubjectOnboardingMessage(true);
+          } else {
+            setShowFigmaQuickReply(true);
+          }
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
@@ -588,7 +681,10 @@ function MainPage() {
 
       // chat.greeting 표시 후 온보딩 또는 QuickReply 처리
       setTimeout(() => {
-        if (showGradeSelection) {
+        if (isEnableLearningNavi) {
+          // 학습 내비 활성화: 바로 과목 선택 온보딩 표시
+          setShowSubjectOnboardingMessage(true);
+        } else if (showGradeSelection) {
           // 학년 선택이 활성화된 경우: 온보딩 메시지 표시
           setShowOnboardingMessage(true);
         } else {
@@ -618,7 +714,11 @@ function MainPage() {
         setTimeout(() => {
           addTypingBotMessage(greeting.sub);
           setTimeout(() => {
-            setShowFigmaQuickReply(true);
+            if (isEnableLearningNavi) {
+              setShowSubjectOnboardingMessage(true);
+            } else {
+              setShowFigmaQuickReply(true);
+            }
             setTimeout(() => {
               messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             }, 100);
@@ -626,7 +726,11 @@ function MainPage() {
         }, 1500);
       } else {
         setTimeout(() => {
-          setShowFigmaQuickReply(true);
+          if (isEnableLearningNavi) {
+            setShowSubjectOnboardingMessage(true);
+          } else {
+            setShowFigmaQuickReply(true);
+          }
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
@@ -640,7 +744,9 @@ function MainPage() {
 
       // chat.greeting 표시 후 온보딩 또는 QuickReply 처리
       setTimeout(() => {
-        if (showGradeSelection) {
+        if (isEnableLearningNavi) {
+          setShowSubjectOnboardingMessage(true);
+        } else if (showGradeSelection) {
           setShowOnboardingMessage(true);
         } else {
           setShowFigmaQuickReply(true);
@@ -728,13 +834,15 @@ function MainPage() {
             value={newMessage}
             onChange={setNewMessage}
             onSend={handleSendClick}
-            disabled={isTyping || (showGradeSelection && !selectedGrade && !greeting)}
+            disabled={isTyping || (isEnableLearningNavi && !selectedSubject && !greeting) || (!isEnableLearningNavi && showGradeSelection && !selectedGrade && !greeting)}
             clientId={clientId}
             appId={appId}
             placeholder={
-              showGradeSelection && !selectedGrade && !greeting
-                ? 'まずは学年を選択してください'
-                : undefined
+              isEnableLearningNavi && !selectedSubject && !greeting
+                ? 'まずは教科を選択してください'
+                : showGradeSelection && !selectedGrade && !greeting
+                  ? 'まずは学年を選択してください'
+                  : undefined
             }
             onMenuItemClick={handleMenuItemClick}
             attachedFile={attachedFile}
@@ -779,25 +887,33 @@ function MainPage() {
                   <GradeSelection
                     onGradeSelect={handleGradeSelect}
                     clientId={clientId}
-                    apiGrades={apiGrades}
-                    isLoading={gradesLoading}
                   />
                 </div>
               )}
-              
+
               {/* もどる 버튼 클릭 후 GradeSelection 표시 (가장 마지막 もどる 메시지에만) */}
-              {message.type === 'user' && message.content === 'もどる' && showGradeSelectionComponent && 
+              {message.type === 'user' && message.content === 'もどる' && showGradeSelectionComponent &&
                index === messages.length - 1 && (
                 <div className="mt-4">
-                  <GradeSelection 
+                  <GradeSelection
                     onGradeSelect={handleGradeSelect}
                     clientId={clientId}
-                    apiGrades={apiGrades}
-                    isLoading={gradesLoading}
                   />
                 </div>
               )}
               
+              {/* 과목 선택 UI 표시 (학습 내비 활성화, 마지막 봇 메시지 뒤에) */}
+              {message.type === 'bot' && showSubjectSelectionComponent && isEnableLearningNavi &&
+               index === messages.length - 1 && (
+                <div className="mt-4">
+                  <SubjectSelection
+                    onSubjectSelect={handleSubjectSelect}
+                    apiSubjects={apiSubjects}
+                    isLoading={subjectsLoading}
+                  />
+                </div>
+              )}
+
               {/* 온보딩이 비활성화된 경우 또는 greeting이 있는 경우 기본 QuickReply 표시 */}
               {/* chat.greeting(index=0) → greeting.main(index=1) → greeting.sub(index=2) 순서 */}
               {/* QuickReply는 마지막 greeting 메시지 다음에 표시 */}
@@ -808,7 +924,7 @@ function MainPage() {
                 return index === quickReplyIndex &&
                   message.type === 'bot' &&
                   showFigmaQuickReply &&
-                  (!showGradeSelection || greeting);
+                  (!showGradeSelection || greeting) && !isEnableLearningNavi;
               })() && (
                 <div className="mt-4">
                   <QuickReply
@@ -840,6 +956,29 @@ function MainPage() {
                     onReplyClick={handleQuickReplyClick}
                     onShowFAQCategories={handleShowFAQCategories}
                     onBackClick={handleBackToGradeSelection}
+                    clientId={clientId}
+                    appId={appId}
+                  />
+                </div>
+              )}
+              {/* 과목 확인 메시지 후 QuickReply 표시 (학습 내비 활성화, 과목 선택 완료) */}
+              {message.type === 'bot' && showFigmaQuickReply && selectedSubject && isEnableLearningNavi &&
+               message.content && typeof message.content === 'string' &&
+               message.content.includes('ですね！どのようなことを知りたいですか？') &&
+               (() => {
+                 const confirmationMessages = messages.filter(msg =>
+                   msg.type === 'bot' && msg.content && typeof msg.content === 'string' &&
+                   msg.content.includes('ですね！どのようなことを知りたいですか？')
+                 );
+                 const lastConfirmationIndex = messages.lastIndexOf(confirmationMessages[confirmationMessages.length - 1]);
+                 return index === lastConfirmationIndex;
+               })() && (
+                <div className="mt-4">
+                  <QuickReply
+                    onReplyClick={handleQuickReplyClick}
+                    onShowFAQCategories={handleShowFAQCategories}
+                    show={true}
+                    userId={userId}
                     clientId={clientId}
                     appId={appId}
                   />
